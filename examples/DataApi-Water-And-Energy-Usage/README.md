@@ -49,6 +49,6 @@ You can ignore the other functions for now, they will be repeated on the L1 modu
 
 With node installed, move to the directory and then type: `npm i`
 
-Then you can send some transactions to your metagraph (after replace the URLs and the private key)
+Then you can send some transactions to your metagraph (after replacing the URLs and the private key)
 
 To run the script type: `node send_data_transaction.js`
