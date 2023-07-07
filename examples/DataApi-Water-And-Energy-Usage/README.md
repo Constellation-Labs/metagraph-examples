@@ -19,7 +19,7 @@ At this example you can take a look at the files:
 `modules/shared_data/src/main/scala/com/my/currency/shared_data/Main.scala`
 
 
-### Shared
+### shared_data
 ->   `validateData` and `validateUpdate`
 * These functions will check the provided data to verify its validity. If the amount that we want to update  of water and energy usage is valid (at this example > 0), we will proceed to the state update, otherwise, we will return an error
 
@@ -37,15 +37,15 @@ At this example you can take a look at the files:
 -> `dataEncoder` and `dataDecoder`
 * The encoder and decoder
 
-### L0
+### l0
 The L0 module contains the `genesis` function. This function will initialize our state, in this case, we initialize with `(0,0)` (0 of Water and Energy usage)
 
 You can ignore the other functions for now, they will be repeated on the L1 module
 
-### L1
+### l1
 The currency L1 layer, in this example we don't use a custom implementation
   
-### DATA_L1
+### data_l1
 The module that will receive the requests to be processed. This module calls the functions of shared folder to validate/update the state
   
  ## Scripts
