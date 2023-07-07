@@ -8,23 +8,18 @@ This is one example of the Data API, where we can send transactions to update th
 
 ## Template
 
-This project contains dependencies of the Tessellation on version `v2.0.0-alpha.7`
+This project contains dependencies of the Tessellation on version `v2.0.0-alpha.8`
 
  
 At this example you can take a look at the files:
 
 `modules/l0/src/main/scala/com/my/currency/l0/Main.scala`
 `modules/l1/src/main/scala/com/my/currency/l1/Main.scala`
+`modules/data_l1/src/main/scala/com/my/currency/data_l1/Main.scala`
+`modules/shared_data/src/main/scala/com/my/currency/shared_data/Main.scala`
 
 
-### L0
-The L0 module contains the `genesis` function. This function will initialize our state, in this case, we initialize with `(0,0)` (0 of Water and Energy usage)
-
-You can ignore the other functions for now, they will be repeated on the L1 module
-
-  ### L1
-  The module that will receive the requests to be processed. Contains the following functions:
-  
+### Shared
 ->   `validateData` and `validateUpdate`
 * These functions will check the provided data to verify its validity. If the amount that we want to update  of water and energy usage is valid (at this example > 0), we will proceed to the state update, otherwise, we will return an error
 
@@ -41,6 +36,17 @@ You can ignore the other functions for now, they will be repeated on the L1 modu
 
 -> `dataEncoder` and `dataDecoder`
 * The encoder and decoder
+
+### L0
+The L0 module contains the `genesis` function. This function will initialize our state, in this case, we initialize with `(0,0)` (0 of Water and Energy usage)
+
+You can ignore the other functions for now, they will be repeated on the L1 module
+
+### L1
+The currency L1 layer, in this example we don't use a custom implementation
+  
+### DATA_L1
+The module that will receive the requests to be processed. This module calls the functions of shared folder to validate/update the state
   
  ## Scripts
  We create a script to send some data transactions to this example. This is a simple script where you must provide the `globalL0Url` and the `metagraphL1DataUrl`. You should also provide one private key to send the transaction, this key will be used to sign the transaction and to log in your wallet to the network.
