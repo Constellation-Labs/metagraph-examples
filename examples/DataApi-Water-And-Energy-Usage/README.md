@@ -8,7 +8,7 @@ This is one example of the Data API, where we can send transactions to update th
 
 ## Template
 
-This project contains dependencies of the Tessellation on version `v2.0.0-alpha.8`
+This project contains dependencies of the Tessellation on version `develop`
 
  
 At this example you can take a look at the files:
