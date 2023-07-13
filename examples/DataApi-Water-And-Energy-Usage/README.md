@@ -1,6 +1,6 @@
 # Metagraph - Data API - Water and Energy Usage
 
-This is one example of the Data API, where we can send transactions to update the state of Water and Energy usage
+This example uses the Data API to demonstrate a basic IoT use case. In the example a client, representing a sensor, sends signed data updates to a metagraph which validates the data before merging the updates into snapshot state.
 
 ## Template
 
@@ -18,35 +18,35 @@ At this example you can take a look at the files:
 
 ### shared_data
 
--> `validateData`
-
-- This function will check the provided data to verify its validity. This validation happens on the L0 layer. In this case, we consider the `oldState` and the `proofs`. For this example, we check if the provided address is the same that the address that signed the message. We also check the `oldState` to avoid doubling when updating
-
 -> `validateUpdate`
 
-- Pretty similar to the `validateData` method, but this one will happen on the L1 layer and will do the initial validations that don't need to consider the `proofs` and the `oldState`. In this case, we're validating if the provided usage is greater than 0.
+- This method performs initial validation on the update on the L1 layer. It does not have access to state information. 
+
+-> `validateData`
+
+- This function will check the provided data to verify its validity. This validation happens on the L0 layer. In this case, we consider the `oldState` and the `proofs`. For this example, we check that the provided address is the same as the address that signed the message. We also check the most recent update timestamp in order to prevent old data or duplicated data from being accepted.
 
 -> `combine`
 
-- This function will combine the old state with the new update provided. In this case, if we provide `EnergyUsage` of 10, we will sum 0 + 10
+- This method accepts validated data and the previous state which is combined to return the new state.
 
 -> `serializeState`
 
-- These are the functions that will serialize the state JSON. In this case, one example of request that is serialized for these functions:
+- This is the functions that will serialize the state JSON. This will take the State object and transform it into a JSON. The JSON should be like this:
 
 ```
 
-{"value":{"EnergyUsage":{"value":10}},"proofs":[{"id":"e75a6011eaa38d7b0a1cb41810c655cdc89c6c5ffd207cbab9d18fd49cbf2729e262b5387a4687a23a163d14bc0dff8ef6539e2a73932e77d2de6b1895facd99","signature":"3044022060107a64dabbc9b0e2779a9fada99646798b3ebd21ecda22c7de2740f13addc30220564d8303f1a581f9a7c021252f624911b7c3bec63620a0d000b7f651753e020d"}]}
+{ "devices" : { "DAG8py4LY1sr8ZZM3aryeP85NuhgsCYcPKuhhbw6": { "waterUsage": { "usage": 10, "timestamp": 10 }, "energyUsage": { "usage": 100, "timestamp": 21 } } } }
 
 ```
 
 -> `serializeUpdate`
 
-- These are the functions that will serialize the update JSON. In this case, one example of request that is serialized for these functions:
+- This is the functions that will serialize the update JSON. This will take the Update object and transform it into a JSON. The JSON should be like this:
 
 ```
 
-{"value":{"EnergyUsage":{"value":10}},"proofs":[{"id":"e75a6011eaa38d7b0a1cb41810c655cdc89c6c5ffd207cbab9d18fd49cbf2729e262b5387a4687a23a163d14bc0dff8ef6539e2a73932e77d2de6b1895facd99","signature":"3044022060107a64dabbc9b0e2779a9fada99646798b3ebd21ecda22c7de2740f13addc30220564d8303f1a581f9a7c021252f624911b7c3bec63620a0d000b7f651753e020d"}]}
+{"address":"DAG15uzQZ3LLKXMcpqBwtBEp2EzdgUVzpf9nQXAF","energyUsage":{"usage":7,"timestamp":1689190483073},"waterUsage":{"usage":7,"timestamp":1689190483073}}
 
 ```
 
