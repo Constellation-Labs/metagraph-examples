@@ -48,14 +48,12 @@ object Errors {
 }
 
 object Validations {
-   /* Validate if the provided Energy usage is greater than 0. */
   def validateEnergyUsageUpdate(energy: EnergyUsage): DataApplicationValidationErrorOr[Unit] =
     if (energy.usage > 0L && energy.timestamp > 0L)
       ().validNec
     else
       EnergyNotPositive.asInstanceOf[DataApplicationValidationError].invalidNec
 
- /* Validate if the provided Water usage is greater than 0. */
   def validateWaterUsageUpdate(water: WaterUsage): DataApplicationValidationErrorOr[Unit] =
     if (water.usage > 0L && water.timestamp > 0L)
       ().validNec
@@ -91,7 +89,6 @@ object Validations {
         WaterUpdateOutdated.asInstanceOf[DataApplicationValidationError].invalidNec
     }.getOrElse(().validNec)
 
-  /* Validate if the provided address on body is the same than the address that signed the message.*/
   def validateProvidedAddress(proofAddresses: List[Address], address: Address): DataApplicationValidationErrorOr[Unit] = {
     if (proofAddresses.contains(address)) {
       ().validNec
@@ -307,11 +304,6 @@ object Data {
       json.as[Update]
     }
   }
-
-  /*
-  * This function will expose custom routes to your application, in this case, we're not using this functionality yet.
-  */
-  def routes: HttpRoutes[IO] = HttpRoutes.empty
 
   def dataEncoder: Encoder[Update] = deriveEncoder
 

@@ -70,8 +70,12 @@ The currency L1 layer, in this example we don't use a custom implementation
 ### data_l1
 
 The module that will receive the requests to be processed. This module contains the `/data` endpoint, where we gonna send the requests.
+This module also contains the `routes` function. This function will implement custom routes to our application.
+In this example, we will implement 2 different endpoints:
+  -> The first one will list all the devices of the state
+  -> The second one will show the information of the device of the provided address, or Not Found
 
-The functions were explained above on the `shared_data` module
+The remaining functions were explained above on the `shared_data` module
 
 ## Scripts
 

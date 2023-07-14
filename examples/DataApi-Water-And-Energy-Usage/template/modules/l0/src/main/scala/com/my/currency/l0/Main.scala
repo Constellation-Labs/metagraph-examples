@@ -56,7 +56,7 @@ object Main
 
     override def dataDecoder: Decoder[Update] = Data.dataDecoder
 
-    override def routes(implicit context: L0NodeContext[IO]): HttpRoutes[IO] = Data.routes
+    override def routes(implicit context: L0NodeContext[IO]): HttpRoutes[IO] = HttpRoutes.empty
 
     }))
 
