@@ -27,15 +27,14 @@ object Main
     Option(BaseDataApplicationL0Service(new DataApplicationL0Service[IO, Update, State] {
 
     /**
-     * This is the initial State of your application. In this case, we will have a relationship between devices
-     * and their usages of Energy and Water. For that, we should initialize our state with an empty map, imagine
-     * this as a JSON like this:
-     * { "devices" : {} }
-     * initially, we don't have any devices, but according with the updates we will update this state to contain
-     * devices, and the State will be like:
-     * { "devices" : { "DAG8py4LY1sr8ZZM3aryeP85NuhgsCYcPKuhhbw6": { "waterUsage": { "usage": 10, "timestamp": 10 }, "energyUsage": { "usage": 100, "timestamp": 21 } } } }
-     *
-     */
+      * This is the initial State of your application. In this case, we will have a relationship between devices
+      * and their usages of Energy and Water. For that, we should initialize our state with an empty map, imagine
+      * this as an object like this:
+      * { "devices" : {} }
+      * initially, we don't have any devices, but according with the updates we will update this state to contain
+      * devices, and the State will be like:
+      * { "devices" : { "DAG8py4LY1sr8ZZM3aryeP85NuhgsCYcPKuhhbw6": { "waterUsage": { "usage": 10, "timestamp": 10 }, "energyUsage": { "usage": 100, "timestamp": 21 } } } }
+      */
     override def genesis: State = State(Map.empty)
 
     override def validateData(oldState: State, updates: NonEmptyList[Signed[Update]])(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = Data.validateData(oldState, updates)(context.securityProvider)
