@@ -60,12 +60,13 @@ object Validations {
     else
       WaterNotPositive.asInstanceOf[DataApplicationValidationError].invalidNec
 
-  /* This validation is necessary to avoid doubling the update on the state. When we send data to be updated,
-   * we create blocks on the L1 layer, these blocks are sent to the L0 layer. To run the consensus, the L1 layer
-   * needs the 3 nodes, and these nodes could send blocks with the same update to the L0 layer. This timestamp
-   * validation prevents doubling the state on update checking this, if the state already was updated with that timestamp,
-   * we should not update again.
-  * */
+  /** 
+    * This validation prevents old updates from being accepted after a newer update has already been processed. 
+    * There is also a case where old blocks can be sent to L0 consensus by different nodes with duplicate values
+    * which can result in "double spends". This validation provides enough uniqueness to prevent that scenario. 
+    * In other implementations, a unique field of some sort should be provided to validate whether an update has been 
+    * already included in state or not. 
+    */
   def validateEnergyTimestamp(maybeState: Option[AggregatedUsage], energy: EnergyUsage): DataApplicationValidationErrorOr[Unit] = {
     maybeState.map { total =>
       if (energy.timestamp > total.energy.timestamp && energy.usage > 0L)
@@ -75,12 +76,9 @@ object Validations {
     }.getOrElse(().validNec)
   }
 
-  /* This validation is necessary to avoid doubling the update on the state. When we send data to be updated,
-   * we create blocks on the L1 layer, these blocks are sent to the L0 layer. To run the consensus, the L1 layer
-   * needs the 3 nodes, and these nodes could send blocks with the same update to the L0 layer. This timestamp
-   * validation prevents doubling the state on update checking this, if the state already was updated with that timestamp,
-   * we should not update again.
-  * */
+  /** 
+    * This validation provides the same assurance as the `validateEnergyTimestamp` for WaterUsage. See comment above for details.
+    */
   def validateWaterTimestamp(maybeState: Option[AggregatedUsage], water: WaterUsage): DataApplicationValidationErrorOr[Unit] =
     maybeState.map { total =>
       if (water.timestamp > total.energy.timestamp && water.usage > 0L)
@@ -127,24 +125,25 @@ object Data {
   }
 
   /*
-  * This will be the schema of the update body, in this example a JSON like this:
+  * This will be the schema of the update body, in this example an object like this:
   * { "address": "DAG...", "energyUsage":{"usage": 10, "timestamp": 10}, "waterUsage":{"usage": 11, "timestamp": 12} }
   */
   @derive(decoder, encoder)
   case class Update(address: Address, energyUsage: Option[EnergyUsage], waterUsage: Option[WaterUsage]) extends DataUpdate
 
   /*
-  * This will be the schema of the State, in this example a JSON like this:
+  * This will be the schema of the State, in this example an object like this:
   * { "devices" : { "DAG8py4LY1sr8ZZM3aryeP85NuhgsCYcPKuhhbw6": { "waterUsage": { "usage": 10, "timestamp": 10 }, "energyUsage": { "usage": 100, "timestamp": 21 } } } }
   */
   @derive(decoder, encoder)
   case class State(devices: Map[Address, AggregatedUsage]) extends DataState
 
-  /*
-  * This function will do the validation of the provided body at the L1 layer. This validation will be done without
-  * considering the previous State and the proofs. In this example, we're validating if the provided usage of the
-  * Water and Energy is greater than 0, if not, we should return an error.
-  */
+  /**
+    * This method will do the validation of the provided body on the L1 layer. This validation will be done without
+    * considering the previous State and the proofs. In this example, we're validating if the provided usage of the
+    * Water and Energy is greater than 0, if not, we should return an error. Errors returned here will be sent to the 
+    * client as the message portion of a 500 response.
+    */
   def validateUpdate(update: Update): IO[DataApplicationValidationErrorOr[Unit]] = {
     IO {
       val energyUsage = update.energyUsage.getOrElse(EnergyUsage.empty)
@@ -164,13 +163,14 @@ object Data {
     }
   }
 
-  /*
-  * This function will validate the provided body at the L0 layer. Different from the validateUpdate function,
-  * this function will consider the previous state and the proofs. In this example, we are checking if the provided
-  * address is the same as the address that signed the message, on proofs. We also check if the provided timestamp
-  * is greater than the last timestamp of the provided device. Different from validateUpdate, this function will not
-  * return an error to sending user/device, but it will be shown on the logs if the message was rejected for validation reasons.
-  */
+  /**
+    * This method valides the update on the L0 layer. This method has access to the previous state and the proofs (request signatures). 
+    * In this example, we are checking if the provided address is the same as the address that signed the message based on proofs. 
+    * We also check if the provided timestamp is greater than the last timestamp of the provided device. 
+    * 
+    * Returning an error from this method will not return any error message to the client because the response would have already been sent on the L1
+    * layer. Errors returned here will show up in the L0 logs. 
+    */
   def validateData(oldState: State, updates: NonEmptyList[Signed[Update]])(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
     val validateUpdates = updates.traverse { update =>
       validateUpdate(update.value)
@@ -212,15 +212,15 @@ object Data {
 
   }
 
-  /*
-  * After the validations, this function is the one that effectively will update the State. We will get the list of
-  * updates here and iterate over them. In this case, we take the provided address, then we search on the State to check
-  * if we already have some information about this address. If we have some information about this device we will
-  * concatenate with the current information the new values provided, e.g if we provide the address DAG...X and one update
-  * of 10 on their water usage, and let's say that the state already contains this address and the amount of 20 on their
-  * water usage, so this method will update the state to have 30 on the water usage. If the provided address does not
-  * exist in the state, we will fill in the provided values without concatenating.
-  */
+  /**
+    * After validations have run, this function will update the State. We will get the list of
+    * updates here and iterate over them. In this case, we take the provided address, then we search on the State to check
+    * if we already have some information about this address. If we have some information about this device we will
+    * concatenate with the current information the new values provided, e.g if we provide the address DAG...X and one update
+    * of 10 on their water usage, and let's say that the state already contains this address and the amount of 20 on their
+    * water usage, so this method will update the state to have 30 on the water usage. If the provided address does not
+    * exist in the state, we will fill in the provided values without concatenating.
+    */
   def combine(oldState: State, updates: NonEmptyList[Signed[Update]]): IO[State] = IO {
     updates.foldLeft(oldState) { (acc, signedUpdate) => {
       val update = signedUpdate.value
@@ -260,21 +260,20 @@ object Data {
     }
   }
 
-  /*
-  * This function will do the serialization of the State. In other words, we want to transform the object State into
-  * a JSON. For that, in this example, we are calling the function asJson.deepDropNullValues.noSpaces. This function
-  * will transform to JSON and will remove all the null values and the spaces, so it should be a single line of JSON
-  * without spaces and null values.
-  */
+  /**
+    * This method will serialize the State. It accepts the State object, transforms it to a JSON string with no
+    * whitespace, then converts to a byte array
+    */
   def serializeState(state: State): IO[Array[Byte]] = IO {
     println("Serialize state event received")
     println(state.asJson.deepDropNullValues.noSpaces)
     state.asJson.deepDropNullValues.noSpaces.getBytes(StandardCharsets.UTF_8)
   }
 
-  /*
-  * This function will deserialize the State. In other words, we want to transform the JSON into an object State
-  */
+  /**
+    * This method will deserialize the State from the byte array produced in `serializeState` 
+    * by parsing it as JSON befor converting to the State object.
+    */
   def deserializeState(bytes: Array[Byte]): IO[Either[Throwable, State]] = IO {
     parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
       json.as[State]
@@ -282,14 +281,13 @@ object Data {
   }
 
   /**
-   * This function will do the serialization of the Update message. In other words, we want to transform the object
-   * Update into a JSON. For that, in this example, we are calling the function asJson.deepDropNullValues.noSpaces.
-   * This function will transform to JSON and will remove all the null values and the spaces, so it should be a single
-   * line of JSON without spaces and null values. It's very important to know that this function generates a JSON in
-   * one order, each field has its position. When you'll send update messages be sure to serialize your messages exactly
-   * equal to this part before signing, even the order of fields is important, the JSON message should be exactly equal
-   * to the serialized JSON here
-   */
+    * This method serializes the update `value` field to a byte array from the Update object. 
+    * The update is serialized before checking proof validity.
+    * 
+    * This method processes JSON as a string so the order of the keys needs to be consistent. When you 
+    * send updates be sure to serialize your messages exactly equal to this part before signing.
+    * The JSON message should be exactly equal to the serialized JSON here.
+    */
   def serializeUpdate(update: Update): IO[Array[Byte]] = IO {
     println("Updated event received")
     println(update.asJson.deepDropNullValues.noSpaces)
@@ -297,7 +295,7 @@ object Data {
   }
 
   /*
-  * This function will deserialize the Update. In other words, we want to transform the JSON into an object Update
+  * This function will deserialize the update byte array into the Update object. 
   */
   def deserializeUpdate(bytes: Array[Byte]): IO[Either[Throwable, Update]] = IO {
     parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
