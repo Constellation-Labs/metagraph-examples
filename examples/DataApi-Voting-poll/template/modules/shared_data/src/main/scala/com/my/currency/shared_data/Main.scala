@@ -2,7 +2,7 @@ package com.my.currency.shared_data
 
 import cats.data.NonEmptyList
 import cats.effect.IO
-import com.my.currency.shared_data.Errors.{InvalidAddress, InvalidEndSnapshot, InvalidOption, NegativeTimestamp, PollAlreadyExists, PollDoesNotExists, RepeatedVote}
+import com.my.currency.shared_data.Errors.{ClosedPool, CouldNotGetLatestCurrencySnapshot, CouldNotGetLatestState, InvalidAddress, InvalidEndSnapshot, InvalidOption, PollAlreadyExists, PollDoesNotExists, RepeatedVote}
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
@@ -14,7 +14,7 @@ import org.tessellation.security.signature.Signed
 import cats.syntax.all._
 import com.my.currency.shared_data.Data.{NewPoll, PollState, PollUpdate, PollVote, State}
 import com.my.currency.shared_data.Routes.{routeValidateData, routeValidateUpdate}
-import com.my.currency.shared_data.TypeValidators.{validateIfNewPollExists, validateIfOptionExists, validateIfUserAlreadyVoted, validateIfVotePollExists, validateProvidedAddress, validateSnapshotNewPoll, validateTimestampPositive}
+import com.my.currency.shared_data.TypeValidators.{validateIfNewPollExists, validateIfOptionExists, validateIfUserAlreadyVoted, validateIfVotePollExists, validatePollSnapshotInterval, validateProvidedAddress, validateSnapshotNewPoll}
 import com.my.currency.shared_data.Utils.{customStateDeserialization, customStateSerialization, customUpdateDeserialization, customUpdateSerialization}
 import monocle.syntax.all._
 import org.tessellation.schema.SnapshotOrdinal
@@ -41,16 +41,24 @@ object Errors {
     val message = "Provided address different than proof"
   }
 
-  case object NegativeTimestamp extends DataApplicationValidationError {
-    val message = "Timestamp should be greater than 0"
-  }
-
   case object RepeatedVote extends DataApplicationValidationError {
     val message = "This user already voted!"
   }
 
   case object InvalidEndSnapshot extends DataApplicationValidationError {
     val message = "Provided end snapshot ordinal lower than current snapshot!"
+  }
+
+  case object CouldNotGetLatestCurrencySnapshot extends DataApplicationValidationError {
+    val message = "Could not get latest currency snapshot!"
+  }
+
+  case object CouldNotGetLatestState extends DataApplicationValidationError {
+    val message = "Could not get latest state!"
+  }
+
+  case object ClosedPool extends DataApplicationValidationError {
+    val message = "Pool is closed"
   }
 }
 
@@ -89,14 +97,6 @@ object TypeValidators {
     }
   }
 
-  def validateTimestampPositive(update: PollUpdate): DataApplicationValidationErrorOr[Unit] = {
-    if (update.timestamp > 0) {
-      ().validNec
-    } else {
-      NegativeTimestamp.asInstanceOf[DataApplicationValidationError].invalidNec
-    }
-  }
-
   def validateIfUserAlreadyVoted(maybeState: Option[PollState], address: Address): DataApplicationValidationErrorOr[Unit] = {
     maybeState match {
       case Some(value) =>
@@ -116,30 +116,62 @@ object TypeValidators {
       ().validNec
     }
   }
+
+  def validatePollSnapshotInterval(lastSnapshotOrdinal: SnapshotOrdinal, currentState: State, pollVote: PollVote): DataApplicationValidationErrorOr[Unit] = {
+    val poll = currentState.polls.get(pollVote.id)
+    poll match {
+      case Some(value) =>
+        if (value.endSnapshotOrdinal < lastSnapshotOrdinal.value.value) {
+          ClosedPool.asInstanceOf[DataApplicationValidationError].invalidNec
+        } else {
+          ().validNec
+        }
+      case None => PollDoesNotExists.asInstanceOf[DataApplicationValidationError].invalidNec
+    }
+  }
 }
 
 object Routes {
-  def routeValidateUpdate(update: PollUpdate)(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
+  def routeValidateUpdate(update: PollUpdate, state: State, lastSnapshotOrdinal: SnapshotOrdinal): IO[DataApplicationValidationErrorOr[Unit]] = {
     update match {
       case newPoll: NewPoll =>
-        val validateNewPollSnapshot = context.getLastCurrencySnapshot.map(_.get.ordinal).map { lastSnapshotOrdinal =>
+        val validateNewPollSnapshot = IO {
           validateSnapshotNewPoll(lastSnapshotOrdinal, newPoll)
         }
 
-        val validateTimestamp = IO {
-          validateTimestampPositive(newPoll)
+        val validatePoll = IO {
+          val voteId = Hash.fromBytes(customUpdateSerialization(newPoll))
+          validateIfNewPollExists(state.polls.get(voteId.toString))
         }
 
         for {
           validatedNewPollSnapshot <- validateNewPollSnapshot
-          validatedTimestamp <- validateTimestamp
-        } yield validatedNewPollSnapshot.productR(validatedTimestamp)
+          validatedPoll <- validatePoll
+        } yield validatedNewPollSnapshot.productR(validatedPoll)
 
       case pollVote: PollVote =>
-        val validateTimestamp = IO {
-          validateTimestampPositive(pollVote)
+        val validateSnapshotInterval = IO {
+          validatePollSnapshotInterval(lastSnapshotOrdinal, state, pollVote)
         }
-        validateTimestamp
+
+        val validatePoll = IO {
+          validateIfVotePollExists(state.polls.get(pollVote.id))
+        }
+
+        val validateOption = IO {
+          validateIfOptionExists(state.polls.get(pollVote.id), pollVote.option)
+        }
+
+        val validateRepeatedVote = IO {
+          validateIfUserAlreadyVoted(state.polls.get(pollVote.id), pollVote.address)
+        }
+
+        for {
+          validatedSnapshotInterval <- validateSnapshotInterval
+          validatedPoll <- validatePoll
+          validatedOption <- validateOption
+          validatedRepeatedVote <- validateRepeatedVote
+        } yield validatedSnapshotInterval.productR(validatedPoll).productR(validatedOption).productR(validatedRepeatedVote)
     }
   }
 
@@ -248,7 +280,21 @@ object Data {
   case class State(polls: Map[String, Poll]) extends DataState
 
   def validateUpdate(update: PollUpdate)(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
-    routeValidateUpdate(update)
+    val lastCurrencySnapshot = context.getLastCurrencySnapshot
+    lastCurrencySnapshot.map(_.get.data).flatMap {
+      case Some(state) =>
+        val currentState = customStateDeserialization(state)
+        currentState match {
+          case Left(_) => IO {
+            CouldNotGetLatestState.asInstanceOf[DataApplicationValidationError].invalidNec
+          }
+          case Right(state) =>
+            lastCurrencySnapshot.map(_.get.ordinal).flatMap { lastSnapshotOrdinal =>
+              routeValidateUpdate(update, state, lastSnapshotOrdinal)
+            }
+        }
+      case None => IO { CouldNotGetLatestCurrencySnapshot.asInstanceOf[DataApplicationValidationError].invalidNec }
+    }
   }
 
   def validateData(oldState: State, updates: NonEmptyList[Signed[PollUpdate]])(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
