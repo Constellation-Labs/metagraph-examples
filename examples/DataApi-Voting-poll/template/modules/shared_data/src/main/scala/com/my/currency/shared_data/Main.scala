@@ -1,6 +1,6 @@
 package com.my.currency.shared_data
 
-import cats.data.NonEmptyList
+import cats.data.{NonEmptyList, NonEmptySet}
 import cats.effect.IO
 import com.my.currency.shared_data.Errors.{ClosedPool, CouldNotGetLatestCurrencySnapshot, CouldNotGetLatestState, InvalidAddress, InvalidEndSnapshot, InvalidOption, PollAlreadyExists, PollDoesNotExists, RepeatedVote}
 import derevo.circe.magnolia.{decoder, encoder}
@@ -12,15 +12,17 @@ import org.tessellation.currency.dataApplication.dataApplication.DataApplication
 import org.tessellation.currency.dataApplication.{DataApplicationValidationError, DataState, DataUpdate, L1NodeContext}
 import org.tessellation.security.signature.Signed
 import cats.syntax.all._
-import com.my.currency.shared_data.Data.{NewPoll, PollState, PollUpdate, PollVote, State}
-import com.my.currency.shared_data.Routes.{routeValidateData, routeValidateUpdate}
-import com.my.currency.shared_data.TypeValidators.{validateIfNewPollExists, validateIfOptionExists, validateIfUserAlreadyVoted, validateIfVotePollExists, validatePollSnapshotInterval, validateProvidedAddress, validateSnapshotNewPoll}
+import com.my.currency.shared_data.Combiners.{combineCreatePoll, combineVoteInPoll}
+import com.my.currency.shared_data.Data.{CreatePollUpdate, Poll, PollState, PollUpdate, VoteInPollUpdate, State}
+import com.my.currency.shared_data.Validations.{createPollValidationsWithSignature, createPollValidations, voteInPollValidationsWithSignature, voteInPollValidations}
+import com.my.currency.shared_data.TypeValidators.{validateIfOptionExists, validateIfPollAlreadyExists, validateIfUserAlreadyVoted, validateIfVotePollExists, validatePollSnapshotInterval, validateProvidedAddress, validateSnapshotCreatePoll}
 import com.my.currency.shared_data.Utils.{customStateDeserialization, customStateSerialization, customUpdateDeserialization, customUpdateSerialization}
 import monocle.syntax.all._
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.schema.address.Address
 import org.tessellation.security.SecurityProvider
 import org.tessellation.security.hash.Hash
+import org.tessellation.security.signature.signature.SignatureProof
 
 import java.nio.charset.StandardCharsets
 
@@ -63,7 +65,7 @@ object Errors {
 }
 
 object TypeValidators {
-  def validateIfNewPollExists(maybeState: Option[PollState]): DataApplicationValidationErrorOr[Unit] = {
+  def validateIfPollAlreadyExists(maybeState: Option[PollState]): DataApplicationValidationErrorOr[Unit] = {
     maybeState match {
       case Some(_) => PollAlreadyExists.asInstanceOf[DataApplicationValidationError].invalidNec
       case None => ().validNec
@@ -109,7 +111,7 @@ object TypeValidators {
     }
   }
 
-  def validateSnapshotNewPoll(snapshotOrdinal: SnapshotOrdinal, update: NewPoll): DataApplicationValidationErrorOr[Unit] = {
+  def validateSnapshotCreatePoll(snapshotOrdinal: SnapshotOrdinal, update: CreatePollUpdate): DataApplicationValidationErrorOr[Unit] = {
     if (update.endSnapshotOrdinal < snapshotOrdinal.value.value) {
       InvalidEndSnapshot.asInstanceOf[DataApplicationValidationError].invalidNec
     } else {
@@ -117,8 +119,8 @@ object TypeValidators {
     }
   }
 
-  def validatePollSnapshotInterval(lastSnapshotOrdinal: SnapshotOrdinal, currentState: State, pollVote: PollVote): DataApplicationValidationErrorOr[Unit] = {
-    val poll = currentState.polls.get(pollVote.id)
+  def validatePollSnapshotInterval(lastSnapshotOrdinal: SnapshotOrdinal, currentState: State, voteInPoll: VoteInPollUpdate): DataApplicationValidationErrorOr[Unit] = {
+    val poll = currentState.polls.get(voteInPoll.pollId)
     poll match {
       case Some(value) =>
         if (value.endSnapshotOrdinal < lastSnapshotOrdinal.value.value) {
@@ -131,96 +133,106 @@ object TypeValidators {
   }
 }
 
-object Routes {
-  def routeValidateUpdate(update: PollUpdate, state: State, lastSnapshotOrdinal: SnapshotOrdinal): IO[DataApplicationValidationErrorOr[Unit]] = {
-    update match {
-      case newPoll: NewPoll =>
-        val validateNewPollSnapshot = IO {
-          validateSnapshotNewPoll(lastSnapshotOrdinal, newPoll)
-        }
-
-        val validatePoll = IO {
-          val voteId = Hash.fromBytes(customUpdateSerialization(newPoll))
-          validateIfNewPollExists(state.polls.get(voteId.toString))
-        }
-
-        for {
-          validatedNewPollSnapshot <- validateNewPollSnapshot
-          validatedPoll <- validatePoll
-        } yield validatedNewPollSnapshot.productR(validatedPoll)
-
-      case pollVote: PollVote =>
-        val validateSnapshotInterval = IO {
-          validatePollSnapshotInterval(lastSnapshotOrdinal, state, pollVote)
-        }
-
-        val validatePoll = IO {
-          validateIfVotePollExists(state.polls.get(pollVote.id))
-        }
-
-        val validateOption = IO {
-          validateIfOptionExists(state.polls.get(pollVote.id), pollVote.option)
-        }
-
-        val validateRepeatedVote = IO {
-          validateIfUserAlreadyVoted(state.polls.get(pollVote.id), pollVote.address)
-        }
-
-        for {
-          validatedSnapshotInterval <- validateSnapshotInterval
-          validatedPoll <- validatePoll
-          validatedOption <- validateOption
-          validatedRepeatedVote <- validateRepeatedVote
-        } yield validatedSnapshotInterval.productR(validatedPoll).productR(validatedOption).productR(validatedRepeatedVote)
+object Validations {
+  def createPollValidations(update: CreatePollUpdate, state: State, lastSnapshotOrdinal: Option[SnapshotOrdinal]): IO[DataApplicationValidationErrorOr[Unit]] = {
+    val validateCreatePollSnapshot = IO {
+      lastSnapshotOrdinal match {
+        case Some(value) => validateSnapshotCreatePoll(value, update)
+        case None => ().validNec
+      }
     }
+
+    val validatePoll = IO {
+      val voteId = Hash.fromBytes(customUpdateSerialization(update))
+      validateIfPollAlreadyExists(state.polls.get(voteId.toString))
+    }
+
+    for {
+      validatedCreatePollSnapshot <- validateCreatePollSnapshot
+      validatedPoll <- validatePoll
+    } yield validatedCreatePollSnapshot.productR(validatedPoll)
+
   }
 
-  def routeValidateData(oldState: State, signedUpdate: Signed[PollUpdate])(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
-    signedUpdate.value match {
-      case newPoll: NewPoll =>
-        val validateAddress = signedUpdate.proofs
-          .map(_.id)
-          .toList
-          .traverse(_.toAddress[IO])
-          .map(validateProvidedAddress(_, newPoll.owner))
-
-        val validatePoll = IO {
-          val voteId = Hash.fromBytes(customUpdateSerialization(newPoll))
-          validateIfNewPollExists(oldState.polls.get(voteId.toString))
-        }
-
-        for {
-          validatedAddress <- validateAddress
-          validatedPoll <- validatePoll
-        } yield validatedAddress.productR(validatedPoll)
-
-      case pollVote: PollVote =>
-        val validateAddress = signedUpdate.proofs
-          .map(_.id)
-          .toList
-          .traverse(_.toAddress[IO])
-          .map(validateProvidedAddress(_, pollVote.address))
-
-
-        val validatePoll = IO {
-          validateIfVotePollExists(oldState.polls.get(pollVote.id))
-        }
-
-        val validateOption = IO {
-          validateIfOptionExists(oldState.polls.get(pollVote.id), pollVote.option)
-        }
-
-        val validateRepeatedVote = IO {
-          validateIfUserAlreadyVoted(oldState.polls.get(pollVote.id), pollVote.address)
-        }
-
-        for {
-          validatedAddress <- validateAddress
-          validatedPoll <- validatePoll
-          validatedOption <- validateOption
-          validatedRepeatedVote <- validateRepeatedVote
-        } yield validatedAddress.productR(validatedPoll).productR(validatedOption).productR(validatedRepeatedVote)
+  def voteInPollValidations(update: VoteInPollUpdate, state: State, lastSnapshotOrdinal: Option[SnapshotOrdinal]): IO[DataApplicationValidationErrorOr[Unit]] = {
+    val validateSnapshotInterval = IO {
+      lastSnapshotOrdinal match {
+        case Some(value) => validatePollSnapshotInterval(value, state, update)
+        case None => ().validNec
+      }
     }
+
+    val validatePoll = IO {
+      validateIfVotePollExists(state.polls.get(update.pollId))
+    }
+
+    val validateOption = IO {
+      validateIfOptionExists(state.polls.get(update.pollId), update.option)
+    }
+
+    val validateRepeatedVote = IO {
+      validateIfUserAlreadyVoted(state.polls.get(update.pollId), update.address)
+    }
+
+    for {
+      validatedSnapshotInterval <- validateSnapshotInterval
+      validatedPoll <- validatePoll
+      validatedOption <- validateOption
+      validatedRepeatedVote <- validateRepeatedVote
+    } yield validatedSnapshotInterval.productR(validatedPoll).productR(validatedOption).productR(validatedRepeatedVote)
+
+  }
+
+  def createPollValidationsWithSignature(update: CreatePollUpdate, proofs: NonEmptySet[SignatureProof], state: State)(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
+    val validateAddress = proofs
+      .map(_.id)
+      .toList
+      .traverse(_.toAddress[IO])
+      .map(validateProvidedAddress(_, update.owner))
+
+    val validations = createPollValidations(update, state, None)
+    for {
+      validatedAddress <- validateAddress
+      validatedPoll <- validations
+    } yield validatedAddress.productR(validatedPoll)
+  }
+
+  def voteInPollValidationsWithSignature(update: VoteInPollUpdate, proofs: NonEmptySet[SignatureProof], state: State)(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
+    val validateAddress = proofs
+      .map(_.id)
+      .toList
+      .traverse(_.toAddress[IO])
+      .map(validateProvidedAddress(_, update.address))
+
+    val validations = voteInPollValidations(update, state, None)
+
+    for {
+      validatedAddress <- validateAddress
+      validatedPoll <- validations
+    } yield validatedAddress.productR(validatedPoll)
+  }
+}
+
+object Combiners {
+  def combineCreatePoll(poll: CreatePollUpdate, acc: State): State = {
+    val pollId = Hash.fromBytes(customUpdateSerialization(poll)).toString
+    val pollOptions = poll.pollOptions.flatMap(option => Map(option -> 0L)).toMap
+    val newState = Poll(pollId, poll.name, poll.owner, pollOptions, Map.empty, poll.startSnapshotOrdinal, poll.endSnapshotOrdinal)
+
+    acc.focus(_.polls).modify(_.updated(pollId, newState))
+  }
+
+  def combineVoteInPoll(voteInPoll: VoteInPollUpdate, acc: State): State = {
+    val currentState = acc.polls(voteInPoll.pollId)
+    val currentOptionNumber = currentState.pollOptions(voteInPoll.option)
+
+    val newState = currentState
+      .focus(_.pollOptions)
+      .modify(_.updated(voteInPoll.option, currentOptionNumber + 1))
+      .focus(_.votes)
+      .modify(_.updated(voteInPoll.address, Map(voteInPoll.option -> 1)))
+
+    acc.focus(_.polls).modify(_.updated(voteInPoll.pollId, newState))
   }
 }
 
@@ -252,29 +264,26 @@ object Utils {
 
 object Data {
   @derive(decoder, encoder)
-  sealed trait PollUpdate extends DataUpdate {
-    val timestamp: Long
-  }
+  sealed trait PollUpdate extends DataUpdate
 
   @derive(decoder, encoder)
-  case class NewPoll(name: String, owner: Address, pollOptions: List[String], startSnapshotOrdinal: Long, endSnapshotOrdinal: Long, timestamp: Long) extends PollUpdate
+  case class CreatePollUpdate(name: String, owner: Address, pollOptions: List[String], startSnapshotOrdinal: Long, endSnapshotOrdinal: Long) extends PollUpdate
 
   @derive(decoder, encoder)
-  case class PollVote(id: String, address: Address, option: String, timestamp: Long) extends PollUpdate
+  case class VoteInPollUpdate(pollId: String, address: Address, option: String) extends PollUpdate
 
   @derive(decoder, encoder)
   sealed trait PollState extends DataState {
     val name: String
     val owner: Address
     val pollOptions: Map[String, Long]
-    val votes: Map[Address, Long]
+    val votes: Map[Address, Map[String, Long]]
     val startSnapshotOrdinal: Long
     val endSnapshotOrdinal: Long
-    val timestamp: Long
   }
 
   @derive(decoder, encoder)
-  case class Poll(name: String, owner: Address, pollOptions: Map[String, Long], votes: Map[Address, Long], startSnapshotOrdinal: Long, endSnapshotOrdinal: Long, timestamp: Long) extends PollState
+  case class Poll(id: String, name: String, owner: Address, pollOptions: Map[String, Long], votes: Map[Address, Map[String, Long]], startSnapshotOrdinal: Long, endSnapshotOrdinal: Long) extends PollState
 
   @derive(decoder, encoder)
   case class State(polls: Map[String, Poll]) extends DataState
@@ -290,16 +299,28 @@ object Data {
           }
           case Right(state) =>
             lastCurrencySnapshot.map(_.get.ordinal).flatMap { lastSnapshotOrdinal =>
-              routeValidateUpdate(update, state, lastSnapshotOrdinal)
+              update match {
+                case poll: CreatePollUpdate =>
+                  createPollValidations(poll, state, Some(lastSnapshotOrdinal))
+                case voteInPoll: VoteInPollUpdate =>
+                  voteInPollValidations(voteInPoll, state, Some(lastSnapshotOrdinal))
+              }
             }
         }
-      case None => IO { CouldNotGetLatestCurrencySnapshot.asInstanceOf[DataApplicationValidationError].invalidNec }
+      case None => IO {
+        CouldNotGetLatestCurrencySnapshot.asInstanceOf[DataApplicationValidationError].invalidNec
+      }
     }
   }
 
   def validateData(oldState: State, updates: NonEmptyList[Signed[PollUpdate]])(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
-    updates.traverse {
-      update => routeValidateData(oldState, update)
+    updates.traverse { signedUpdate =>
+      signedUpdate.value match {
+        case poll: CreatePollUpdate =>
+          createPollValidationsWithSignature(poll, signedUpdate.proofs, oldState)
+        case pollUpdate: VoteInPollUpdate =>
+          voteInPollValidationsWithSignature(pollUpdate, signedUpdate.proofs, oldState)
+      }
     }.map(_.reduce)
   }
 
@@ -307,23 +328,11 @@ object Data {
     updates.foldLeft(oldState) { (acc, signedUpdate) => {
       val update = signedUpdate.value
       update match {
-        case newPoll: NewPoll =>
-          val pollOptions = newPoll.pollOptions.flatMap(option => Map(option -> 0L)).toMap
-          val newState = Poll(newPoll.name, newPoll.owner, pollOptions, Map.empty, newPoll.startSnapshotOrdinal, newPoll.endSnapshotOrdinal, newPoll.timestamp)
+        case poll: CreatePollUpdate =>
+          combineCreatePoll(poll, acc)
+        case voteInPoll: VoteInPollUpdate =>
+          combineVoteInPoll(voteInPoll, acc)
 
-          val voteId = Hash.fromBytes(customUpdateSerialization(newPoll))
-          acc.focus(_.polls).modify(_.updated(voteId.toString, newState))
-        case pollVote: PollVote =>
-          val currentState = acc.polls(pollVote.id)
-          val currentOptionNumber = currentState.pollOptions(pollVote.option)
-
-          val newState = currentState
-            .focus(_.pollOptions)
-            .modify(_.updated(pollVote.option, currentOptionNumber + 1))
-            .focus(_.votes)
-            .modify(_.updated(pollVote.address, 1))
-
-          acc.focus(_.polls).modify(_.updated(pollVote.id, newState))
       }
     }
     }
