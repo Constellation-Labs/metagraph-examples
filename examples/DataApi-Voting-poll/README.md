@@ -25,7 +25,7 @@ Primary code for the example can be found in the following files:
 
   
 
-`modules/shared_data/src/main/scala/com/my/currency/shared_data/Main.scala`
+`modules/shared_data/src/main/scala/com/my/currency/shared_data/MainData.scala`
 
   
 
