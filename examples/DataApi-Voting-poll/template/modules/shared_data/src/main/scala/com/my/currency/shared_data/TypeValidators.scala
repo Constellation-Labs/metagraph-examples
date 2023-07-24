@@ -2,9 +2,10 @@ package com.my.currency.shared_data
 
 import cats.implicits.catsSyntaxValidatedIdBinCompat0
 import com.my.currency.shared_data.MainData.{CreatePoll, State, VoteInPoll}
-import com.my.currency.shared_data.Errors.{ClosedPool, InvalidAddress, InvalidEndSnapshot, InvalidOption, PollAlreadyExists, PollDoesNotExists, RepeatedVote}
+import com.my.currency.shared_data.Errors.{ClosedPool, InvalidAddress, InvalidEndSnapshot, InvalidOption, NotEnoughWalletBalance, PollAlreadyExists, PollDoesNotExists, RepeatedVote}
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import org.tessellation.currency.schema.currency.CurrencySnapshotInfo
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.schema.address.Address
 
@@ -56,6 +57,19 @@ object TypeValidators {
           case None => ().validNec
         }
       case None => ().validNec
+    }
+  }
+
+  def validateWalletBalance(snapshotInfo: CurrencySnapshotInfo, walletAddress: Address): DataApplicationValidationErrorOr[Unit] = {
+    val walletBalance = snapshotInfo.balances.get(walletAddress)
+    walletBalance match {
+      case Some(balance) =>
+        if (balance.value.value > 0L) {
+          ().validNec
+        } else {
+          NotEnoughWalletBalance.asInstanceOf[DataApplicationValidationError].invalidNec
+        }
+      case None => NotEnoughWalletBalance.asInstanceOf[DataApplicationValidationError].invalidNec
     }
   }
 

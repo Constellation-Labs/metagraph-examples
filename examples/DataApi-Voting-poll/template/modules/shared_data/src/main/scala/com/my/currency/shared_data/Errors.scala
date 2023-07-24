@@ -38,5 +38,9 @@ object Errors {
   case object ClosedPool extends DataApplicationValidationError {
     val message = "Pool is closed"
   }
+
+  case object NotEnoughWalletBalance extends DataApplicationValidationError {
+    val message = "Not enough wallet balance"
+  }
 }
 

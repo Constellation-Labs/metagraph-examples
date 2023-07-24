@@ -3,6 +3,7 @@ package com.my.currency.shared_data
 import com.my.currency.shared_data.MainData.{CreatePoll, Poll, State, VoteInPoll}
 import com.my.currency.shared_data.Utils.customUpdateSerialization
 import monocle.Monocle.toAppliedFocusOps
+import org.tessellation.currency.schema.currency.CurrencySnapshotInfo
 import org.tessellation.security.hash.Hash
 
 object Combiners {
@@ -14,16 +15,24 @@ object Combiners {
     acc.focus(_.polls).modify(_.updated(pollId, newState))
   }
 
-  def combineVoteInPoll(voteInPoll: VoteInPoll, acc: State): State = {
+  def combineVoteInPoll(voteInPoll: VoteInPoll, acc: State, snapshotInfo: CurrencySnapshotInfo): State = {
     val currentState = acc.polls(voteInPoll.pollId)
     val currentOptionNumber = currentState.pollOptions(voteInPoll.option)
 
-    val newState = currentState
-      .focus(_.pollOptions)
-      .modify(_.updated(voteInPoll.option, currentOptionNumber + 1))
-      .focus(_.usersVotes)
-      .modify(_.updated(voteInPoll.address, Map(voteInPoll.option -> 1)))
+    val addressBalance = snapshotInfo.balances.get(voteInPoll.address)
 
-    acc.focus(_.polls).modify(_.updated(voteInPoll.pollId, newState))
+    addressBalance match {
+      case Some(balance) =>
+        val votingAmount = balance.value.value
+        val newState = currentState
+          .focus(_.pollOptions)
+          .modify(_.updated(voteInPoll.option, currentOptionNumber + votingAmount))
+          .focus(_.usersVotes)
+          .modify(_.updated(voteInPoll.address, Map(voteInPoll.option -> votingAmount)))
+
+        acc.focus(_.polls).modify(_.updated(voteInPoll.pollId, newState))
+
+      case None => acc
+    }
   }
 }

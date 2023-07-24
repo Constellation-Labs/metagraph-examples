@@ -8,15 +8,13 @@ import derevo.derive
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.{Decoder, Encoder}
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.currency.dataApplication.{DataApplicationValidationError, DataState, DataUpdate, L1NodeContext}
+import org.tessellation.currency.dataApplication.{DataApplicationValidationError, DataState, DataUpdate, L0NodeContext, L1NodeContext}
 import org.tessellation.security.signature.Signed
 import cats.syntax.all._
 import com.my.currency.shared_data.Combiners.{combineCreatePoll, combineVoteInPoll}
-import com.my.currency.shared_data.Validations.{createPollValidationsWithSignature, createPollValidations, voteInPollValidationsWithSignature, voteInPollValidations}
+import com.my.currency.shared_data.Validations.{createPollValidations, createPollValidationsWithSignature, voteInPollValidations, voteInPollValidationsWithSignature}
 import com.my.currency.shared_data.Utils.{customStateDeserialization, customStateSerialization, customUpdateDeserialization, customUpdateSerialization}
 import org.tessellation.schema.address.Address
-import org.tessellation.security.SecurityProvider
-
 
 object MainData {
   @derive(decoder, encoder)
@@ -57,7 +55,9 @@ object MainData {
                 case poll: CreatePoll =>
                   createPollValidations(poll, state, Some(lastSnapshotOrdinal))
                 case voteInPoll: VoteInPoll =>
-                  voteInPollValidations(voteInPoll, state, Some(lastSnapshotOrdinal))
+                  context.getLastCurrencySnapshotCombined.map(_.get._2).flatMap { snapshotInfo =>
+                    voteInPollValidations(voteInPoll, state, Some(lastSnapshotOrdinal), snapshotInfo)
+                  }
               }
             }
         }
@@ -65,28 +65,32 @@ object MainData {
     }
   }
 
-  def validateData(oldState: State, updates: NonEmptyList[Signed[PollUpdate]])(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
+  def validateData(oldState: State, updates: NonEmptyList[Signed[PollUpdate]])(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
+    implicit val sp = context.securityProvider
     updates.traverse { signedUpdate =>
       signedUpdate.value match {
         case poll: CreatePoll =>
           createPollValidationsWithSignature(poll, signedUpdate.proofs, oldState)
-        case pollUpdate: VoteInPoll =>
-          voteInPollValidationsWithSignature(pollUpdate, signedUpdate.proofs, oldState)
+        case voteInPoll: VoteInPoll =>
+          context.getLastCurrencySnapshotCombined.map(_.get._2).flatMap { snapshotInfo =>
+            voteInPollValidationsWithSignature(voteInPoll, signedUpdate.proofs, oldState, snapshotInfo)
+          }
       }
     }.map(_.reduce)
   }
 
-  def combine(oldState: State, updates: NonEmptyList[Signed[PollUpdate]]): IO[State] = IO {
-    updates.foldLeft(oldState) { (acc, signedUpdate) => {
-      val update = signedUpdate.value
-      update match {
-        case poll: CreatePoll =>
-          combineCreatePoll(poll, acc)
-        case voteInPoll: VoteInPoll =>
-          combineVoteInPoll(voteInPoll, acc)
-
+  def combine(oldState: State, updates: NonEmptyList[Signed[PollUpdate]])(implicit context: L0NodeContext[IO]): IO[State] = {
+    context.getLastCurrencySnapshotCombined.map(_.get._2).map { snapshotInfo =>
+      updates.foldLeft(oldState) { (acc, signedUpdate) => {
+        val update = signedUpdate.value
+        update match {
+          case poll: CreatePoll =>
+            combineCreatePoll(poll, acc)
+          case voteInPoll: VoteInPoll =>
+            combineVoteInPoll(voteInPoll, acc, snapshotInfo)
+        }
       }
-    }
+      }
     }
   }
 

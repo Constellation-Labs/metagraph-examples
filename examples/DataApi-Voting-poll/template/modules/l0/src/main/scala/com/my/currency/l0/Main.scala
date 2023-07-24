@@ -28,7 +28,7 @@ object Main
     Option(BaseDataApplicationL0Service(new DataApplicationL0Service[IO, PollUpdate, State] {
       override def genesis: State = State(Map.empty)
 
-      override def validateData(oldState: State, updates: NonEmptyList[Signed[PollUpdate]])(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = MainData.validateData(oldState, updates)(context.securityProvider)
+      override def validateData(oldState: State, updates: NonEmptyList[Signed[PollUpdate]])(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = MainData.validateData(oldState, updates)
 
       override def validateUpdate(update: PollUpdate)(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = IO { ().validNec }
 
