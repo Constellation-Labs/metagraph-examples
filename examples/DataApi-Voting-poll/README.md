@@ -6,7 +6,12 @@
 This example uses the Data API to demonstrate a basic voting poll use case. In the example, a client can send 2 types of signed data updates to a metagraph: create vote poll and vote in a poll. These updates are validated before merging into the snapshot state.
 
   
-
+The voting system will work as follows:
++ One wallet can only vote 1 time per poll.
++ If the voting wallet doesn't contain balance, the vote will be ignored and the user can vote again with this wallet when he adds balance on that.
++ We validate the chosen option, to confirm if that exists.
++ One vote per token in the wallet, e.g, if the wallet contains 100 tokens as balance, when voting, the chosen option will increase in 100, because this is the balance of the wallet.
++ Cannot duplicate polls.
 ## Template
 
 Primary code for the example can be found in the following files:
