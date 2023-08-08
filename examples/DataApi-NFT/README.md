@@ -32,6 +32,8 @@ In addition to these operations, the client can also fetch the following informa
 - Find all NFTs owned by a specific address
 
   
+To fetch the information above, the base URL is: http://your_ip:your_port/data-application/${path}
+e.g, https://localhost:8000/data-application/collections
 
 Updates involving NFTs and collections undergo validation before being applied to the state.
 
