@@ -22,7 +22,7 @@ object Data {
   sealed trait NFTUpdate extends DataUpdate
 
   @derive(decoder, encoder)
-  case class MintCollection(name: String, description: String) extends NFTUpdate
+  case class MintCollection(name: String) extends NFTUpdate
 
   @derive(decoder, encoder)
   case class MintNFT(owner: Address, collectionId: String, nftId: Long, uri: String, name: String, description: String, metadata: Map[String, String]) extends NFTUpdate

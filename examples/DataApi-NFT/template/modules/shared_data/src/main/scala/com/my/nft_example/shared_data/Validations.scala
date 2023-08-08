@@ -30,6 +30,7 @@ object Validations {
   def transferCollectionValidations(update: TransferCollection, state: State): IO[DataApplicationValidationErrorOr[Unit]] = {
     val validateProvidedCollection = validateIfProvidedCollectionExists(update, state)
     val validateFromAddress = validateIfFromAddressIsTheCollectionOwner(update, state)
+
     IO {
       validateProvidedCollection.productR(validateFromAddress)
     }
@@ -39,6 +40,7 @@ object Validations {
   def transferNFTValidations(update: TransferNFT, state: State): IO[DataApplicationValidationErrorOr[Unit]] = {
     val validateProvidedNFT = validateIfProvidedNFTExists(update, state)
     val validateFromAddress = validateIfFromAddressIsTheNFTOwner(update, state)
+
     IO {
       validateProvidedNFT.productR(validateFromAddress)
     }
