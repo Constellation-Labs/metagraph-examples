@@ -12,8 +12,6 @@ import org.http4s.dsl.io._
 import org.tessellation.currency.dataApplication.L1NodeContext
 import org.tessellation.schema.address.Address
 
-import scala.collection.mutable.ListBuffer
-
 object CustomRoutes {
 
   @derive(decoder, encoder)
@@ -23,123 +21,82 @@ object CustomRoutes {
   case class NFTResponse(id: Long, collectionId: String, owner: Address, uri: String, name: String, description: String, creationDateTimestamp: Long, metadata: Map[String, String])
 
   private def formatToCollectionResponse(collection: CollectionState): CollectionResponse = {
-    CollectionResponse(collection.id, collection.owner, collection.name, collection.creationDateTimestamp, collection.nfts.count(_ => true).toLong)
+    CollectionResponse(collection.id, collection.owner, collection.name, collection.creationDateTimestamp, collection.nfts.size.toLong)
   }
 
   private def formatToNFTResponse(nft: NFTState): NFTResponse = {
     NFTResponse(nft.id, nft.collectionId, nft.owner, nft.uri, nft.name, nft.description, nft.creationDateTimestamp, nft.metadata)
   }
 
-  def getAllCollections(implicit context: L1NodeContext[IO]): IO[Response[IO]] = {
+  private def getState(context: L1NodeContext[IO]) = {
     OptionT(context.getLastCurrencySnapshot)
       .flatMap(_.data.toOptionT)
       .flatMapF(deserializeState(_).map(_.toOption))
       .value
-      .flatMap {
-        case Some(value) =>
-          val allCollectionsResponse = value.collections.map { case (_, collection) => formatToCollectionResponse(collection) }.toList
-          Ok(allCollectionsResponse)
-        case None =>
-          NotFound()
-      }
+  }
+
+  def getAllCollections(implicit context: L1NodeContext[IO]): IO[Response[IO]] = {
+    getState(context).flatMap {
+      case None => NotFound()
+      case Some(value) =>
+        val allCollectionsResponse = value.collections.map { case (_, collection) => formatToCollectionResponse(collection) }.toList
+        Ok(allCollectionsResponse)
+    }
   }
 
   def getCollectionById(collectionId: String)(implicit context: L1NodeContext[IO]): IO[Response[IO]] = {
-    OptionT(context.getLastCurrencySnapshot)
-      .flatMap(_.data.toOptionT)
-      .flatMapF(deserializeState(_).map(_.toOption))
-      .value
-      .flatMap {
-        case Some(value) =>
-          val collection = value.collections.get(collectionId)
-          collection match {
-            case Some(value) => Ok(formatToCollectionResponse(value))
-            case None => NotFound()
-          }
-        case None =>
-          NotFound()
-      }
+    getState(context).flatMap {
+      case None => NotFound()
+      case Some(value) =>
+        value.collections.get(collectionId).map { value =>
+          Ok(formatToCollectionResponse(value))
+        }.getOrElse(NotFound())
+    }
   }
 
   def getCollectionNFTs(collectionId: String)(implicit context: L1NodeContext[IO]): IO[Response[IO]] = {
-    OptionT(context.getLastCurrencySnapshot)
-      .flatMap(_.data.toOptionT)
-      .flatMapF(deserializeState(_).map(_.toOption))
-      .value
-      .flatMap {
-        case Some(value) =>
-          val collection = value.collections.get(collectionId)
-          collection match {
-            case Some(value) =>
-              Ok(value.nfts.map { case (_, nft) => formatToNFTResponse(nft) }.toList)
-            case None => NotFound()
-          }
-        case None =>
-          NotFound()
-      }
+    getState(context).flatMap {
+      case None => NotFound()
+      case Some(value) =>
+        value.collections.get(collectionId).map { value =>
+          Ok(value.nfts.map { case (_, nft) => formatToNFTResponse(nft) }.toList)
+        }.getOrElse(NotFound())
+    }
   }
 
   def getCollectionNFTById(collectionId: String, nftId: Long)(implicit context: L1NodeContext[IO]): IO[Response[IO]] = {
-    OptionT(context.getLastCurrencySnapshot)
-      .flatMap(_.data.toOptionT)
-      .flatMapF(deserializeState(_).map(_.toOption))
-      .value
-      .flatMap {
-        case Some(value) =>
-          val collection = value.collections.get(collectionId)
-          collection match {
-            case Some(value) =>
-              value.nfts.get(nftId) match {
-                case Some(nft) => Ok(formatToNFTResponse(nft))
-                case None => NotFound()
-              }
-            case None => NotFound()
-          }
-        case None =>
-          NotFound()
-      }
+    getState(context).flatMap {
+      case None => NotFound()
+      case Some(state) =>
+        state.collections.get(collectionId).flatMap { collection =>
+          collection.nfts.get(nftId).map { nft => Ok(formatToNFTResponse(nft)) }
+        }.getOrElse(NotFound())
+    }
   }
 
   def getAllCollectionsOfAddress(address: Address)(implicit context: L1NodeContext[IO]): IO[Response[IO]] = {
-    val allAddressCollections = ListBuffer[CollectionResponse]()
-    OptionT(context.getLastCurrencySnapshot)
-      .flatMap(_.data.toOptionT)
-      .flatMapF(deserializeState(_).map(_.toOption))
-      .value
-      .flatMap {
-        case Some(value) =>
-          value.collections.map {
-            case (_, collection) =>
-              if (collection.owner == address) {
-                allAddressCollections += formatToCollectionResponse(collection)
-              }
-          }
-          Ok(allAddressCollections)
-        case None =>
-          NotFound()
-      }
+    getState(context).flatMap {
+      case None => NotFound()
+      case Some(value) =>
+        val addressCollections = value.collections.filter { case (_, collection) =>
+          collection.owner == address
+        }
+        Ok(addressCollections.map { case (_, collection) => formatToCollectionResponse(collection) })
+    }
   }
 
   def getAllNFTsOfAddress(address: Address)(implicit context: L1NodeContext[IO]): IO[Response[IO]] = {
-    val allAddressNFTs = ListBuffer[NFTResponse]()
-    OptionT(context.getLastCurrencySnapshot)
-      .flatMap(_.data.toOptionT)
-      .flatMapF(deserializeState(_).map(_.toOption))
-      .value
-      .flatMap {
-        case Some(value) =>
-          value.collections.map {
-            case (_, collection) =>
-              collection.nfts.map {
-                case (_, nft) =>
-                  if (nft.owner == address) {
-                    allAddressNFTs += formatToNFTResponse(nft)
-                  }
-              }
-          }
-          Ok(allAddressNFTs)
-        case None =>
-          NotFound()
-      }
+    getState(context).flatMap {
+      case None => NotFound()
+      case Some(value) =>
+        val allAddressNFTs = value.collections.flatMap {
+          case (_, collection) =>
+            val addressNFTs = collection.nfts.filter { case (_, nft) =>
+              nft.owner == address
+            }
+            addressNFTs
+        }
+        Ok(allAddressNFTs.map { case (_, nft) => formatToNFTResponse(nft) })
+    }
   }
 }

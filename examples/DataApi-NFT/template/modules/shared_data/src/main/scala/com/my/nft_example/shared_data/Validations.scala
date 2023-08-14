@@ -1,19 +1,19 @@
 package com.my.nft_example.shared_data
 
-import cats.data.NonEmptySet
 import cats.effect.IO
-import cats.implicits.{catsSyntaxApply, toFoldableOps, toTraverseOps}
+import cats.implicits.{catsSyntaxApplicativeId, catsSyntaxApply}
 import com.my.nft_example.shared_data.Data.{MintCollection, MintNFT, State, TransferCollection, TransferNFT}
-import com.my.nft_example.shared_data.TypeValidators.{validateIfCollectionIsUnique, validateIfFromAddressIsTheCollectionOwner, validateIfFromAddressIsTheNFTOwner, validateIfNFTIdIsUnique, validateIfNFTUriIsUnique, validateIfNFTUriIsValid, validateIfProvidedCollectionExists, validateIfProvidedNFTExists, validateProvidedAddress}
+import com.my.nft_example.shared_data.TypeValidators.{validateIfCollectionIsUnique, validateIfFromAddressIsTheCollectionOwner, validateIfFromAddressIsTheNFTOwner, validateIfNFTIdIsUnique, validateIfNFTUriIsUnique, validateIfNFTUriIsValid, validateIfProvidedCollectionExists, validateIfProvidedNFTExists, validateMapMaxSize, validateProvidedAddress, validateStringMaxSize}
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.signature.signature.SignatureProof
+import org.tessellation.schema.address.Address
 
 object Validations {
   def mintCollectionValidations(update: MintCollection, state: State): IO[DataApplicationValidationErrorOr[Unit]] = {
     val validateCollection = validateIfCollectionIsUnique(update, state)
+    val validateCollectionName = validateStringMaxSize(update.name, 64, "name")
+
     IO {
-      validateCollection
+      validateCollection.productR(validateCollectionName)
     }
   }
 
@@ -21,9 +21,12 @@ object Validations {
     val validateNFTUrlValid = validateIfNFTUriIsValid(update)
     val validateUniqueNFTURI = validateIfNFTUriIsUnique(update, state)
     val validateUniqueNFTId = validateIfNFTIdIsUnique(update, state)
+    val validateNFTName = validateStringMaxSize(update.name, 64, "name")
+    val validateNFTDescription = validateStringMaxSize(update.description, 64, "description")
+    val validateNFTMetadata = validateMapMaxSize(update.metadata, 15, "metadata")
 
     IO {
-      validateNFTUrlValid.productR(validateUniqueNFTURI).productR(validateUniqueNFTId)
+      validateNFTUrlValid.productR(validateUniqueNFTURI).productR(validateUniqueNFTId).productR(validateNFTName).productR(validateNFTDescription).productR(validateNFTMetadata)
     }
   }
 
@@ -34,7 +37,6 @@ object Validations {
     IO {
       validateProvidedCollection.productR(validateFromAddress)
     }
-
   }
 
   def transferNFTValidations(update: TransferNFT, state: State): IO[DataApplicationValidationErrorOr[Unit]] = {
@@ -46,49 +48,25 @@ object Validations {
     }
   }
 
-  def mintNFTValidationsWithSignature(update: MintNFT, proofs: NonEmptySet[SignatureProof], state: State)(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
-    val validateAddress = proofs
-      .map(_.id)
-      .toList
-      .traverse(_.toAddress[IO])
-      .map(validateProvidedAddress(_, update.owner))
-
+  def mintNFTValidationsWithSignature(update: MintNFT, addresses: List[Address], state: State): IO[DataApplicationValidationErrorOr[Unit]] = {
+    val validateAddress = validateProvidedAddress(addresses, update.owner).pure[IO]
     val validations = mintNFTValidations(update, state)
 
-    for {
-      validatedAddress <- validateAddress
-      validatedCollection <- validations
-    } yield validatedAddress.productR(validatedCollection)
+    validateAddress.productR(validations)
   }
 
-  def transferCollectionValidationsWithSignature(update: TransferCollection, proofs: NonEmptySet[SignatureProof], state: State)(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
-    val validateAddress = proofs
-      .map(_.id)
-      .toList
-      .traverse(_.toAddress[IO])
-      .map(validateProvidedAddress(_, update.fromAddress))
-
+  def transferCollectionValidationsWithSignature(update: TransferCollection, addresses: List[Address], state: State): IO[DataApplicationValidationErrorOr[Unit]] = {
+    val validateAddress = validateProvidedAddress(addresses, update.fromAddress).pure[IO]
     val validations = transferCollectionValidations(update, state)
 
-    for {
-      validatedAddress <- validateAddress
-      validatedCollection <- validations
-    } yield validatedAddress.productR(validatedCollection)
+    validateAddress.productR(validations)
   }
 
-  def transferNFTValidationsWithSignature(update: TransferNFT, proofs: NonEmptySet[SignatureProof], state: State)(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
-    val validateAddress = proofs
-      .map(_.id)
-      .toList
-      .traverse(_.toAddress[IO])
-      .map(validateProvidedAddress(_, update.fromAddress))
-
+  def transferNFTValidationsWithSignature(update: TransferNFT, addresses: List[Address], state: State): IO[DataApplicationValidationErrorOr[Unit]] = {
+    val validateAddress = validateProvidedAddress(addresses, update.fromAddress).pure[IO]
     val validations = transferNFTValidations(update, state)
 
-    for {
-      validatedAddress <- validateAddress
-      validatedNFT <- validations
-    } yield validatedAddress.productR(validatedNFT)
+    validateAddress.productR(validations)
   }
 }
 

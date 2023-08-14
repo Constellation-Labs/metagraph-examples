@@ -47,5 +47,9 @@ object Errors {
   case object InvalidAddress extends DataApplicationValidationError {
     val message = "Provided address different than proof"
   }
+
+  case class InvalidFieldSize(fieldName: String, maxSize: Long) extends DataApplicationValidationError {
+    val message = s"Invalid field size: $fieldName, maxSize: $maxSize"
+  }
 }
 

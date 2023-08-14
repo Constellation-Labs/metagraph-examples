@@ -89,16 +89,22 @@ object Data {
 
   def validateData(oldState: State, updates: NonEmptyList[Signed[NFTUpdate]])(implicit sp: SecurityProvider[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
     updates.traverse { signedUpdate =>
-      signedUpdate.value match {
-        case mintCollection: MintCollection =>
-          mintCollectionValidations(mintCollection, oldState)
-        case mintNFT: MintNFT =>
-          mintNFTValidationsWithSignature(mintNFT, signedUpdate.proofs, oldState)
-        case transferCollection: TransferCollection =>
-          transferCollectionValidationsWithSignature(transferCollection, signedUpdate.proofs, oldState)
-        case transferNFT: TransferNFT =>
-          transferNFTValidationsWithSignature(transferNFT, signedUpdate.proofs, oldState)
-      }
+      signedUpdate.proofs
+        .map(_.id)
+        .toList
+        .traverse(_.toAddress[IO])
+        .flatMap { addresses =>
+          signedUpdate.value match {
+            case mintCollection: MintCollection =>
+              mintCollectionValidations(mintCollection, oldState)
+            case mintNFT: MintNFT =>
+              mintNFTValidationsWithSignature(mintNFT, addresses, oldState)
+            case transferCollection: TransferCollection =>
+              transferCollectionValidationsWithSignature(transferCollection, addresses, oldState)
+            case transferNFT: TransferNFT =>
+              transferNFTValidationsWithSignature(transferNFT, addresses, oldState)
+          }
+        }
     }.map(_.reduce)
   }
 

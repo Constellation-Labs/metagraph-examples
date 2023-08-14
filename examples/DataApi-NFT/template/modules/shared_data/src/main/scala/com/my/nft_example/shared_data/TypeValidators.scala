@@ -2,7 +2,7 @@ package com.my.nft_example.shared_data
 
 import cats.implicits.catsSyntaxValidatedIdBinCompat0
 import com.my.nft_example.shared_data.Data.{MintCollection, MintNFT, State, TransferCollection, TransferNFT}
-import com.my.nft_example.shared_data.Errors.{CollectionDoesNotBelongsToProvidedAddress, CollectionNotExists, DuplicatedCollection, InvalidAddress, InvalidNFTUri, NFTAlreadyExists, NFTDoesNotBelongsToProvidedAddress, NFTNotExists, NFTUriAlreadyExists}
+import com.my.nft_example.shared_data.Errors.{CollectionDoesNotBelongsToProvidedAddress, CollectionNotExists, DuplicatedCollection, InvalidAddress, InvalidFieldSize, InvalidNFTUri, NFTAlreadyExists, NFTDoesNotBelongsToProvidedAddress, NFTNotExists, NFTUriAlreadyExists}
 import com.my.nft_example.shared_data.Utils.{customUpdateSerialization, isValidURL}
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
@@ -64,19 +64,16 @@ object TypeValidators {
   }
 
   def validateIfFromAddressIsTheNFTOwner(update: TransferNFT, state: State): DataApplicationValidationErrorOr[Unit] = {
-    state.collections.get(update.collectionId) match {
-      case Some(value) =>
-        value.nfts.get(update.nftId) match {
-          case Some(nft) =>
-            if (nft.owner == update.fromAddress) {
-              ().validNec
-            } else {
-              NFTDoesNotBelongsToProvidedAddress.asInstanceOf[DataApplicationValidationError].invalidNec
-            }
-          case None => NFTNotExists.asInstanceOf[DataApplicationValidationError].invalidNec
+    state.collections.get(update.collectionId).flatMap { collection =>
+      collection.nfts.get(update.nftId).map { nft => {
+        if (nft.owner == update.fromAddress) {
+          ().validNec
+        } else {
+          NFTDoesNotBelongsToProvidedAddress.asInstanceOf[DataApplicationValidationError].invalidNec
         }
-      case None => CollectionNotExists.asInstanceOf[DataApplicationValidationError].invalidNec
-    }
+      }
+      }
+    }.getOrElse(CollectionNotExists.asInstanceOf[DataApplicationValidationError].invalidNec)
   }
 
   def validateIfFromAddressIsTheCollectionOwner(update: TransferCollection, state: State): DataApplicationValidationErrorOr[Unit] = {
@@ -104,6 +101,22 @@ object TypeValidators {
       ().validNec
     } else {
       InvalidAddress.asInstanceOf[DataApplicationValidationError].invalidNec
+    }
+  }
+
+  def validateStringMaxSize(value: String, maxSize: Long, fieldName: String): DataApplicationValidationErrorOr[Unit] = {
+    if (value.length > maxSize) {
+      InvalidFieldSize(fieldName, maxSize).asInstanceOf[DataApplicationValidationError].invalidNec
+    } else {
+      ().validNec
+    }
+  }
+
+  def validateMapMaxSize(value: Map[String, String], maxSize: Long, fieldName: String): DataApplicationValidationErrorOr[Unit] = {
+    if (value.size > maxSize) {
+      InvalidFieldSize(fieldName, maxSize).asInstanceOf[DataApplicationValidationError].invalidNec
+    } else {
+      ().validNec
     }
   }
 }
