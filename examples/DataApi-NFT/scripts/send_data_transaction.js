@@ -38,7 +38,7 @@ const buildTransferCollection = () => {
 
 const buildTransferNFT = () => {
   return {
-    TransferCollection: {
+    TransferNFT: {
       fromAddress: ":fromAddress",
       toAddress: ":toAddress",
       collectionId: ":collectionId",

@@ -2,7 +2,7 @@
 # Metagraph - Data API for NFT Management
   
 
-This example demonstrates a fundamental use case of NFTs (Non-Fungible Tokens) using the Data API provided by the Metagraph platform. The example showcases various operations that a client can perform:
+This example demonstrates an example use case of NFTs (Non-Fungible Tokens) based on the ERC-721 standard. Note that this shows a custom implementation of NFTs within a single metagraph using the Data API. It is not meant to describe a cross-metagraph standard for Constellation Network NFTs. 
 
  
 - Minting NFT Collections
@@ -162,4 +162,4 @@ The example includes a script named `send_data_transaction.js` for generating, s
 
 3. Execute the script: `node send_data_transaction.js`.
 
-4. Query the state GET endpoint at `<your L1 base url>/data-application/addresses` to observe the updated state after each update.
+4. Query the state GET endpoint at `<your L1 base url>/data-application/collections` to observe the updated state after each update.
