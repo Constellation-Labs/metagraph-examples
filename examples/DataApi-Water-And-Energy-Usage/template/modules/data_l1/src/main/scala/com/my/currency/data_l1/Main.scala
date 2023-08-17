@@ -16,9 +16,8 @@ import org.tessellation.schema.cluster.ClusterId
 import org.tessellation.security.signature.Signed
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 import org.tessellation.ext.http4s.AddressVar
-import org.tessellation.schema.address.Address
+import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 
-import java.nio.charset.StandardCharsets
 import java.util.UUID
 
 object Main
@@ -62,7 +61,7 @@ object Main
           .flatMap {
             case Some(value) =>
               Ok(value.devices)
-            case None        =>
+            case None =>
               NotFound()
           }
 
@@ -84,5 +83,7 @@ object Main
               NotFound()
           }
     }
+
+    override def signedDataEntityDecoder: EntityDecoder[IO, Signed[Update]] = circeEntityDecoder
   }))
 }
