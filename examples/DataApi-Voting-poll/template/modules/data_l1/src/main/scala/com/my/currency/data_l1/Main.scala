@@ -8,6 +8,7 @@ import com.my.currency.shared_data.MainData
 import com.my.currency.shared_data.MainData.{PollUpdate, State}
 import io.circe.{Decoder, Encoder}
 import org.http4s._
+import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.dsl.io._
 import org.tessellation.BuildInfo
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
@@ -53,5 +54,7 @@ object Main
       case GET -> Root / "polls" => getAllPolls
       case GET -> Root / "polls" / poolId => getPollById(poolId)
     }
+
+    override def signedDataEntityDecoder: EntityDecoder[IO, Signed[PollUpdate]] = circeEntityDecoder
   }))
 }

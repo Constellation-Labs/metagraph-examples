@@ -6,7 +6,7 @@ import cats.implicits.catsSyntaxValidatedIdBinCompat0
 import com.my.currency.shared_data.MainData
 import com.my.currency.shared_data.MainData.{PollUpdate, State}
 import io.circe.{Decoder, Encoder}
-import org.http4s.HttpRoutes
+import org.http4s.{EntityDecoder, HttpRoutes}
 import org.tessellation.BuildInfo
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.currency.dataApplication.{BaseDataApplicationL0Service, DataApplicationL0Service, L0NodeContext}
@@ -14,6 +14,7 @@ import org.tessellation.currency.l0.CurrencyL0App
 import org.tessellation.schema.cluster.ClusterId
 import org.tessellation.security.SecurityProvider
 import org.tessellation.security.signature.Signed
+import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 
 import java.util.UUID
 
@@ -48,6 +49,7 @@ object Main
 
       override def routes(implicit context: L0NodeContext[IO]): HttpRoutes[IO] = HttpRoutes.empty
 
+      override def signedDataEntityDecoder: EntityDecoder[IO, Signed[PollUpdate]] = circeEntityDecoder
     }))
 
   def rewards(implicit sp: SecurityProvider[IO]) = None
