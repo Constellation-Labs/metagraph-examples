@@ -16,6 +16,7 @@ import org.tessellation.currency.l1.CurrencyL1App
 import org.tessellation.ext.http4s.AddressVar
 import org.tessellation.schema.cluster.ClusterId
 import org.tessellation.security.signature.Signed
+import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 
 import java.util.UUID
 
@@ -58,5 +59,7 @@ object Main
       case GET -> Root / "addresses" / AddressVar(address) / "collections" => getAllCollectionsOfAddress(address)
       case GET -> Root / "addresses" / AddressVar(address) / "nfts" => getAllNFTsOfAddress(address)
     }
+
+    override def signedDataEntityDecoder: EntityDecoder[IO, Signed[NFTUpdate]] = circeEntityDecoder
   }))
 }

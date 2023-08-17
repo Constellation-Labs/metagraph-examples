@@ -6,7 +6,8 @@ import cats.implicits.catsSyntaxValidatedIdBinCompat0
 import com.my.nft_example.shared_data.Data
 import com.my.nft_example.shared_data.Data.{NFTUpdate, State}
 import io.circe.{Decoder, Encoder}
-import org.http4s.HttpRoutes
+import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
+import org.http4s.{EntityDecoder, HttpRoutes}
 import org.tessellation.BuildInfo
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.currency.dataApplication.{BaseDataApplicationL0Service, DataApplicationL0Service, L0NodeContext}
@@ -47,6 +48,8 @@ object Main
       override def dataDecoder: Decoder[NFTUpdate] = Data.dataDecoder
 
       override def routes(implicit context: L0NodeContext[IO]): HttpRoutes[IO] = HttpRoutes.empty
+
+      override def signedDataEntityDecoder: EntityDecoder[IO, Signed[NFTUpdate]] = circeEntityDecoder
 
     }))
 

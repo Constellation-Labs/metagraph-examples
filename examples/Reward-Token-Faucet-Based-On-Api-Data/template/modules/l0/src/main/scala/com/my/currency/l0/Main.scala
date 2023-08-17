@@ -8,11 +8,11 @@ import derevo.derive
 import org.tessellation.BuildInfo
 import org.tessellation.currency.dataApplication.BaseDataApplicationL0Service
 import org.tessellation.currency.l0.CurrencyL0App
-import org.tessellation.currency.schema.currency.{CurrencyBlock, CurrencyIncrementalSnapshot, CurrencySnapshotStateProof, CurrencyTransaction}
+import org.tessellation.currency.schema.currency.{CurrencyIncrementalSnapshot, CurrencySnapshotStateProof}
 import org.tessellation.schema.address.Address
 import org.tessellation.schema.balance.Balance
 import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.transaction.{RewardTransaction, TransactionAmount}
+import org.tessellation.schema.transaction.{RewardTransaction, Transaction, TransactionAmount}
 import org.tessellation.sdk.domain.rewards.Rewards
 import org.tessellation.security.SecurityProvider
 import org.tessellation.security.signature.Signed
@@ -64,11 +64,11 @@ object RewardsMintForEachAddressOnApi {
   }
 
   def make[F[_] : Async ] =
-    new Rewards[F, CurrencyTransaction, CurrencyBlock, CurrencySnapshotStateProof, CurrencyIncrementalSnapshot] {
+    new Rewards[F, CurrencySnapshotStateProof, CurrencyIncrementalSnapshot] {
       def distribute(
                       lastArtifact: Signed[CurrencyIncrementalSnapshot],
                       lastBalances: SortedMap[Address, Balance],
-                      acceptedTransactions: SortedSet[Signed[CurrencyTransaction]],
+                      acceptedTransactions: SortedSet[Signed[Transaction]],
                       trigger: ConsensusTrigger
                     ): F[SortedSet[RewardTransaction]] = {
 
