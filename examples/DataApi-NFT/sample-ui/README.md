@@ -45,7 +45,7 @@ Options:
 
 Lets you create a new collection inside the cluster, populates the collection with new NFTs based on the `--nft-count` argument.
 
-_Note: This command may produce errors related to [Action Encoding & Bad Signatures](#action-encoding--bad-signatures)._
+_Note: This command may produce errors related to [Cluster Propagation & Changes](#cluster-propagation--changes)._
 
 ### `yarn script scripts/transfer-collection-nft.ts`
 
