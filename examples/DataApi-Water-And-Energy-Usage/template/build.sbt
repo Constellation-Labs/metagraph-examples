@@ -38,7 +38,8 @@ lazy val sharedData = (project in file("modules/shared_data"))
       Libraries.tessellationDAGL1,
       Libraries.tessellationSDK,
       Libraries.tessellationShared,
-      Libraries.tessellationCurrencyL1
+      Libraries.tessellationCurrencyL1,
+      Libraries.requests
     )
   )
 lazy val currencyL1 = (project in file("modules/l1"))

@@ -23,6 +23,7 @@ object Dependencies {
     val declineCore = decline()
     val declineEffect = decline("effect")
     val declineRefined = decline("refined")
+    val requests = "com.lihaoyi" %% "requests" % "0.8.0"
   }
 
 
