@@ -1,33 +1,33 @@
-package com.my.currency.shared_data
+package com.my.currency.shared_data.validations
 
 import cats.implicits.catsSyntaxValidatedIdBinCompat0
-import com.my.currency.shared_data.MainData.{CreatePoll, State, VoteInPoll}
-import com.my.currency.shared_data.Errors.{ClosedPool, InvalidAddress, InvalidEndSnapshot, InvalidOption, NotEnoughWalletBalance, PollAlreadyExists, PollDoesNotExists, RepeatedVote}
-import org.tessellation.currency.dataApplication.DataApplicationValidationError
+import com.my.currency.shared_data.errors.Errors._
+import com.my.currency.shared_data.types.Types.{VoteCalculatedState, CreatePoll, VoteStateOnChain, VoteInPoll}
+import org.tessellation.currency.dataApplication.{DataApplicationValidationError, DataState}
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.currency.schema.currency.CurrencySnapshotInfo
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.schema.address.Address
 
 object TypeValidators {
-  def validateIfPollAlreadyExists(state: State, pollId: String): DataApplicationValidationErrorOr[Unit] = {
-    val maybeState = state.polls.get(pollId)
+  def validateIfPollAlreadyExists(state: DataState[VoteStateOnChain, VoteCalculatedState], pollId: String): DataApplicationValidationErrorOr[Unit] = {
+    val maybeState = state.calculated.polls.get(pollId)
     maybeState match {
       case Some(_) => PollAlreadyExists.asInstanceOf[DataApplicationValidationError].invalidNec
       case None => ().validNec
     }
   }
 
-  def validateIfVotePollExists(state: State, pollId: String): DataApplicationValidationErrorOr[Unit] = {
-    val maybeState = state.polls.get(pollId)
+  def validateIfVotePollExists(state: DataState[VoteStateOnChain, VoteCalculatedState], pollId: String): DataApplicationValidationErrorOr[Unit] = {
+    val maybeState = state.calculated.polls.get(pollId)
     maybeState match {
       case Some(_) => ().validNec
       case None => PollDoesNotExists.asInstanceOf[DataApplicationValidationError].invalidNec
     }
   }
 
-  def validateIfOptionExists(state: State, pollId: String, option: String): DataApplicationValidationErrorOr[Unit] = {
-    val maybeState = state.polls.get(pollId)
+  def validateIfOptionExists(state: DataState[VoteStateOnChain, VoteCalculatedState], pollId: String, option: String): DataApplicationValidationErrorOr[Unit] = {
+    val maybeState = state.calculated.polls.get(pollId)
     maybeState match {
       case Some(value) =>
         val pollValidOptions = value.pollOptions
@@ -47,8 +47,8 @@ object TypeValidators {
     }
   }
 
-  def validateIfUserAlreadyVoted(state: State, pollId: String, address: Address): DataApplicationValidationErrorOr[Unit] = {
-    val maybeState = state.polls.get(pollId)
+  def validateIfUserAlreadyVoted(state: DataState[VoteStateOnChain, VoteCalculatedState], pollId: String, address: Address): DataApplicationValidationErrorOr[Unit] = {
+    val maybeState = state.calculated.polls.get(pollId)
     maybeState match {
       case Some(value) =>
         val pollVotes = value.usersVotes
@@ -81,8 +81,8 @@ object TypeValidators {
     }
   }
 
-  def validatePollSnapshotInterval(lastSnapshotOrdinal: SnapshotOrdinal, currentState: State, voteInPoll: VoteInPoll): DataApplicationValidationErrorOr[Unit] = {
-    val poll = currentState.polls.get(voteInPoll.pollId)
+  def validatePollSnapshotInterval(lastSnapshotOrdinal: SnapshotOrdinal, state: DataState[VoteStateOnChain, VoteCalculatedState], voteInPoll: VoteInPoll): DataApplicationValidationErrorOr[Unit] = {
+    val poll = state.calculated.polls.get(voteInPoll.pollId)
     poll match {
       case Some(value) =>
         if (value.endSnapshotOrdinal < lastSnapshotOrdinal.value.value) {

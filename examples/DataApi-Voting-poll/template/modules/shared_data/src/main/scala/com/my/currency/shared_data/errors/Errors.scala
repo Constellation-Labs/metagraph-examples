@@ -1,4 +1,4 @@
-package com.my.currency.shared_data
+package com.my.currency.shared_data.errors
 
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
 
