@@ -21,15 +21,15 @@ object CalculatedState {
   }
 
   def setCalculatedState(snapshotOrdinal: SnapshotOrdinal, state: VoteCalculatedState): IO[Boolean] = {
-    val currentCheckInCalculatedState = maybeVoteCalculatedState._2
-    val updatedDevices = state.polls.foldLeft(currentCheckInCalculatedState.polls) {
+    val currentVoteCalculatedState = maybeVoteCalculatedState._2
+    val updatedPolls = state.polls.foldLeft(currentVoteCalculatedState.polls) {
       case (acc, (address, value)) =>
         acc.updated(address, value)
     }
 
     maybeVoteCalculatedState = (
       snapshotOrdinal,
-      VoteCalculatedState(updatedDevices)
+      VoteCalculatedState(updatedPolls)
     )
 
     IO(true)
