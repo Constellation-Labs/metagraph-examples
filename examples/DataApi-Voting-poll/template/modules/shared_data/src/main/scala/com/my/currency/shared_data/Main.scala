@@ -50,6 +50,9 @@ object Main {
   }
 
   def combine(state: DataState[VoteStateOnChain, VoteCalculatedState], updates: List[Signed[PollUpdate]])(implicit context: L0NodeContext[IO]): IO[DataState[VoteStateOnChain, VoteCalculatedState]] = {
+    if (updates.isEmpty) {
+      return IO(DataState(VoteStateOnChain(List.empty), state.calculated))
+    }
     getLastMetagraphIncrementalSnapshotInfo(Left(context)) match {
       case None => println("Could not get lastMetagraphIncrementalSnapshotInfo, keeping current state")
         IO(state)
