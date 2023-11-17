@@ -1,4 +1,4 @@
-package com.my.nft_example.shared_data
+package com.my.nft_example.shared_data.errors
 
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
 

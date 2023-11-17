@@ -62,99 +62,119 @@ The NFT management system operates as follows:
 
 - NFT URIs must be unique.
 
-  
+
 
 ## Template
 
-  
+Primary code for the example can be found in the following files:
 
-The primary code for this example is located in the following files:
 
-  
 
-- `modules/l0/src/main/scala/com/my/currency/l0/Main.scala`
+`modules/l0/src/main/scala/com/my/currency/l0/*`
 
-- `modules/l1/src/main/scala/com/my/currency/l1/Main.scala`
 
-- `modules/data_l1/src/main/scala/com/my/currency/data_l1/Main.scala`
 
-- `modules/shared_data/src/main/scala/com/my/currency/shared_data/MainData.scala`
+`modules/l1/src/main/scala/com/my/currency/l1/*`
 
-  
+
+
+`modules/data_l1/src/main/scala/com/my/currency/data_l1/*`
+
+
+
+`modules/shared_data/src/main/scala/com/my/currency/shared_data/*`
+
+
 
 ### Application Lifecycle
 
-  
+The methods of the DataApplication are invoked in the following sequence:
 
-The DataApplication methods are executed in the following order:
+-   `validateUpdate`
+-   `validateData`
+-   `combine`
+-   `dataEncoder`
+-   `dataDecoder`
+-   `calculatedStateEncoder`
+-   `signedDataEntityDecoder`
+-   `serializeBlock`
+-   `deserializeBlock`
+-   `serializeState`
+-   `deserializeState`
+-   `serializeUpdate`
+-   `deserializeUpdate`
+-   `setCalculatedState`
+-   `getCalculatedState`
+-   `hashCalculatedState`
+-   `routes`
 
-  
+For a more detailed understanding, please refer to the [complete documentation](https://docs.constellationnetwork.io/sdk/frameworks/currency/data-api) on the Data API.
 
-1. `serializeUpdate`
+### Lifecycle Functions
 
-2. `validateUpdate`
+#### -> `validateUpdate`
 
-3. `validateData`
+* This method initiates the initial validation of updates on the L1 layer. Due to a lack of contextual information (state), its validation capabilities are constrained. Any errors arising from this method result in a 500 response from the `/data` POST endpoint.
 
-4. `combine`
+#### -> `validateData`
 
-5. `serializeState`
+* This method validates data on the L0 layer, with access to contextual information, including the current state. In this example, we ensure that the provided address matches the one that signed the message. Additionally, we verify the most recent update timestamp to prevent the acceptance of outdated or duplicated data.
 
-  
+#### -> `combine`
 
-For additional details, refer to the [full documentation](https://docs.constellationnetwork.io/sdk/frameworks/currency/data-api) of the Data API.
+* This method takes validated data and the prior state, combining them to produce the new state. In this instance, we update device information in the state based on the validated update.
 
-  
+#### -> `dataEncoder` and `dataDecoder`
 
-### shared_data
+* These are the encoder/decoder components used for incoming updates.
 
-  
+#### -> `calculatedStateEncoder`
 
-- `validateUpdate`: Initial validation on the update at the L1 layer. Checks include uniqueness of collections, uniqueness of NFTs within a collection, and uniqueness of NFT URIs.
+* This encoder is employed for the calculatedState.
 
-- `validateData`: Validation on data at the L0 layer with access to context information. Similar checks as in `validateUpdate`.
+#### -> `signedDataEntityDecoder`
 
-- `combine`: Accepts validated data and the previous state to compute the new state. In this example, it creates new collections, NFTs, and handles transfers.
+* This function handles the parsing of request body formats (JSON, string, xml) into a `Signed[Update]` class.
 
-- `serializeState`: Serializes the State object to a byte array for storage in the snapshot.
+#### -> `serializeBlock` and `deserializeBlock`
 
-- `serializeUpdate`: Serializes the Update object to a byte array. Updates are serialized before input signature validation.
+* The serialize function accepts the block object and converts it into a byte array for storage within the snapshot. The deserialize function is responsible for deserializing into Blocks.
 
-- `deserializeState` and `deserializeUpdate`: Opposite of `serializeState` and `serializeUpdate`, used for deserialization.
+#### -> `serializeState` and `deserializeState`
 
-  
+* The serialize function accepts the state object and converts it into a byte array for storage within the snapshot. The deserialize function is responsible for deserializing into State.
 
-### l0
+#### -> `serializeUpdate` and `deserializeUpdate`
 
-  
+* The serialize function accepts the update object and converts it into a byte array for storage within the snapshot. The deserialize function is responsible for deserializing into Updates.
 
-The L0 module contains the `genesis` function, initializing the state with an empty `polls` map. The Data class (shared_data) implements the remaining methods.
+#### -> `setCalculatedState`
 
-  
+* This function sets the calculatedState. You can store this as a variable in memory or use external services such as databases. In this example, we use in-memory storage.
 
-### l1
+#### -> `getCalculatedState`
 
-  
+* This function retrieves the calculated state.
 
-The currency L1 layer, with a default implementation in this example.
+#### -> `hashCalculatedState`
 
-  
+* This function creates a hash of the calculatedState to be validated when rebuilding this state, in case of restarting the metagraph.
 
-### data_l1
+#### -> `routes`
 
-  
+Customizes routes for our application.
 
-This module processes incoming data requests. It includes the `/data` POST endpoint for data requests. The remaining methods are implemented in the Data class (shared_data).
-
-  
+In this example, the following endpoints are implemented:
+- `GET <metagraph l0 url>/data-application/collections`: Retrieves all collections.
+- `GET <metagraph l0 url>/data-application/collections/:collection_id`: Retrieves a collection by ID.
+- `GET <metagraph l0 url>/data-application/collections/:collection_id/nfts`: Retrieves all NFTs of a collection.
+- `GET <metagraph l0 url>/data-application/collections/:collection_id/nfts/:nft_id`: Retrieves an NFT of a collection by ID.
+- `GET <metagraph l0 url>/data-application/addresses/:address/collections`: Retrieves all collections associated with an address.
+- `GET <metagraph l0 url>/data-application/addresses/:address/nfts`: Retrieves all NFTs associated with an address.
 
 ## Scripts
 
-  
-
 The example includes a script named `send_data_transaction.js` for generating, signing, and sending data updates to the Metagraph. To use the script:
-
-  
 
 1. Install Node.js if not already done: `npm install`.
 

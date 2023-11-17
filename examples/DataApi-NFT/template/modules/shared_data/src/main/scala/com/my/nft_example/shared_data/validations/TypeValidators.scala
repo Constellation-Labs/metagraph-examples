@@ -1,18 +1,19 @@
-package com.my.nft_example.shared_data
+package com.my.nft_example.shared_data.validations
 
 import cats.implicits.catsSyntaxValidatedIdBinCompat0
-import com.my.nft_example.shared_data.Data.{MintCollection, MintNFT, State, TransferCollection, TransferNFT}
-import com.my.nft_example.shared_data.Errors.{CollectionDoesNotBelongsToProvidedAddress, CollectionNotExists, DuplicatedCollection, InvalidAddress, InvalidFieldSize, InvalidNFTUri, NFTAlreadyExists, NFTDoesNotBelongsToProvidedAddress, NFTNotExists, NFTUriAlreadyExists}
-import com.my.nft_example.shared_data.Utils.{customUpdateSerialization, isValidURL}
-import org.tessellation.currency.dataApplication.DataApplicationValidationError
+import com.my.nft_example.shared_data.errors.Errors._
+import com.my.nft_example.shared_data.Utils.isValidURL
+import com.my.nft_example.shared_data.serializers.Serializers
+import com.my.nft_example.shared_data.types.Types.{MintCollection, MintNFT, NFTUpdatesCalculatedState, NFTUpdatesState, TransferCollection, TransferNFT}
+import org.tessellation.currency.dataApplication.{DataApplicationValidationError, DataState}
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.schema.address.Address
 import org.tessellation.security.hash.Hash
 
 object TypeValidators {
-  def validateIfCollectionIsUnique(update: MintCollection, state: State): DataApplicationValidationErrorOr[Unit] = {
-    val collectionId = Hash.fromBytes(customUpdateSerialization(update)).toString
-    state.collections.get(collectionId) match {
+  def validateIfCollectionIsUnique(update: MintCollection, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataApplicationValidationErrorOr[Unit] = {
+    val collectionId = Hash.fromBytes(Serializers.serializeUpdate(update)).toString
+    state.calculated.collections.get(collectionId) match {
       case Some(_) => DuplicatedCollection.asInstanceOf[DataApplicationValidationError].invalidNec
       case None => ().validNec
     }
@@ -26,8 +27,8 @@ object TypeValidators {
     }
   }
 
-  def validateIfNFTUriIsUnique(update: MintNFT, state: State): DataApplicationValidationErrorOr[Unit] = {
-    state.collections.get(update.collectionId) match {
+  def validateIfNFTUriIsUnique(update: MintNFT, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataApplicationValidationErrorOr[Unit] = {
+    state.calculated.collections.get(update.collectionId) match {
       case Some(value) =>
         val uris = value.nfts.map { case (_, value) => value.uri }.toList
         if (uris.contains(update.uri)) {
@@ -39,8 +40,8 @@ object TypeValidators {
     }
   }
 
-  def validateIfNFTIdIsUnique(update: MintNFT, state: State): DataApplicationValidationErrorOr[Unit] = {
-    state.collections.get(update.collectionId) match {
+  def validateIfNFTIdIsUnique(update: MintNFT, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataApplicationValidationErrorOr[Unit] = {
+    state.calculated.collections.get(update.collectionId) match {
       case Some(value) =>
         val uris = value.nfts.map { case (_, value) => value.id }.toList
         if (uris.contains(update.nftId)) {
@@ -52,8 +53,8 @@ object TypeValidators {
     }
   }
 
-  def validateIfProvidedNFTExists(update: TransferNFT, state: State): DataApplicationValidationErrorOr[Unit] = {
-    state.collections.get(update.collectionId) match {
+  def validateIfProvidedNFTExists(update: TransferNFT, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataApplicationValidationErrorOr[Unit] = {
+    state.calculated.collections.get(update.collectionId) match {
       case Some(value) =>
         value.nfts.get(update.nftId) match {
           case Some(_) => ().validNec
@@ -63,8 +64,8 @@ object TypeValidators {
     }
   }
 
-  def validateIfFromAddressIsTheNFTOwner(update: TransferNFT, state: State): DataApplicationValidationErrorOr[Unit] = {
-    state.collections.get(update.collectionId).flatMap { collection =>
+  def validateIfFromAddressIsTheNFTOwner(update: TransferNFT, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataApplicationValidationErrorOr[Unit] = {
+    state.calculated.collections.get(update.collectionId).flatMap { collection =>
       collection.nfts.get(update.nftId).map { nft => {
         if (nft.owner == update.fromAddress) {
           ().validNec
@@ -76,8 +77,8 @@ object TypeValidators {
     }.getOrElse(CollectionNotExists.asInstanceOf[DataApplicationValidationError].invalidNec)
   }
 
-  def validateIfFromAddressIsTheCollectionOwner(update: TransferCollection, state: State): DataApplicationValidationErrorOr[Unit] = {
-    state.collections.get(update.collectionId) match {
+  def validateIfFromAddressIsTheCollectionOwner(update: TransferCollection, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataApplicationValidationErrorOr[Unit] = {
+    state.calculated.collections.get(update.collectionId) match {
       case Some(collection) =>
         if (collection.owner == update.fromAddress) {
           ().validNec
@@ -88,8 +89,8 @@ object TypeValidators {
     }
   }
 
-  def validateIfProvidedCollectionExists(update: TransferCollection, state: State): DataApplicationValidationErrorOr[Unit] = {
-    state.collections.get(update.collectionId) match {
+  def validateIfProvidedCollectionExists(update: TransferCollection, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataApplicationValidationErrorOr[Unit] = {
+    state.calculated.collections.get(update.collectionId) match {
       case Some(_) =>
         ().validNec
       case None => CollectionNotExists.asInstanceOf[DataApplicationValidationError].invalidNec
