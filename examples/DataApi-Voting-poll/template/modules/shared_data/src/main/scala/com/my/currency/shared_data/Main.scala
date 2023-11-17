@@ -14,9 +14,12 @@ import com.my.currency.shared_data.combiners.Combiners.{combineCreatePoll, combi
 import com.my.currency.shared_data.errors.Errors.CouldNotGetLatestCurrencySnapshot
 import com.my.currency.shared_data.validations.Validations.{createPollValidations, createPollValidationsWithSignature, voteInPollValidations, voteInPollValidationsWithSignature}
 import com.my.currency.shared_data.types.Types.{CreatePoll, PollUpdate, VoteCalculatedState, VoteInPoll, VoteStateOnChain}
+import org.slf4j.LoggerFactory
 import org.tessellation.security.SecurityProvider
 
 object Main {
+
+  private val logger = LoggerFactory.getLogger("Main")
 
   def validateUpdate(update: PollUpdate)(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
     val lastCurrencySnapshot = context.getLastCurrencySnapshot
@@ -50,24 +53,30 @@ object Main {
   }
 
   def combine(state: DataState[VoteStateOnChain, VoteCalculatedState], updates: List[Signed[PollUpdate]])(implicit context: L0NodeContext[IO]): IO[DataState[VoteStateOnChain, VoteCalculatedState]] = {
+    val newStateIO = IO(DataState(VoteStateOnChain(List.empty), state.calculated))
+
     if (updates.isEmpty) {
-      return IO(DataState(VoteStateOnChain(List.empty), state.calculated))
+      logger.info("Snapshot without any update, updating the state to empty updates")
+      return newStateIO
     }
+
     getLastMetagraphIncrementalSnapshotInfo(Left(context)) match {
       case None => println("Could not get lastMetagraphIncrementalSnapshotInfo, keeping current state")
         IO(state)
       case Some(snapshotInfo) =>
-        val updatedState = updates.foldLeft(state) { (acc, signedUpdate) => {
-          val update = signedUpdate.value
-          update match {
-            case poll: CreatePoll =>
-              combineCreatePoll(poll, acc)
-            case voteInPoll: VoteInPoll =>
-              combineVoteInPoll(voteInPoll, acc, snapshotInfo)
+        newStateIO.flatMap(newState => {
+          val updatedState = updates.foldLeft(newState) { (acc, signedUpdate) => {
+            val update = signedUpdate.value
+            update match {
+              case poll: CreatePoll =>
+                combineCreatePoll(poll, acc)
+              case voteInPoll: VoteInPoll =>
+                combineVoteInPoll(voteInPoll, acc, snapshotInfo)
+            }
           }
-        }
-        }
-        IO(updatedState)
+          }
+          IO(updatedState)
+        })
     }
   }
 
