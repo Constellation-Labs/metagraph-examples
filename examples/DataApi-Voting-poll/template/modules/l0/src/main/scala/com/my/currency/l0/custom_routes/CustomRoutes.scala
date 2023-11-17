@@ -1,16 +1,19 @@
 package com.my.currency.l0.custom_routes
 
-import cats.effect.IO
+import cats.effect.Async
+import cats.implicits.toFlatMapOps
 import com.my.currency.shared_data.calculated_state.CalculatedState.getCalculatedState
 import com.my.currency.shared_data.types.Types.Poll
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
-import org.http4s._
+import eu.timepit.refined.auto._
+import org.http4s.{HttpRoutes, Response}
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
-import org.http4s.dsl.io._
+import org.http4s.dsl.Http4sDsl
+import org.tessellation.http.routes.internal.{InternalUrlPrefix, PublicRoutes}
 import org.tessellation.schema.address.Address
 
-object CustomRoutes {
+case class CustomRoutes[F[_]: Async]() extends Http4sDsl[F] with PublicRoutes[F] {
   @derive(decoder, encoder)
   case class PollResponse(id: String, name: String, owner: Address, result: Map[String, Long], startSnapshotOrdinal: Long, endSnapshotOrdinal: Long, status: String)
 
@@ -22,18 +25,16 @@ object CustomRoutes {
     }
   }
 
-  def getAllPolls: IO[Response[IO]] = {
-    val calculatedState = getCalculatedState
-    calculatedState.flatMap { state =>
+  private def getAllPolls: F[Response[F]] = {
+    getCalculatedState.flatMap { state =>
       val pollsResponse = state._2.polls.map { case (_, value) => formatPoll(value, state._1.value.value) }
       Ok(pollsResponse)
     }
 
   }
 
-  def getPollById(pollId: String): IO[Response[IO]] = {
-    val calculatedState = getCalculatedState
-    calculatedState.flatMap { state =>
+  private def getPollById(pollId: String): F[Response[F]] = {
+    getCalculatedState.flatMap { state =>
       val poll = state._2.polls.get(pollId)
       poll match {
         case Some(value) => Ok(formatPoll(value, state._1.value.value))
@@ -42,4 +43,10 @@ object CustomRoutes {
     }
   }
 
+   val public: HttpRoutes[F] = HttpRoutes.of[F] {
+    case GET -> Root / "polls" => getAllPolls
+    case GET -> Root / "polls" / poolId => getPollById(poolId)
+  }
+
+  override protected def prefixPath: InternalUrlPrefix = "/"
 }

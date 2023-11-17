@@ -1,29 +1,17 @@
 package com.my.currency.shared_data
 
-import cats.effect.IO
-import cats.effect.unsafe.implicits.global
+import cats.Functor
+import cats.syntax.functor._
 import org.tessellation.currency.dataApplication.{L0NodeContext, L1NodeContext}
-import org.tessellation.currency.schema.currency.{CurrencyIncrementalSnapshot, CurrencySnapshotInfo}
-import org.tessellation.security.Hashed
+import org.tessellation.currency.schema.currency.CurrencySnapshotInfo
 
 
 object Utils {
-  private def getSnapshotInfo(snapshotIO: IO[Option[(Hashed[CurrencyIncrementalSnapshot], CurrencySnapshotInfo)]]): Option[CurrencySnapshotInfo] = {
-    snapshotIO.map {
-      case Some(value) => Some(value._2)
-      case None => None
-    }.unsafeRunSync()
-  }
 
-  def getLastMetagraphIncrementalSnapshotInfo(context: Either[L0NodeContext[IO], L1NodeContext[IO]]): Option[CurrencySnapshotInfo] = {
-    context match {
-      case Left(value) =>
-        val lastSnapshotCombinedIO = value.getLastCurrencySnapshotCombined
-        getSnapshotInfo(lastSnapshotCombinedIO)
-      case Right(value) =>
-        val lastSnapshotCombinedIO = value.getLastCurrencySnapshotCombined
-        getSnapshotInfo(lastSnapshotCombinedIO)
-    }
+  def getLastMetagraphIncrementalSnapshotInfo[F[_] : Functor](context: Either[L0NodeContext[F], L1NodeContext[F]]): F[Option[CurrencySnapshotInfo]] = {
+    context
+      .fold(_.getLastCurrencySnapshotCombined, _.getLastCurrencySnapshotCombined)
+      .map(_.map(_._2))
   }
 }
 
