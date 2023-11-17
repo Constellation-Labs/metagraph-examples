@@ -88,7 +88,7 @@ Primary code for the example can be found in the following files:
 
 ### Application Lifecycle
 
-The methods of the DataApplication are invoked in the following sequence:
+The methods of the DataApplication are:
 
 -   `validateUpdate`
 -   `validateData`
