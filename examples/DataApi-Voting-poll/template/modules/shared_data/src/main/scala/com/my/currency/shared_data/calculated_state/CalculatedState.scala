@@ -14,23 +14,23 @@ import java.util.concurrent.atomic.AtomicReference
 
 object CalculatedState {
 
-  private val maybeVoteCalculatedState: AtomicReference[(SnapshotOrdinal, VoteCalculatedState)] = new AtomicReference(
+  private val stateRef: AtomicReference[(SnapshotOrdinal, VoteCalculatedState)] = new AtomicReference(
     (SnapshotOrdinal(NonNegLong(0L)),
       VoteCalculatedState(Map.empty))
   )
 
   def getCalculatedState[F[_]: Applicative]: F[(SnapshotOrdinal, VoteCalculatedState)] = {
-    maybeVoteCalculatedState.get().pure[F]
+    stateRef.get().pure[F]
   }
 
   def setCalculatedState[F[_] : Async](snapshotOrdinal: SnapshotOrdinal, state: VoteCalculatedState): F[Boolean] = Async[F].delay {
-    val currentVoteCalculatedState = maybeVoteCalculatedState.get()._2
+    val currentVoteCalculatedState = stateRef.get()._2
     val updatedPolls = state.polls.foldLeft(currentVoteCalculatedState.polls) {
       case (acc, (address, value)) =>
         acc.updated(address, value)
     }
 
-    maybeVoteCalculatedState.set((
+    stateRef.set((
       snapshotOrdinal,
       VoteCalculatedState(updatedPolls)
     )
