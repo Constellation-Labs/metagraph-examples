@@ -16,17 +16,7 @@ object Types {
   case class VoteInPoll(pollId: String, address: Address, option: String) extends PollUpdate
 
   @derive(decoder, encoder)
-  sealed trait PollState {
-    val name: String
-    val owner: Address
-    val pollOptions: Map[String, Long]
-    val usersVotes: Map[Address, Map[String, Long]]
-    val startSnapshotOrdinal: Long
-    val endSnapshotOrdinal: Long
-  }
-
-  @derive(decoder, encoder)
-  case class Poll(id: String, name: String, owner: Address, pollOptions: Map[String, Long], usersVotes: Map[Address, Map[String, Long]], startSnapshotOrdinal: Long, endSnapshotOrdinal: Long) extends PollState
+  case class Poll(id: String, name: String, owner: Address, pollOptions: Map[String, Long], usersVotes: Map[Address, Map[String, Long]], startSnapshotOrdinal: Long, endSnapshotOrdinal: Long)
 
   @derive(decoder, encoder)
   case class VoteStateOnChain(updates: List[PollUpdate]) extends DataOnChainState

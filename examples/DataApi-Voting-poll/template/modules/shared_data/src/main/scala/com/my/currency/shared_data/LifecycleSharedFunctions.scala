@@ -1,10 +1,14 @@
 package com.my.currency.shared_data
 
-import cats.Monad
 import cats.conversions.all.autoWidenFunctor
 import cats.data.NonEmptyList
 import cats.effect.Async
-import cats.implicits.{catsSyntaxApplicativeId, catsSyntaxEitherId, catsSyntaxValidatedIdBinCompat0, toFlatMapOps, toFunctorOps}
+import cats.syntax.applicative._
+import cats.syntax.either._
+import cats.syntax.flatMap._
+import cats.syntax.functor._
+import cats.syntax.option._
+import cats.syntax.validated._
 import com.my.currency.shared_data.Utils.getLastMetagraphIncrementalSnapshotInfo
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.currency.dataApplication.{DataApplicationValidationError, DataState, L0NodeContext, L1NodeContext}
@@ -20,20 +24,21 @@ object LifecycleSharedFunctions {
 
   private val logger = LoggerFactory.getLogger("Data")
 
-  def validateUpdate[F[_] : Monad](update: PollUpdate)(implicit context: L1NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] = {
-    val lastCurrencySnapshot = context.getLastCurrencySnapshot
-
-    lastCurrencySnapshot.map(_.get.ordinal).flatMap { lastSnapshotOrdinal =>
-      update match {
-        case poll: CreatePoll =>
-          createPollValidations(poll, None, Some(lastSnapshotOrdinal))
-        case voteInPoll: VoteInPoll =>
-          getLastMetagraphIncrementalSnapshotInfo(context.asRight[L0NodeContext[F]]).flatMap {
-            case Some(snapshotInfo) => voteInPollValidations(voteInPoll, None, Some(lastSnapshotOrdinal), snapshotInfo)
-            case None => CouldNotGetLatestCurrencySnapshot.asInstanceOf[DataApplicationValidationError].invalidNec[Unit].pure[F]
-          }
+  def validateUpdate[F[_] : Async](update: PollUpdate)(implicit context: L1NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] = {
+    context
+      .getLastCurrencySnapshot
+      .map(_.get.ordinal)
+      .flatMap { lastSnapshotOrdinal =>
+        update match {
+          case poll: CreatePoll => createPollValidations(poll, none, lastSnapshotOrdinal.some)
+          case voteInPoll: VoteInPoll =>
+            getLastMetagraphIncrementalSnapshotInfo(context.asRight[L0NodeContext[F]])
+              .flatMap {
+                case Some(snapshotInfo) => voteInPollValidations(voteInPoll, none, lastSnapshotOrdinal.some, snapshotInfo)
+                case None => CouldNotGetLatestCurrencySnapshot.invalidNec[Unit].pure[F]
+              }
+        }
       }
-    }
   }
 
   def validateData[F[_] : Async](state: DataState[VoteStateOnChain, VoteCalculatedState], updates: NonEmptyList[Signed[PollUpdate]])(implicit context: L0NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] = {

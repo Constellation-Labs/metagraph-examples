@@ -9,22 +9,20 @@ import org.tessellation.security.signature.Signed
 import java.nio.charset.StandardCharsets
 
 object Deserializers {
+  private def deserialize[A: Decoder](bytes: Array[Byte]): Either[Throwable, A] =
+    parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
+      json.as[A]
+    }
 
   def deserializeUpdate(bytes: Array[Byte]): Either[Throwable, PollUpdate] = {
-    parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
-      json.as[PollUpdate]
-    }
+    deserialize[PollUpdate](bytes)
   }
 
   def deserializeState(bytes: Array[Byte]): Either[Throwable, VoteStateOnChain] = {
-    parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
-      json.as[VoteStateOnChain]
-    }
+    deserialize[VoteStateOnChain](bytes)
   }
 
   def deserializeBlock(bytes: Array[Byte])(implicit e: Decoder[DataUpdate]): Either[Throwable, Signed[DataApplicationBlock]] = {
-    parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
-      json.as[Signed[DataApplicationBlock]]
-    }
+    deserialize[Signed[DataApplicationBlock]](bytes)
   }
 }

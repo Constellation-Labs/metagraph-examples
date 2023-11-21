@@ -10,6 +10,7 @@ import eu.timepit.refined.auto._
 import org.http4s.{HttpRoutes, Response}
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 import org.http4s.dsl.Http4sDsl
+import org.http4s.server.middleware.CORS
 import org.tessellation.http.routes.internal.{InternalUrlPrefix, PublicRoutes}
 import org.tessellation.schema.address.Address
 
@@ -43,10 +44,16 @@ case class CustomRoutes[F[_]: Async]() extends Http4sDsl[F] with PublicRoutes[F]
     }
   }
 
-   val public: HttpRoutes[F] = HttpRoutes.of[F] {
+  private val routes: HttpRoutes[F] = HttpRoutes.of[F] {
     case GET -> Root / "polls" => getAllPolls
     case GET -> Root / "polls" / poolId => getPollById(poolId)
   }
+
+  val public: HttpRoutes[F] =
+    CORS
+      .policy
+      .withAllowCredentials(true)
+      .httpRoutes(routes)
 
   override protected def prefixPath: InternalUrlPrefix = "/"
 }
