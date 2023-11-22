@@ -2,7 +2,8 @@ package com.my.currency.l0
 
 import cats.data.NonEmptyList
 import cats.effect.IO
-import cats.implicits.{catsSyntaxApplicativeId, catsSyntaxValidatedIdBinCompat0}
+import cats.syntax.applicative._
+import cats.syntax.validated._
 import com.my.currency.l0.custom_routes.CustomRoutes
 import com.my.currency.shared_data.LifecycleSharedFunctions
 import com.my.currency.shared_data.calculated_state.CalculatedState

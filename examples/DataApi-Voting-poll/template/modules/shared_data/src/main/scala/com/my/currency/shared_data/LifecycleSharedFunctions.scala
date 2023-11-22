@@ -15,6 +15,7 @@ import org.tessellation.currency.dataApplication.{DataApplicationValidationError
 import org.tessellation.security.signature.Signed
 import com.my.currency.shared_data.combiners.Combiners.{combineCreatePoll, combineVoteInPoll}
 import com.my.currency.shared_data.errors.Errors.CouldNotGetLatestCurrencySnapshot
+import com.my.currency.shared_data.errors.Errors.DataApplicationValidationTypeOps
 import com.my.currency.shared_data.validations.Validations.{createPollValidations, createPollValidationsWithSignature, voteInPollValidations, voteInPollValidationsWithSignature}
 import com.my.currency.shared_data.types.Types.{CreatePoll, PollUpdate, VoteCalculatedState, VoteInPoll, VoteStateOnChain}
 import org.slf4j.LoggerFactory
@@ -35,7 +36,7 @@ object LifecycleSharedFunctions {
             getLastMetagraphIncrementalSnapshotInfo(context.asRight[L0NodeContext[F]])
               .flatMap {
                 case Some(snapshotInfo) => voteInPollValidations(voteInPoll, none, lastSnapshotOrdinal.some, snapshotInfo)
-                case None => CouldNotGetLatestCurrencySnapshot.invalidNec[Unit].pure[F]
+                case None => CouldNotGetLatestCurrencySnapshot.invalid.pure[F]
               }
         }
       }
@@ -50,7 +51,7 @@ object LifecycleSharedFunctions {
         case voteInPoll: VoteInPoll =>
           getLastMetagraphIncrementalSnapshotInfo(context.asLeft[L1NodeContext[F]]).flatMap {
             case Some(snapshotInfo) => voteInPollValidationsWithSignature(voteInPoll, signedUpdate.proofs, state, snapshotInfo)
-            case None => CouldNotGetLatestCurrencySnapshot.asInstanceOf[DataApplicationValidationError].invalidNec[Unit].pure[F]
+            case None => CouldNotGetLatestCurrencySnapshot.invalid.pure[F]
           }
       }
     }.map(_.reduce)

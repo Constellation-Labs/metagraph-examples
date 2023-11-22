@@ -14,7 +14,7 @@ import org.http4s.server.middleware.CORS
 import org.tessellation.http.routes.internal.{InternalUrlPrefix, PublicRoutes}
 import org.tessellation.schema.address.Address
 
-case class CustomRoutes[F[_]: Async]() extends Http4sDsl[F] with PublicRoutes[F] {
+case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F] {
   @derive(decoder, encoder)
   case class PollResponse(id: String, name: String, owner: Address, result: Map[String, Long], startSnapshotOrdinal: Long, endSnapshotOrdinal: Long, status: String)
 
@@ -27,21 +27,22 @@ case class CustomRoutes[F[_]: Async]() extends Http4sDsl[F] with PublicRoutes[F]
   }
 
   private def getAllPolls: F[Response[F]] = {
-    getCalculatedState.flatMap { state =>
-      val pollsResponse = state._2.polls.map { case (_, value) => formatPoll(value, state._1.value.value) }
-      Ok(pollsResponse)
-    }
-
+    getCalculatedState
+      .flatMap { state =>
+        val pollsResponse = state._2.polls.map { case (_, value) => formatPoll(value, state._1.value.value) }
+        Ok(pollsResponse)
+      }
   }
 
   private def getPollById(pollId: String): F[Response[F]] = {
-    getCalculatedState.flatMap { state =>
-      val poll = state._2.polls.get(pollId)
-      poll match {
-        case Some(value) => Ok(formatPoll(value, state._1.value.value))
-        case None => NotFound()
+    getCalculatedState
+      .flatMap { state =>
+        val poll = state._2.polls.get(pollId)
+        poll match {
+          case Some(value) => Ok(formatPoll(value, state._1.value.value))
+          case None => NotFound()
+        }
       }
-    }
   }
 
   private val routes: HttpRoutes[F] = HttpRoutes.of[F] {
