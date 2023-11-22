@@ -1,7 +1,7 @@
 package com.my.currency.l0.custom_routes
 
 import cats.effect.Async
-import cats.implicits.toFlatMapOps
+import cats.implicits.{catsSyntaxApplicativeError, catsSyntaxFlatMapOps, toFlatMapOps}
 import com.my.currency.shared_data.calculated_state.CalculatedState.getCalculatedState
 import com.my.currency.shared_data.types.Types.Poll
 import derevo.circe.magnolia.{decoder, encoder}
@@ -13,8 +13,12 @@ import org.http4s.dsl.Http4sDsl
 import org.http4s.server.middleware.CORS
 import org.tessellation.http.routes.internal.{InternalUrlPrefix, PublicRoutes}
 import org.tessellation.schema.address.Address
+import org.typelevel.log4cats.SelfAwareStructuredLogger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F] {
+  implicit val logger: SelfAwareStructuredLogger[F] = Slf4jLogger.getLogger[F]
+
   @derive(decoder, encoder)
   case class PollResponse(id: String, name: String, owner: Address, result: Map[String, Long], startSnapshotOrdinal: Long, endSnapshotOrdinal: Long, status: String)
 
@@ -32,6 +36,7 @@ case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F
         val pollsResponse = state._2.polls.map { case (_, value) => formatPoll(value, state._1.value.value) }
         Ok(pollsResponse)
       }
+      .handleErrorWith(e => logger.error(e)(s"An error occured!") >> BadRequest())
   }
 
   private def getPollById(pollId: String): F[Response[F]] = {
@@ -43,6 +48,7 @@ case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F
           case None => NotFound()
         }
       }
+      .handleErrorWith(e => logger.error(e)(s"An error occured!") >> BadRequest())
   }
 
   private val routes: HttpRoutes[F] = HttpRoutes.of[F] {
@@ -53,7 +59,7 @@ case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F
   val public: HttpRoutes[F] =
     CORS
       .policy
-      .withAllowCredentials(true)
+      .withAllowCredentials(false)
       .httpRoutes(routes)
 
   override protected def prefixPath: InternalUrlPrefix = "/"
