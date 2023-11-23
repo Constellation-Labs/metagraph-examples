@@ -18,122 +18,104 @@ Primary code for the example can be found in the following files:
 
   
 
-`modules/l0/src/main/scala/com/my/currency/l0/Main.scala`
+`modules/l0/src/main/scala/com/my/currency/l0/*`
 
   
 
-`modules/l1/src/main/scala/com/my/currency/l1/Main.scala`
+`modules/l1/src/main/scala/com/my/currency/l1/*`
 
   
 
-`modules/data_l1/src/main/scala/com/my/currency/data_l1/Main.scala`
+`modules/data_l1/src/main/scala/com/my/currency/data_l1/*`
 
   
 
-`modules/shared_data/src/main/scala/com/my/currency/shared_data/MainData.scala`
+`modules/shared_data/src/main/scala/com/my/currency/shared_data/*`
 
-  
+
 
 ### Application Lifecycle
 
-The DataApplication methods are called in the following order:
+The methods of the DataApplication are invoked in the following sequence:
 
-- `serializeUpdate`
+-   `validateUpdate`
+-   `validateData`
+-   `combine`
+-   `dataEncoder`
+-   `dataDecoder`
+-   `calculatedStateEncoder`
+-   `signedDataEntityDecoder`
+-   `serializeBlock`
+-   `deserializeBlock`
+-   `serializeState`
+-   `deserializeState`
+-   `serializeUpdate`
+-   `deserializeUpdate`
+-   `setCalculatedState`
+-   `getCalculatedState`
+-   `hashCalculatedState`
+-   `routes`
 
-- `validateUpdate`
+For a more detailed understanding, please refer to the [complete documentation](https://docs.constellationnetwork.io/sdk/frameworks/currency/data-api) on the Data API.
 
-- `validateData`
+### Lifecycle Functions
 
-- `combine`
+#### -> `validateUpdate`
 
-- `serializeState`
+* This method initiates the initial validation of updates on the L1 layer. Due to a lack of contextual information (state), its validation capabilities are constrained. Any errors arising from this method result in a 500 response from the `/data` POST endpoint.
 
-  
+#### -> `validateData`
 
-See [full documentation](https://docs.constellationnetwork.io/sdk/frameworks/currency/data-api) on the Data API for additional detail.
+* This method validates data on the L0 layer, with access to contextual information, including the current state. In this example, we ensure that the provided address matches the one that signed the message. Additionally, we verify the most recent update timestamp to prevent the acceptance of outdated or duplicated data.
 
-  
+#### -> `combine`
 
-### shared_data
+* This method takes validated data and the prior state, combining them to produce the new state. In this instance, we update device information in the state based on the validated update.
 
-  
+#### -> `dataEncoder` and `dataDecoder`
 
--> `validateUpdate`
+* These are the encoder/decoder components used for incoming updates.
 
-  
+#### -> `calculatedStateEncoder`
 
-This method performs initial validation on the update on the L1 layer.  For this example, we check that the provided address is the same as the address that signed the message. We also check if the user already voted in a poll, if the poll already exists, and if the poll is valid yet, comparing the current snapshot with the end snapshot, provided on the poll creation. If an error is returned from this method, it will be returned as a 500 response from the `/data` POST endpoint.
+* This encoder is employed for the calculatedState.
 
-  
+#### -> `signedDataEntityDecoder`
 
--> `validateData`
+* This function handles the parsing of request body formats (JSON, string, xml) into a `Signed[Update]` class.
 
-  
+#### -> `serializeBlock` and `deserializeBlock`
 
-This method performs validation on the data on the L0 layer and has access to context information. For this example, we check that the provided address is the same as the address that signed the message. We also check if the user already voted in a poll, if the poll already exists, and if the poll is valid yet, comparing the current snapshot with the end snapshot, provided on the poll creation.
+* The serialize function accepts the block object and converts it into a byte array for storage within the snapshot. The deserialize function is responsible for deserializing into Blocks.
 
-  
+#### -> `serializeState` and `deserializeState`
 
--> `combine`
+* The serialize function accepts the state object and converts it into a byte array for storage within the snapshot. The deserialize function is responsible for deserializing into State.
 
-  
+#### -> `serializeUpdate` and `deserializeUpdate`
 
-This method accepts validated data and the previous state which is combined to return the new state. For this example, we update inserting a new poll or voting in an existent poll, storing the information of who voted and what is the vote with amount.
+* The serialize function accepts the update object and converts it into a byte array for storage within the snapshot. The deserialize function is responsible for deserializing into Updates.
 
-  
+#### -> `setCalculatedState`
 
--> `serializeState`
+* This function sets the calculatedState. You can store this as a variable in memory or use external services such as databases. In this example, we use in-memory storage.
 
-  
+#### -> `getCalculatedState`
 
-This method accepts the State object and serializes it to a byte array for storage in the snapshot.
+* This function retrieves the calculated state.
 
-  
+#### -> `hashCalculatedState`
 
--> `serializeUpdate`
+* This function creates a hash of the calculatedState to be validated when rebuilding this state, in case of restarting the metagraph.
 
-  
+#### -> `routes`
 
-This method accepts the Update object and serializes it to a byte array. Updates are serialized before their input signatures are checked for validity.
+Customizes routes for our application.
 
-  
-  
+In this example, the following endpoints are implemented:
 
--> `deserializeState` and `deserializeUpdate`
-
-  
-
-The opposite of `serializeState` and `serializeUpdate`, this will deserialize to State and Update objects, respectively.
-
-  
-
-### l0
-
-  
-
-The L0 module contains the `genesis` function. This function will initialize our state, in this case, we initialize with an empty `polls` map. The remaining methods are implemented in the Data class (shared_data).
-
-  
-
-### l1
-
-  
-
-The currency L1 layer, in this example we use a default implementation.
-
-  
-
-### data_l1
-
-  
-
-The module that will receive the requests to be processed. This module contains the `/data` POST endpoint which accepts incoming data requests.
-
-  
-
-The remaining methods are implemented in the Data class (shared_data).
-
-  
+-   GET `<metagraph l0 url>/data-application/polls`: Returns the polls.
+-   GET `<metagraph l0 url>/data-application/polls/:poll_id`: Returns the poll by id.
 
 ## Scripts
 
@@ -151,4 +133,4 @@ This example includes a script to generate, sign, and send data updates to the m
 
 - Run the script with `node send_data_transaction.js`
 
-- Query the state GET endpoint at `<your L1 base url>/data-application/addresses` to see the updated state after each update.
+- Query the state GET endpoint at `<your metagraph L0 base url>/data-application/addresses` to see the updated state after each update.

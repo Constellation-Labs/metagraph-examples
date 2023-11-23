@@ -89,7 +89,12 @@ lazy val currencyL0 = (project in file("modules/l0"))
       Libraries.tessellationSDK,
       Libraries.tessellationShared,
       Libraries.tessellationKeytool,
-      Libraries.tessellationCurrencyL0
+      Libraries.tessellationCurrencyL0,
+      Libraries.http4sCore,
+      Libraries.http4sDsl,
+      Libraries.http4sServer,
+      Libraries.http4sClient,
+      Libraries.http4sCirce
     )
   )
 
