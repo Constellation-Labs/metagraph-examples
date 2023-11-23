@@ -1,6 +1,5 @@
 package com.my.currency.shared_data
 
-import cats.conversions.all.autoWidenFunctor
 import cats.data.NonEmptyList
 import cats.effect.Async
 import cats.syntax.applicative._
@@ -8,10 +7,9 @@ import cats.syntax.either._
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 import cats.syntax.option._
-import cats.syntax.validated._
 import com.my.currency.shared_data.Utils.getLastMetagraphIncrementalSnapshotInfo
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.currency.dataApplication.{DataApplicationValidationError, DataState, L0NodeContext, L1NodeContext}
+import org.tessellation.currency.dataApplication.{DataState, L0NodeContext, L1NodeContext}
 import org.tessellation.security.signature.Signed
 import com.my.currency.shared_data.combiners.Combiners.{combineCreatePoll, combineVoteInPoll}
 import com.my.currency.shared_data.errors.Errors.CouldNotGetLatestCurrencySnapshot

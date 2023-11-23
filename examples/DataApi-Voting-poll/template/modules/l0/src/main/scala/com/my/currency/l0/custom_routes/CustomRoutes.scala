@@ -1,7 +1,9 @@
 package com.my.currency.l0.custom_routes
 
 import cats.effect.Async
-import cats.implicits.{catsSyntaxApplicativeError, catsSyntaxFlatMapOps, toFlatMapOps}
+import cats.syntax.functor._
+import cats.syntax.applicativeError._
+import cats.syntax.flatMap._
 import com.my.currency.shared_data.calculated_state.CalculatedState.getCalculatedState
 import com.my.currency.shared_data.types.Types.Poll
 import derevo.circe.magnolia.{decoder, encoder}
@@ -32,23 +34,23 @@ case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F
 
   private def getAllPolls: F[Response[F]] = {
     getCalculatedState
-      .flatMap { state =>
-        val pollsResponse = state._2.polls.map { case (_, value) => formatPoll(value, state._1.value.value) }
-        Ok(pollsResponse)
+      .map { case (ord, state) => state.polls.view.mapValues(formatPoll(_, ord.value.value)).toList }
+      .flatMap(Ok(_))
+      .handleErrorWith { e =>
+        val message = s"An error occurred when getAllPolls: ${e.getMessage}"
+        logger.error(message) >> new Exception(message).raiseError[F, Response[F]]
       }
-      .handleErrorWith(e => logger.error(e)(s"An error occured!") >> BadRequest())
   }
 
   private def getPollById(pollId: String): F[Response[F]] = {
     getCalculatedState
-      .flatMap { state =>
-        val poll = state._2.polls.get(pollId)
-        poll match {
-          case Some(value) => Ok(formatPoll(value, state._1.value.value))
-          case None => NotFound()
-        }
+      .map { case (ord, state) => state.polls.get(pollId).map(formatPoll(_, ord.value.value)) }
+      .flatMap(_.fold(NotFound())(Ok(_)))
+      .handleErrorWith { e =>
+        val message = s"An error occurred when getPollById: ${e.getMessage}"
+        logger.error(message) >> new Exception(message).raiseError[F, Response[F]]
       }
-      .handleErrorWith(e => logger.error(e)(s"An error occured!") >> BadRequest())
+
   }
 
   private val routes: HttpRoutes[F] = HttpRoutes.of[F] {
