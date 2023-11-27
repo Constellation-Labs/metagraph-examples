@@ -1,34 +1,17 @@
 package com.my.currency.shared_data
 
-import com.my.currency.shared_data.MainData.{PollUpdate, State}
-import io.circe.parser
-import io.circe.syntax.EncoderOps
+import cats.Functor
+import cats.syntax.functor._
+import org.tessellation.currency.dataApplication.{L0NodeContext, L1NodeContext}
+import org.tessellation.currency.schema.currency.CurrencySnapshotInfo
 
-import java.nio.charset.StandardCharsets
 
 object Utils {
-  def customUpdateSerialization(update: PollUpdate): Array[Byte] = {
-    println("Serialize UPDATE event received")
-    println(update.asJson.deepDropNullValues.noSpaces)
-    update.asJson.deepDropNullValues.noSpaces.getBytes(StandardCharsets.UTF_8)
-  }
 
-  def customStateSerialization(state: State): Array[Byte] = {
-    println("Serialize STATE event received")
-    println(state.asJson.deepDropNullValues.noSpaces)
-    state.asJson.deepDropNullValues.noSpaces.getBytes(StandardCharsets.UTF_8)
-  }
-
-  def customStateDeserialization(bytes: Array[Byte]): Either[Throwable, State] = {
-    parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
-      json.as[State]
-    }
-  }
-
-  def customUpdateDeserialization(bytes: Array[Byte]): Either[Throwable, PollUpdate] = {
-    parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
-      json.as[PollUpdate]
-    }
+  def getLastMetagraphIncrementalSnapshotInfo[F[_] : Functor](context: Either[L0NodeContext[F], L1NodeContext[F]]): F[Option[CurrencySnapshotInfo]] = {
+    context
+      .fold(_.getLastCurrencySnapshotCombined, _.getLastCurrencySnapshotCombined)
+      .map(_.map(_._2))
   }
 }
 
