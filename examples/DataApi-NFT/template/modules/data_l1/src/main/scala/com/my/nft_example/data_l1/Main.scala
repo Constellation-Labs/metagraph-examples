@@ -2,8 +2,8 @@ package com.my.nft_example.data_l1
 
 import cats.data.NonEmptyList
 import cats.effect.IO
-import cats.implicits.catsSyntaxValidatedIdBinCompat0
-import com.my.nft_example.shared_data
+import cats.implicits.{catsSyntaxApplicativeId, catsSyntaxValidatedIdBinCompat0}
+import com.my.nft_example.shared_data.LifecycleSharedFunctions
 import com.my.nft_example.shared_data.calculated_state.CalculatedState
 import com.my.nft_example.shared_data.deserializers.Deserializers
 import com.my.nft_example.shared_data.serializers.Serializers
@@ -31,13 +31,11 @@ object Main
   ) {
   override def dataApplication: Option[BaseDataApplicationL1Service[IO]] = Option(BaseDataApplicationL1Service(new DataApplicationL1Service[IO, NFTUpdate, NFTUpdatesState, NFTUpdatesCalculatedState] {
 
-    override def validateData(state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState], updates: NonEmptyList[Signed[NFTUpdate]])(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = IO {
-      ().validNec
-    }
+    override def validateData(state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState], updates: NonEmptyList[Signed[NFTUpdate]])(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = ().validNec.pure[IO]
 
-    override def validateUpdate(update: NFTUpdate)(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = shared_data.Main.validateUpdate(update)
+    override def validateUpdate(update: NFTUpdate)(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = LifecycleSharedFunctions.validateUpdate[IO](update)
 
-    override def combine(state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState], updates: List[Signed[NFTUpdate]])(implicit context: L1NodeContext[IO]): IO[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]] = IO(state)
+    override def combine(state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState], updates: List[Signed[NFTUpdate]])(implicit context: L1NodeContext[IO]): IO[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]] = state.pure[IO]
 
     override def serializeState(state: NFTUpdatesState): IO[Array[Byte]] = IO(Serializers.serializeState(state))
 
@@ -63,10 +61,10 @@ object Main
 
     override def signedDataEntityDecoder: EntityDecoder[IO, Signed[NFTUpdate]] = circeEntityDecoder
 
-    override def getCalculatedState(implicit context: L1NodeContext[IO]): IO[(SnapshotOrdinal, NFTUpdatesCalculatedState)] = CalculatedState.getCalculatedState
+    override def getCalculatedState(implicit context: L1NodeContext[IO]): IO[(SnapshotOrdinal, NFTUpdatesCalculatedState)] = CalculatedState.getCalculatedState[IO]
 
-    override def setCalculatedState(ordinal: SnapshotOrdinal, state: NFTUpdatesCalculatedState)(implicit context: L1NodeContext[IO]): IO[Boolean] = CalculatedState.setCalculatedState(ordinal, state)
+    override def setCalculatedState(ordinal: SnapshotOrdinal, state: NFTUpdatesCalculatedState)(implicit context: L1NodeContext[IO]): IO[Boolean] = CalculatedState.setCalculatedState[IO](ordinal, state)
 
-    override def hashCalculatedState(state: NFTUpdatesCalculatedState)(implicit context: L1NodeContext[IO]): IO[Hash] = CalculatedState.hashCalculatedState(state)
+    override def hashCalculatedState(state: NFTUpdatesCalculatedState)(implicit context: L1NodeContext[IO]): IO[Hash] = CalculatedState.hashCalculatedState[IO](state)
   }))
 }

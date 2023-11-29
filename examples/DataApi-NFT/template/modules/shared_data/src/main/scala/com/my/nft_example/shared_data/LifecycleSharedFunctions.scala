@@ -1,21 +1,25 @@
 package com.my.nft_example.shared_data
 
 import cats.data.NonEmptyList
-import cats.effect.IO
+import cats.effect.Async
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.currency.dataApplication.{DataState, L0NodeContext}
 import org.tessellation.security.signature.Signed
 import cats.syntax.all._
+import com.my.nft_example.shared_data.Utils.{getAllAddressesFromProofs, getFirstAddressFromProofs}
 import com.my.nft_example.shared_data.combiners.Combiners.{combineMintCollection, combineMintNFT, combineTransferCollection, combineTransferNFT}
 import com.my.nft_example.shared_data.types.Types.{MintCollection, MintNFT, NFTUpdate, NFTUpdatesCalculatedState, NFTUpdatesState, TransferCollection, TransferNFT}
 import com.my.nft_example.shared_data.validations.Validations.{mintCollectionValidations, mintNFTValidations, mintNFTValidationsWithSignature, transferCollectionValidations, transferCollectionValidationsWithSignature, transferNFTValidations, transferNFTValidationsWithSignature}
-import org.slf4j.LoggerFactory
 import org.tessellation.security.SecurityProvider
+import org.typelevel.log4cats.SelfAwareStructuredLogger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 
-object Main {
-  private val logger = LoggerFactory.getLogger("Data")
+object LifecycleSharedFunctions {
+  def logger[F[_] : Async]: SelfAwareStructuredLogger[F] = Slf4jLogger.getLoggerFromName[F]("ClusterApi")
 
-  def validateUpdate(update: NFTUpdate): IO[DataApplicationValidationErrorOr[Unit]] = {
+  def validateUpdate[F[_] : Async](
+    update: NFTUpdate
+  ): F[DataApplicationValidationErrorOr[Unit]] =
     update match {
       case mintCollection: MintCollection =>
         mintCollectionValidations(mintCollection, None)
@@ -26,15 +30,14 @@ object Main {
       case transferNFT: TransferNFT =>
         transferNFTValidations(transferNFT, None)
     }
-  }
 
-  def validateData(state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState], updates: NonEmptyList[Signed[NFTUpdate]])(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = {
-    implicit val sp: SecurityProvider[IO] = context.securityProvider
+  def validateData[F[_] : Async](
+    state  : DataState[NFTUpdatesState, NFTUpdatesCalculatedState],
+    updates: NonEmptyList[Signed[NFTUpdate]]
+  )(implicit context: L0NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] = {
+    implicit val sp: SecurityProvider[F] = context.securityProvider
     updates.traverse { signedUpdate =>
-      signedUpdate.proofs
-        .map(_.id)
-        .toList
-        .traverse(_.toAddress[IO])
+      getAllAddressesFromProofs(signedUpdate.proofs)
         .flatMap { addresses =>
           signedUpdate.value match {
             case mintCollection: MintCollection =>
@@ -50,32 +53,32 @@ object Main {
     }.map(_.reduce)
   }
 
-  def combine(state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState], updates: List[Signed[NFTUpdate]])(implicit context: L0NodeContext[IO]): IO[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]] = {
-    val newStateIO = IO(DataState(NFTUpdatesState(List.empty), state.calculated))
+  def combine[F[_] : Async](
+    state  : DataState[NFTUpdatesState, NFTUpdatesCalculatedState],
+    updates: List[Signed[NFTUpdate]]
+  )(implicit context: L0NodeContext[F]): F[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]] = {
+    val newStateF = DataState(NFTUpdatesState(List.empty), state.calculated).pure[F]
 
     if (updates.isEmpty) {
-      logger.info("Snapshot without any updates, updating the state to empty updates")
-      return newStateIO
-    }
-
-    implicit val sp: SecurityProvider[IO] = context.securityProvider
-    newStateIO.flatMap(newState => {
-      updates.foldLeftM(newState) { (acc, signedUpdate) => {
-        val update = signedUpdate.value
-        update match {
-          case mintCollection: MintCollection =>
-            val collectionOwner = signedUpdate.proofs.map(_.id).toList.head.toAddress[IO]
-            collectionOwner.map(address => combineMintCollection(mintCollection, acc, address))
-          case mintNFT: MintNFT =>
-            combineMintNFT(mintNFT, acc).pure[IO]
-          case transferCollection: TransferCollection =>
-            combineTransferCollection(transferCollection, acc).pure[IO]
-          case transferNFT: TransferNFT =>
-            combineTransferNFT(transferNFT, acc).pure[IO]
+      logger.info("Snapshot without any updates, updating the state to empty updates") >> newStateF
+    } else {
+      implicit val sp: SecurityProvider[F] = context.securityProvider
+      newStateF.flatMap(newState => {
+        updates.foldLeftM(newState) { (acc, signedUpdate) => {
+          signedUpdate.value match {
+            case mintCollection: MintCollection =>
+              getFirstAddressFromProofs(signedUpdate.proofs)
+                .map(combineMintCollection(mintCollection, acc, _))
+            case mintNFT: MintNFT =>
+              Async[F].delay(combineMintNFT(mintNFT, acc))
+            case transferCollection: TransferCollection =>
+              Async[F].delay(combineTransferCollection(transferCollection, acc))
+            case transferNFT: TransferNFT =>
+              Async[F].delay(combineTransferNFT(transferNFT, acc))
+          }
         }
-      }
-      }
-    })
+        }
+      })
+    }
   }
-
 }

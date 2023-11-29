@@ -1,44 +1,60 @@
 package com.my.nft_example.l0.custom_routes
 
-import cats.effect.IO
+import cats.effect.Async
+import cats.implicits.{toFlatMapOps, toFunctorOps}
 import com.my.nft_example.shared_data.calculated_state.CalculatedState.getCalculatedState
-import com.my.nft_example.shared_data.types.Types.{Collection, NFT, NFTUpdatesCalculatedState}
-import derevo.circe.magnolia.{decoder, encoder}
-import derevo.derive
+import com.my.nft_example.shared_data.types.Types.{Collection, CollectionResponse, NFT, NFTResponse, NFTUpdatesCalculatedState}
 import org.http4s._
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
-import org.http4s.dsl.io._
+import org.http4s.dsl.Http4sDsl
+import org.tessellation.ext.http4s.AddressVar
+import org.tessellation.http.routes.internal.{InternalUrlPrefix, PublicRoutes}
 import org.tessellation.schema.address.Address
+import eu.timepit.refined.auto._
+import org.http4s.server.middleware.CORS
 
-object CustomRoutes {
+case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F] {
 
-  @derive(decoder, encoder)
-  case class CollectionResponse(id: String, owner: Address, name: String, creationDateTimestamp: Long, numberOfNFTs: Long)
+  private def formatToCollectionResponse(
+    collection: Collection
+  ): CollectionResponse =
+    CollectionResponse(
+      collection.id,
+      collection.owner,
+      collection.name,
+      collection.creationDateTimestamp,
+      collection.nfts.size.toLong
+    )
 
-  @derive(decoder, encoder)
-  case class NFTResponse(id: Long, collectionId: String, owner: Address, uri: String, name: String, description: String, creationDateTimestamp: Long, metadata: Map[String, String])
-
-  private def formatToCollectionResponse(collection: Collection): CollectionResponse = {
-    CollectionResponse(collection.id, collection.owner, collection.name, collection.creationDateTimestamp, collection.nfts.size.toLong)
+  private def formatToNFTResponse(
+    nft: NFT
+  ): NFTResponse = {
+    NFTResponse(
+      nft.id,
+      nft.collectionId,
+      nft.owner, nft.uri,
+      nft.name,
+      nft.description,
+      nft.creationDateTimestamp,
+      nft.metadata
+    )
   }
 
-  private def formatToNFTResponse(nft: NFT): NFTResponse = {
-    NFTResponse(nft.id, nft.collectionId, nft.owner, nft.uri, nft.name, nft.description, nft.creationDateTimestamp, nft.metadata)
-  }
-
-  private def getState: IO[NFTUpdatesCalculatedState] = {
+  private def getState: F[NFTUpdatesCalculatedState] = {
     val calculatedState = getCalculatedState
     calculatedState.map(_._2)
   }
 
-  def getAllCollections: IO[Response[IO]] = {
+  private def getAllCollections: F[Response[F]] = {
     getState.flatMap { state =>
       val allCollectionsResponse = state.collections.map { case (_, collection) => formatToCollectionResponse(collection) }.toList
       Ok(allCollectionsResponse)
     }
   }
 
-  def getCollectionById(collectionId: String): IO[Response[IO]] = {
+  private def getCollectionById(
+    collectionId: String
+  ): F[Response[F]] = {
     getState.flatMap { state =>
       state.collections.get(collectionId).map { value =>
         Ok(formatToCollectionResponse(value))
@@ -46,7 +62,9 @@ object CustomRoutes {
     }
   }
 
-  def getCollectionNFTs(collectionId: String): IO[Response[IO]] = {
+  private def getCollectionNFTs(
+    collectionId: String
+  ): F[Response[F]] = {
     getState.flatMap { state =>
       state.collections.get(collectionId).map { value =>
         Ok(value.nfts.map { case (_, nft) => formatToNFTResponse(nft) }.toList)
@@ -54,7 +72,10 @@ object CustomRoutes {
     }
   }
 
-  def getCollectionNFTById(collectionId: String, nftId: Long): IO[Response[IO]] = {
+  private def getCollectionNFTById(
+    collectionId: String,
+    nftId       : Long
+  ): F[Response[F]] = {
     getState.flatMap { state =>
       state.collections.get(collectionId).flatMap { collection =>
         collection.nfts.get(nftId).map { nft => Ok(formatToNFTResponse(nft)) }
@@ -62,7 +83,9 @@ object CustomRoutes {
     }
   }
 
-  def getAllCollectionsOfAddress(address: Address): IO[Response[IO]] = {
+  private def getAllCollectionsOfAddress(
+    address: Address
+  ): F[Response[F]] = {
     getState.flatMap { state =>
       val addressCollections = state.collections.filter { case (_, collection) =>
         collection.owner == address
@@ -71,7 +94,9 @@ object CustomRoutes {
     }
   }
 
-  def getAllNFTsOfAddress(address: Address): IO[Response[IO]] = {
+  private def getAllNFTsOfAddress(
+    address: Address
+  ): F[Response[F]] = {
     getState.flatMap { state =>
       val allAddressNFTs = state.collections.flatMap {
         case (_, collection) =>
@@ -83,4 +108,21 @@ object CustomRoutes {
       Ok(allAddressNFTs.map { case (_, nft) => formatToNFTResponse(nft) })
     }
   }
+
+  private val routes: HttpRoutes[F] = HttpRoutes.of[F] {
+    case GET -> Root / "collections" => getAllCollections
+    case GET -> Root / "collections" / collectionId => getCollectionById(collectionId)
+    case GET -> Root / "collections" / collectionId / "nfts" => getCollectionNFTs(collectionId)
+    case GET -> Root / "collections" / collectionId / "nfts" / nftId => getCollectionNFTById(collectionId, nftId.toLong)
+    case GET -> Root / "addresses" / AddressVar(address) / "collections" => getAllCollectionsOfAddress(address)
+    case GET -> Root / "addresses" / AddressVar(address) / "nfts" => getAllNFTsOfAddress(address)
+  }
+
+  val public: HttpRoutes[F] =
+    CORS
+      .policy
+      .withAllowCredentials(false)
+      .httpRoutes(routes)
+
+  override protected def prefixPath: InternalUrlPrefix = "/"
 }

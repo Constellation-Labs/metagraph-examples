@@ -8,7 +8,11 @@ import org.tessellation.schema.address.Address
 import org.tessellation.security.hash.Hash
 
 object Combiners {
-  def combineMintCollection(update: MintCollection, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState], collectionOwner: Address): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] = {
+  def combineMintCollection(
+    update         : MintCollection,
+    state          : DataState[NFTUpdatesState, NFTUpdatesCalculatedState],
+    collectionOwner: Address
+  ): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] = {
     val collectionId = Hash.fromBytes(Serializers.serializeUpdate(update)).toString
     val nowInTime = System.currentTimeMillis()
     val newState = Collection(collectionId, collectionOwner, update.name, nowInTime, Map.empty)
@@ -19,7 +23,10 @@ object Combiners {
     DataState(NFTUpdatesState(newUpdatesList), newCalculatedState)
   }
 
-  def combineMintNFT(update: MintNFT, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] = {
+  def combineMintNFT(
+    update: MintNFT,
+    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+  ): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] = {
     val nowInTime = System.currentTimeMillis()
     val newNFT = NFT(update.nftId, update.collectionId, update.owner, update.uri, update.name, update.description, nowInTime, update.metadata)
 
@@ -33,8 +40,12 @@ object Combiners {
     DataState(NFTUpdatesState(newUpdatesList), newCalculatedState)
   }
 
-  def combineTransferCollection(update: TransferCollection, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] = {
+  def combineTransferCollection(
+    update: TransferCollection,
+    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+  ): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] =
     state.calculated.collections.get(update.collectionId) match {
+      case None => state
       case Some(collection) =>
         val newState = collection.copy(owner = update.toAddress)
 
@@ -42,12 +53,14 @@ object Combiners {
         val newCalculatedState = state.calculated.focus(_.collections).modify(_.updated(update.collectionId, newState))
 
         DataState(NFTUpdatesState(newUpdatesList), newCalculatedState)
-      case None => state
     }
-  }
 
-  def combineTransferNFT(update: TransferNFT, state: DataState[NFTUpdatesState, NFTUpdatesCalculatedState]): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] = {
+  def combineTransferNFT(
+    update: TransferNFT,
+    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+  ): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] =
     state.calculated.collections.get(update.collectionId) match {
+      case None => state
       case Some(collection) =>
         collection.nfts.get(update.nftId) match {
           case Some(nft) =>
@@ -61,7 +74,5 @@ object Combiners {
             DataState(NFTUpdatesState(newUpdatesList), newCalculatedState)
           case None => state
         }
-      case None => state
     }
-  }
 }

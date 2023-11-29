@@ -22,6 +22,6 @@ object Serializers {
   }
 
   def serializeBlock(state: Signed[DataApplicationBlock])(implicit e: Encoder[DataUpdate]): Array[Byte] = {
-    serialize[DataApplicationBlock](state)
+    serialize[Signed[DataApplicationBlock]](state)
   }
 }
