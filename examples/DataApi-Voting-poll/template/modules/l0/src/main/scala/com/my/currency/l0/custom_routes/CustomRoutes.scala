@@ -1,16 +1,16 @@
 package com.my.currency.l0.custom_routes
 
 import cats.effect.Async
-import cats.syntax.functor._
 import cats.syntax.applicativeError._
 import cats.syntax.flatMap._
-import com.my.currency.shared_data.calculated_state.CalculatedState.getCalculatedState
+import cats.syntax.functor._
+import com.my.currency.shared_data.calculated_state.CalculatedStateService
 import com.my.currency.shared_data.types.Types.Poll
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 import eu.timepit.refined.auto._
-import org.http4s.{HttpRoutes, Response}
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
+import org.http4s.{HttpRoutes, Response}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.middleware.CORS
 import org.tessellation.http.routes.internal.{InternalUrlPrefix, PublicRoutes}
@@ -18,7 +18,7 @@ import org.tessellation.schema.address.Address
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
-case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F] {
+case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateService[F]) extends Http4sDsl[F] with PublicRoutes[F] {
   implicit val logger: SelfAwareStructuredLogger[F] = Slf4jLogger.getLogger[F]
 
   @derive(decoder, encoder)
@@ -33,7 +33,8 @@ case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F
   }
 
   private def getAllPolls: F[Response[F]] = {
-    getCalculatedState
+    calculatedStateService.getCalculatedState
+      .map(v => (v.ordinal, v.state))
       .map { case (ord, state) => state.polls.view.mapValues(formatPoll(_, ord.value.value)).toList }
       .flatMap(Ok(_))
       .handleErrorWith { e =>
@@ -43,7 +44,8 @@ case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F
   }
 
   private def getPollById(pollId: String): F[Response[F]] = {
-    getCalculatedState
+    calculatedStateService.getCalculatedState
+      .map(v => (v.ordinal, v.state))
       .map { case (ord, state) => state.polls.get(pollId).map(formatPoll(_, ord.value.value)) }
       .flatMap(_.fold(NotFound())(Ok(_)))
       .handleErrorWith { e =>

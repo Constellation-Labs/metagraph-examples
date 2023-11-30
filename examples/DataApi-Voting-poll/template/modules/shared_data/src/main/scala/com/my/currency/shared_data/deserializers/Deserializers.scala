@@ -1,6 +1,6 @@
 package com.my.currency.shared_data.deserializers
 
-import com.my.currency.shared_data.types.Types.{PollUpdate, VoteStateOnChain}
+import com.my.currency.shared_data.types.Types.{PollUpdate, VoteCalculatedState, VoteStateOnChain}
 import io.circe.{Decoder, parser}
 import org.tessellation.currency.dataApplication.DataUpdate
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationBlock
@@ -24,5 +24,9 @@ object Deserializers {
 
   def deserializeBlock(bytes: Array[Byte])(implicit e: Decoder[DataUpdate]): Either[Throwable, Signed[DataApplicationBlock]] = {
     deserialize[Signed[DataApplicationBlock]](bytes)
+  }
+
+  def deserializeCalculatedState(bytes: Array[Byte]): Either[Throwable, VoteCalculatedState] = {
+    deserialize[VoteCalculatedState](bytes)
   }
 }
