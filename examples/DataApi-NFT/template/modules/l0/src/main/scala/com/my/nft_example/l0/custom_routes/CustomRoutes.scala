@@ -1,9 +1,10 @@
 package com.my.nft_example.l0.custom_routes
 
 import cats.effect.Async
-import cats.implicits.{toFlatMapOps, toFunctorOps}
-import com.my.nft_example.shared_data.calculated_state.CalculatedState.getCalculatedState
-import com.my.nft_example.shared_data.types.Types.{Collection, CollectionResponse, NFT, NFTResponse, NFTUpdatesCalculatedState}
+import cats.syntax.flatMap.toFlatMapOps
+import cats.syntax.functor.toFunctorOps
+import com.my.nft_example.shared_data.calculated_state.CalculatedStateService
+import com.my.nft_example.shared_data.types.Types._
 import org.http4s._
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 import org.http4s.dsl.Http4sDsl
@@ -13,7 +14,7 @@ import org.tessellation.schema.address.Address
 import eu.timepit.refined.auto._
 import org.http4s.server.middleware.CORS
 
-case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F] {
+case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateService[F]) extends Http4sDsl[F] with PublicRoutes[F] {
 
   private def formatToCollectionResponse(
     collection: Collection
@@ -41,8 +42,8 @@ case class CustomRoutes[F[_] : Async]() extends Http4sDsl[F] with PublicRoutes[F
   }
 
   private def getState: F[NFTUpdatesCalculatedState] = {
-    val calculatedState = getCalculatedState
-    calculatedState.map(_._2)
+    val calculatedState = calculatedStateService.getCalculatedState
+    calculatedState.map(_.state)
   }
 
   private def getAllCollections: F[Response[F]] = {

@@ -2,7 +2,8 @@ package com.my.nft_example.shared_data
 
 import cats.data.NonEmptySet
 import cats.effect.Async
-import cats.implicits.{toFoldableOps, toTraverseOps}
+import cats.syntax.foldable.toFoldableOps
+import cats.syntax.traverse.toTraverseOps
 import org.tessellation.schema.address.Address
 import org.tessellation.security.SecurityProvider
 import org.tessellation.security.signature.signature.SignatureProof

@@ -174,12 +174,10 @@ In this example, the following endpoints are implemented:
 
 ## Scripts
 
-The example includes a script named `send_data_transaction.js` for generating, signing, and sending data updates to the Metagraph. To use the script:
+On the sample-ui directory, we have better instructions on how send transactions to this Metagraph, such as:
 
-1. Install Node.js if not already done: `npm install`.
-
-2. Replace `globalL0Url`, `metagraphL1DataUrl`, and `privateKey` with your values.
-
-3. Execute the script: `node send_data_transaction.js`.
-
-4. Query the state GET endpoint at `<your L1 base url>/data-application/collections` to observe the updated state after each update.
+`yarn script scripts/mint-collection-nft.ts`
+`yarn script scripts/mint-collection.ts`
+`yarn script scripts/mint-sample-collection.ts`
+`yarn script scripts/transfer-collection-nft.ts`
+`yarn script scripts/transfer-collection.ts`

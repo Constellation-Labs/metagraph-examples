@@ -1,6 +1,6 @@
 package com.my.nft_example.shared_data.deserializers
 
-import com.my.nft_example.shared_data.types.Types.{NFTUpdate, NFTUpdatesState}
+import com.my.nft_example.shared_data.types.Types.{NFTUpdate, NFTUpdatesCalculatedState, NFTUpdatesState}
 import io.circe.{Decoder, parser}
 import org.tessellation.currency.dataApplication.DataUpdate
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationBlock
@@ -30,4 +30,9 @@ object Deserializers {
     bytes: Array[Byte]
   )(implicit e: Decoder[DataUpdate]): Either[Throwable, Signed[DataApplicationBlock]] =
     deserialize[Signed[DataApplicationBlock]](bytes)
+
+  def deserializeCalculatedState(
+    bytes: Array[Byte]
+  ): Either[Throwable, NFTUpdatesCalculatedState] =
+    deserialize[NFTUpdatesCalculatedState](bytes)
 }

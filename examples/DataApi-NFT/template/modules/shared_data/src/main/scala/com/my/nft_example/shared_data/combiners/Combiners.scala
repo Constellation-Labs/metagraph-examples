@@ -1,7 +1,7 @@
 package com.my.nft_example.shared_data.combiners
 
 import com.my.nft_example.shared_data.serializers.Serializers
-import com.my.nft_example.shared_data.types.Types.{Collection, MintCollection, MintNFT, NFT, NFTUpdatesCalculatedState, NFTUpdatesState, TransferCollection, TransferNFT}
+import com.my.nft_example.shared_data.types.Types._
 import monocle.Monocle.toAppliedFocusOps
 import org.tessellation.currency.dataApplication.DataState
 import org.tessellation.schema.address.Address
@@ -44,35 +44,37 @@ object Combiners {
     update: TransferCollection,
     state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] =
-    state.calculated.collections.get(update.collectionId) match {
-      case None => state
-      case Some(collection) =>
+    state.calculated.collections
+      .get(update.collectionId)
+      .fold(state) { collection =>
         val newState = collection.copy(owner = update.toAddress)
 
         val newUpdatesList = state.onChain.updates :+ update
         val newCalculatedState = state.calculated.focus(_.collections).modify(_.updated(update.collectionId, newState))
 
         DataState(NFTUpdatesState(newUpdatesList), newCalculatedState)
-    }
+      }
 
   def combineTransferNFT(
     update: TransferNFT,
     state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataState[NFTUpdatesState, NFTUpdatesCalculatedState] =
-    state.calculated.collections.get(update.collectionId) match {
-      case None => state
-      case Some(collection) =>
-        collection.nfts.get(update.nftId) match {
-          case Some(nft) =>
+    state.calculated.collections
+      .get(update.collectionId)
+      .fold(state) { collection =>
+        collection.nfts
+          .get(update.nftId)
+          .fold(state) { nft =>
             val updatedNFT = NFT(nft.id, nft.collectionId, update.toAddress, nft.uri, nft.name, nft.description, nft.creationDateTimestamp, nft.metadata)
             val collectionNFTs = collection.nfts + (nft.id -> updatedNFT)
             val newState = Collection(collection.id, collection.owner, collection.name, collection.creationDateTimestamp, collectionNFTs)
 
             val newUpdatesList = state.onChain.updates :+ update
-            val newCalculatedState = state.calculated.focus(_.collections).modify(_.updated(update.collectionId, newState))
+            val newCalculatedState = state.calculated
+              .focus(_.collections)
+              .modify(_.updated(update.collectionId, newState))
 
             DataState(NFTUpdatesState(newUpdatesList), newCalculatedState)
-          case None => state
-        }
-    }
+          }
+      }
 }

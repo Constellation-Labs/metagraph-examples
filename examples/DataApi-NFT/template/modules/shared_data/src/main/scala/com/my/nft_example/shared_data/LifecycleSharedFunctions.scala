@@ -6,16 +6,16 @@ import org.tessellation.currency.dataApplication.dataApplication.DataApplication
 import org.tessellation.currency.dataApplication.{DataState, L0NodeContext}
 import org.tessellation.security.signature.Signed
 import cats.syntax.all._
-import com.my.nft_example.shared_data.Utils.{getAllAddressesFromProofs, getFirstAddressFromProofs}
-import com.my.nft_example.shared_data.combiners.Combiners.{combineMintCollection, combineMintNFT, combineTransferCollection, combineTransferNFT}
-import com.my.nft_example.shared_data.types.Types.{MintCollection, MintNFT, NFTUpdate, NFTUpdatesCalculatedState, NFTUpdatesState, TransferCollection, TransferNFT}
-import com.my.nft_example.shared_data.validations.Validations.{mintCollectionValidations, mintNFTValidations, mintNFTValidationsWithSignature, transferCollectionValidations, transferCollectionValidationsWithSignature, transferNFTValidations, transferNFTValidationsWithSignature}
+import com.my.nft_example.shared_data.Utils._
+import com.my.nft_example.shared_data.combiners.Combiners._
+import com.my.nft_example.shared_data.types.Types._
+import com.my.nft_example.shared_data.validations.Validations._
 import org.tessellation.security.SecurityProvider
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object LifecycleSharedFunctions {
-  def logger[F[_] : Async]: SelfAwareStructuredLogger[F] = Slf4jLogger.getLoggerFromName[F]("ClusterApi")
+  private def logger[F[_] : Async]: SelfAwareStructuredLogger[F] = Slf4jLogger.getLoggerFromName[F]("ClusterApi")
 
   def validateUpdate[F[_] : Async](
     update: NFTUpdate

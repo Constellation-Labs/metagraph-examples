@@ -1,6 +1,6 @@
 package com.my.nft_example.shared_data.serializers
 
-import com.my.nft_example.shared_data.types.Types.{NFTUpdate, NFTUpdatesState}
+import com.my.nft_example.shared_data.types.Types.{NFTUpdate, NFTUpdatesCalculatedState, NFTUpdatesState}
 import io.circe.Encoder
 import io.circe.syntax.EncoderOps
 import org.tessellation.currency.dataApplication.DataUpdate
@@ -12,8 +12,9 @@ import java.nio.charset.StandardCharsets
 object Serializers {
   private def serialize[A: Encoder](
     serializableData: A
-  ): Array[Byte] =
+  ): Array[Byte] = {
     serializableData.asJson.deepDropNullValues.noSpaces.getBytes(StandardCharsets.UTF_8)
+  }
 
   def serializeUpdate(
     update: NFTUpdate
@@ -29,4 +30,9 @@ object Serializers {
     state: Signed[DataApplicationBlock]
   )(implicit e: Encoder[DataUpdate]): Array[Byte] =
     serialize[Signed[DataApplicationBlock]](state)
+
+  def serializeCalculatedState(
+    state: NFTUpdatesCalculatedState
+  ): Array[Byte] =
+    serialize[NFTUpdatesCalculatedState](state)
 }

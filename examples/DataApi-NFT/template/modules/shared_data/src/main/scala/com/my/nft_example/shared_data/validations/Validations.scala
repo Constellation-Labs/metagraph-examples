@@ -1,7 +1,9 @@
 package com.my.nft_example.shared_data.validations
 
 import cats.effect.Async
-import cats.implicits._
+import cats.syntax.applicative.catsSyntaxApplicativeId
+import cats.syntax.apply.catsSyntaxApply
+import cats.syntax.option.catsSyntaxOptionId
 import com.my.nft_example.shared_data.errors.Errors.valid
 import com.my.nft_example.shared_data.types.Types._
 import com.my.nft_example.shared_data.validations.TypeValidators._
@@ -16,12 +18,15 @@ object Validations {
   ): F[DataApplicationValidationErrorOr[Unit]] =
     maybeState match {
       case Some(state) =>
-        val validateCollection = validateIfCollectionIsUnique(update, state)
-        val validateCollectionName = validateStringMaxSize(update.name, 64, "name")
-        Async[F].delay(validateCollection.productR(validateCollectionName))
+        Async[F].delay {
+          val validateCollection = validateIfCollectionIsUnique(update, state)
+          val validateCollectionName = validateStringMaxSize(update.name, 64, "name")
+          validateCollection.productR(validateCollectionName)
+        }
       case None =>
-        val validateCollectionName = validateStringMaxSize(update.name, 64, "name")
-        Async[F].delay(validateCollectionName)
+        Async[F].delay {
+          validateStringMaxSize(update.name, 64, "name")
+        }
     }
 
   def mintNFTValidations[F[_] : Async](
@@ -30,14 +35,14 @@ object Validations {
   ): F[DataApplicationValidationErrorOr[Unit]] =
     maybeState match {
       case Some(state) =>
-        val validateNFTUrlValid = validateIfNFTUriIsValid(update)
-        val validateUniqueNFTURI = validateIfNFTUriIsUnique(update, state)
-        val validateUniqueNFTId = validateIfNFTIdIsUnique(update, state)
-        val validateNFTName = validateStringMaxSize(update.name, 64, "name")
-        val validateNFTDescription = validateStringMaxSize(update.description, 64, "description")
-        val validateNFTMetadata = validateMapMaxSize(update.metadata, 15, "metadata")
-
         Async[F].delay {
+          val validateNFTUrlValid = validateIfNFTUriIsValid(update)
+          val validateUniqueNFTURI = validateIfNFTUriIsUnique(update, state)
+          val validateUniqueNFTId = validateIfNFTIdIsUnique(update, state)
+          val validateNFTName = validateStringMaxSize(update.name, 64, "name")
+          val validateNFTDescription = validateStringMaxSize(update.description, 64, "description")
+          val validateNFTMetadata = validateMapMaxSize(update.metadata, 15, "metadata")
+
           validateNFTUrlValid
             .productR(validateUniqueNFTURI)
             .productR(validateUniqueNFTId)
@@ -46,12 +51,12 @@ object Validations {
             .productR(validateNFTMetadata)
         }
       case None =>
-        val validateNFTUrlValid = validateIfNFTUriIsValid(update)
-        val validateNFTName = validateStringMaxSize(update.name, 64, "name")
-        val validateNFTDescription = validateStringMaxSize(update.description, 64, "description")
-        val validateNFTMetadata = validateMapMaxSize(update.metadata, 15, "metadata")
-
         Async[F].delay {
+          val validateNFTUrlValid = validateIfNFTUriIsValid(update)
+          val validateNFTName = validateStringMaxSize(update.name, 64, "name")
+          val validateNFTDescription = validateStringMaxSize(update.description, 64, "description")
+          val validateNFTMetadata = validateMapMaxSize(update.metadata, 15, "metadata")
+
           validateNFTUrlValid
             .productR(validateNFTName)
             .productR(validateNFTDescription)
@@ -66,10 +71,10 @@ object Validations {
     maybeState match {
       case None => valid.pure[F]
       case Some(state) =>
-        val validateProvidedCollection = validateIfProvidedCollectionExists(update, state)
-        val validateFromAddress = validateIfFromAddressIsTheCollectionOwner(update, state)
-
         Async[F].delay {
+          val validateProvidedCollection = validateIfProvidedCollectionExists(update, state)
+          val validateFromAddress = validateIfFromAddressIsTheCollectionOwner(update, state)
+
           validateProvidedCollection.productR(validateFromAddress)
         }
     }
@@ -82,10 +87,10 @@ object Validations {
     maybeState match {
       case None => valid.pure[F]
       case Some(state) =>
-        val validateProvidedNFT = validateIfProvidedNFTExists(update, state)
-        val validateFromAddress = validateIfFromAddressIsTheNFTOwner(update, state)
-
         Async[F].delay {
+          val validateProvidedNFT = validateIfProvidedNFTExists(update, state)
+          val validateFromAddress = validateIfFromAddressIsTheNFTOwner(update, state)
+
           validateProvidedNFT.productR(validateFromAddress)
         }
     }
