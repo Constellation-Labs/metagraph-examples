@@ -41,10 +41,8 @@ case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateSer
     )
   }
 
-  private def getState: F[NFTUpdatesCalculatedState] = {
-    val calculatedState = calculatedStateService.getCalculatedState
-    calculatedState.map(_.state)
-  }
+  private def getState: F[NFTUpdatesCalculatedState] =
+    calculatedStateService.getCalculatedState.map(_.state)
 
   private def getAllCollections: F[Response[F]] = {
     getState.flatMap { state =>

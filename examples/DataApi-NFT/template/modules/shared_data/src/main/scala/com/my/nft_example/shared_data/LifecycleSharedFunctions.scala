@@ -22,13 +22,13 @@ object LifecycleSharedFunctions {
   ): F[DataApplicationValidationErrorOr[Unit]] =
     update match {
       case mintCollection: MintCollection =>
-        mintCollectionValidations(mintCollection, None)
+        Async[F].delay(mintCollectionValidations(mintCollection, None))
       case mintNFT: MintNFT =>
-        mintNFTValidations(mintNFT, None)
+        Async[F].delay(mintNFTValidations(mintNFT, None))
       case transferCollection: TransferCollection =>
-        transferCollectionValidations(transferCollection, None)
+        Async[F].delay(transferCollectionValidations(transferCollection, None))
       case transferNFT: TransferNFT =>
-        transferNFTValidations(transferNFT, None)
+        Async[F].delay(transferNFTValidations(transferNFT, None))
     }
 
   def validateData[F[_] : Async](
@@ -41,13 +41,13 @@ object LifecycleSharedFunctions {
         .flatMap { addresses =>
           signedUpdate.value match {
             case mintCollection: MintCollection =>
-              mintCollectionValidations(mintCollection, state.some)
+              Async[F].delay(mintCollectionValidations(mintCollection, state.some))
             case mintNFT: MintNFT =>
-              mintNFTValidationsWithSignature(mintNFT, addresses, state)
+              Async[F].delay(mintNFTValidationsWithSignature(mintNFT, addresses, state))
             case transferCollection: TransferCollection =>
-              transferCollectionValidationsWithSignature(transferCollection, addresses, state)
+              Async[F].delay(transferCollectionValidationsWithSignature(transferCollection, addresses, state))
             case transferNFT: TransferNFT =>
-              transferNFTValidationsWithSignature(transferNFT, addresses, state)
+              Async[F].delay(transferNFTValidationsWithSignature(transferNFT, addresses, state))
           }
         }
     }.map(_.reduce)

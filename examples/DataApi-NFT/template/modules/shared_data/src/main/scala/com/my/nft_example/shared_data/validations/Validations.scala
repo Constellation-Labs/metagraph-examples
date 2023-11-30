@@ -1,7 +1,5 @@
 package com.my.nft_example.shared_data.validations
 
-import cats.effect.Async
-import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.apply.catsSyntaxApply
 import cats.syntax.option.catsSyntaxOptionId
 import com.my.nft_example.shared_data.errors.Errors.valid
@@ -12,120 +10,83 @@ import org.tessellation.currency.dataApplication.dataApplication.DataApplication
 import org.tessellation.schema.address.Address
 
 object Validations {
-  def mintCollectionValidations[F[_] : Async](
+  def mintCollectionValidations(
     update    : MintCollection,
     maybeState: Option[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]]
-  ): F[DataApplicationValidationErrorOr[Unit]] =
+  ): DataApplicationValidationErrorOr[Unit] =
     maybeState match {
       case Some(state) =>
-        Async[F].delay {
-          val validateCollection = validateIfCollectionIsUnique(update, state)
-          val validateCollectionName = validateStringMaxSize(update.name, 64, "name")
-          validateCollection.productR(validateCollectionName)
-        }
+        validateIfCollectionIsUnique(update, state)
+          .productR(validateStringMaxSize(update.name, 64, "name"))
       case None =>
-        Async[F].delay {
-          validateStringMaxSize(update.name, 64, "name")
-        }
+        validateStringMaxSize(update.name, 64, "name")
+
     }
 
-  def mintNFTValidations[F[_] : Async](
+  def mintNFTValidations(
     update    : MintNFT,
     maybeState: Option[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]]
-  ): F[DataApplicationValidationErrorOr[Unit]] =
+  ): DataApplicationValidationErrorOr[Unit] =
     maybeState match {
       case Some(state) =>
-        Async[F].delay {
-          val validateNFTUrlValid = validateIfNFTUriIsValid(update)
-          val validateUniqueNFTURI = validateIfNFTUriIsUnique(update, state)
-          val validateUniqueNFTId = validateIfNFTIdIsUnique(update, state)
-          val validateNFTName = validateStringMaxSize(update.name, 64, "name")
-          val validateNFTDescription = validateStringMaxSize(update.description, 64, "description")
-          val validateNFTMetadata = validateMapMaxSize(update.metadata, 15, "metadata")
-
-          validateNFTUrlValid
-            .productR(validateUniqueNFTURI)
-            .productR(validateUniqueNFTId)
-            .productR(validateNFTName)
-            .productR(validateNFTDescription)
-            .productR(validateNFTMetadata)
-        }
+        validateIfNFTUriIsValid(update)
+          .productR(validateIfNFTUriIsUnique(update, state))
+          .productR(validateIfNFTIdIsUnique(update, state))
+          .productR(validateStringMaxSize(update.name, 64, "name"))
+          .productR(validateStringMaxSize(update.description, 64, "description"))
+          .productR(validateMapMaxSize(update.metadata, 15, "metadata"))
       case None =>
-        Async[F].delay {
-          val validateNFTUrlValid = validateIfNFTUriIsValid(update)
-          val validateNFTName = validateStringMaxSize(update.name, 64, "name")
-          val validateNFTDescription = validateStringMaxSize(update.description, 64, "description")
-          val validateNFTMetadata = validateMapMaxSize(update.metadata, 15, "metadata")
-
-          validateNFTUrlValid
-            .productR(validateNFTName)
-            .productR(validateNFTDescription)
-            .productR(validateNFTMetadata)
-        }
+        validateIfNFTUriIsValid(update)
+          .productR(validateStringMaxSize(update.name, 64, "name"))
+          .productR(validateStringMaxSize(update.description, 64, "description"))
+          .productR(validateMapMaxSize(update.metadata, 15, "metadata"))
     }
 
-  def transferCollectionValidations[F[_] : Async](
+  def transferCollectionValidations(
     update    : TransferCollection,
     maybeState: Option[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]]
-  ): F[DataApplicationValidationErrorOr[Unit]] =
+  ): DataApplicationValidationErrorOr[Unit] =
     maybeState match {
-      case None => valid.pure[F]
+      case None => valid
       case Some(state) =>
-        Async[F].delay {
-          val validateProvidedCollection = validateIfProvidedCollectionExists(update, state)
-          val validateFromAddress = validateIfFromAddressIsTheCollectionOwner(update, state)
-
-          validateProvidedCollection.productR(validateFromAddress)
-        }
+        validateIfProvidedCollectionExists(update, state)
+          .productR(validateIfFromAddressIsTheCollectionOwner(update, state))
     }
 
-
-  def transferNFTValidations[F[_] : Async](
+  def transferNFTValidations(
     update    : TransferNFT,
     maybeState: Option[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]]
-  ): F[DataApplicationValidationErrorOr[Unit]] =
+  ): DataApplicationValidationErrorOr[Unit] =
     maybeState match {
-      case None => valid.pure[F]
+      case None => valid
       case Some(state) =>
-        Async[F].delay {
-          val validateProvidedNFT = validateIfProvidedNFTExists(update, state)
-          val validateFromAddress = validateIfFromAddressIsTheNFTOwner(update, state)
-
-          validateProvidedNFT.productR(validateFromAddress)
-        }
+        validateIfProvidedNFTExists(update, state)
+          .productR(validateIfFromAddressIsTheNFTOwner(update, state))
     }
 
-  def mintNFTValidationsWithSignature[F[_] : Async](
+  def mintNFTValidationsWithSignature(
     update   : MintNFT,
     addresses: List[Address],
     state    : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
-  ): F[DataApplicationValidationErrorOr[Unit]] = {
-    val validateAddress = Async[F].delay(validateProvidedAddress(addresses, update.owner))
-    val validations = mintNFTValidations(update, state.some)
+  ): DataApplicationValidationErrorOr[Unit] =
+    mintNFTValidations(update, state.some)
+      .productR(validateProvidedAddress(addresses, update.owner))
 
-    validateAddress.productR(validations)
-  }
-
-  def transferCollectionValidationsWithSignature[F[_] : Async](
+  def transferCollectionValidationsWithSignature(
     update   : TransferCollection,
     addresses: List[Address],
     state    : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
-  ): F[DataApplicationValidationErrorOr[Unit]] = {
-    val validateAddress = Async[F].delay(validateProvidedAddress(addresses, update.fromAddress))
-    val validations = transferCollectionValidations(update, state.some)
+  ): DataApplicationValidationErrorOr[Unit] =
+    transferCollectionValidations(update, state.some)
+      .productR(validateProvidedAddress(addresses, update.fromAddress))
 
-    validateAddress.productR(validations)
-  }
-
-  def transferNFTValidationsWithSignature[F[_] : Async](
+  def transferNFTValidationsWithSignature(
     update   : TransferNFT,
     addresses: List[Address],
     state    : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
-  ): F[DataApplicationValidationErrorOr[Unit]] = {
-    val validateAddress = Async[F].delay(validateProvidedAddress(addresses, update.fromAddress))
-    val validations = transferNFTValidations(update, state.some)
-
-    validateAddress.productR(validations)
+  ): DataApplicationValidationErrorOr[Unit] = {
+    transferNFTValidations(update, state.some)
+      .productR(validateProvidedAddress(addresses, update.fromAddress))
   }
 }
 

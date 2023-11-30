@@ -1,7 +1,8 @@
 package com.my.nft_example.shared_data.deserializers
 
 import com.my.nft_example.shared_data.types.Types.{NFTUpdate, NFTUpdatesCalculatedState, NFTUpdatesState}
-import io.circe.{Decoder, parser}
+import io.circe.Decoder
+import io.circe.jawn.decode
 import org.tessellation.currency.dataApplication.DataUpdate
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationBlock
 import org.tessellation.security.signature.Signed
@@ -12,9 +13,7 @@ object Deserializers {
   private def deserialize[A: Decoder](
     bytes: Array[Byte]
   ): Either[Throwable, A] =
-    parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
-      json.as[A]
-    }
+    decode[A](new String(bytes, StandardCharsets.UTF_8))
 
   def deserializeUpdate(
     bytes: Array[Byte]

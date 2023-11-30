@@ -132,12 +132,8 @@ object Main
       IO(Deserializers.deserializeCalculatedState(bytes))
   })
 
-  private def makeL0Service: IO[BaseDataApplicationL0Service[IO]] = {
-    for {
-      calculatedStateService <- CalculatedStateService.make[IO]
-      dataApplicationL0Service = makeBaseDataApplicationL0Service(calculatedStateService)
-    } yield dataApplicationL0Service
-  }
+  private def makeL0Service: IO[BaseDataApplicationL0Service[IO]] =
+    CalculatedStateService.make[IO].map(makeBaseDataApplicationL0Service)
 
   override def dataApplication: Option[Resource[IO, BaseDataApplicationL0Service[IO]]] =
     makeL0Service.asResource.some
