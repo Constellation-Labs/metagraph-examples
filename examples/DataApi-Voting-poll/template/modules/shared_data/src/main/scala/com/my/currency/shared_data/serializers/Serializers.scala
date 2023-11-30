@@ -1,6 +1,6 @@
 package com.my.currency.shared_data.serializers
 
-import com.my.currency.shared_data.types.Types.{PollUpdate, VoteStateOnChain}
+import com.my.currency.shared_data.types.Types.{PollUpdate, VoteCalculatedState, VoteStateOnChain}
 import io.circe.Encoder
 import io.circe.syntax.EncoderOps
 import org.tessellation.currency.dataApplication.DataUpdate
@@ -22,6 +22,10 @@ object Serializers {
   }
 
   def serializeBlock(state: Signed[DataApplicationBlock])(implicit e: Encoder[DataUpdate]): Array[Byte] = {
-    serialize[DataApplicationBlock](state)
+    serialize[Signed[DataApplicationBlock]](state)
+  }
+
+  def serializeCalculatedState(state: VoteCalculatedState): Array[Byte] = {
+    serialize[VoteCalculatedState](state)
   }
 }
