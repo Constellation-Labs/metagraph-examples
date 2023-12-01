@@ -19,17 +19,18 @@ object LifecycleSharedFunctions {
 
   def validateUpdate[F[_] : Async](
     update: NFTUpdate
-  ): F[DataApplicationValidationErrorOr[Unit]] =
+  ): F[DataApplicationValidationErrorOr[Unit]] = Async[F].delay {
     update match {
       case mintCollection: MintCollection =>
-        Async[F].delay(mintCollectionValidations(mintCollection, None))
+        mintCollectionValidations(mintCollection, None)
       case mintNFT: MintNFT =>
-        Async[F].delay(mintNFTValidations(mintNFT, None))
+        mintNFTValidations(mintNFT, None)
       case transferCollection: TransferCollection =>
-        Async[F].delay(transferCollectionValidations(transferCollection, None))
+        transferCollectionValidations(transferCollection, None)
       case transferNFT: TransferNFT =>
-        Async[F].delay(transferNFTValidations(transferNFT, None))
+        transferNFTValidations(transferNFT, None)
     }
+  }
 
   def validateData[F[_] : Async](
     state  : DataState[NFTUpdatesState, NFTUpdatesCalculatedState],
@@ -39,15 +40,17 @@ object LifecycleSharedFunctions {
     updates.traverse { signedUpdate =>
       getAllAddressesFromProofs(signedUpdate.proofs)
         .flatMap { addresses =>
-          signedUpdate.value match {
-            case mintCollection: MintCollection =>
-              Async[F].delay(mintCollectionValidations(mintCollection, state.some))
-            case mintNFT: MintNFT =>
-              Async[F].delay(mintNFTValidationsWithSignature(mintNFT, addresses, state))
-            case transferCollection: TransferCollection =>
-              Async[F].delay(transferCollectionValidationsWithSignature(transferCollection, addresses, state))
-            case transferNFT: TransferNFT =>
-              Async[F].delay(transferNFTValidationsWithSignature(transferNFT, addresses, state))
+          Async[F].delay {
+            signedUpdate.value match {
+              case mintCollection: MintCollection =>
+                mintCollectionValidations(mintCollection, state.some)
+              case mintNFT: MintNFT =>
+                mintNFTValidationsWithSignature(mintNFT, addresses, state)
+              case transferCollection: TransferCollection =>
+                transferCollectionValidationsWithSignature(transferCollection, addresses, state)
+              case transferNFT: TransferNFT =>
+                transferNFTValidationsWithSignature(transferNFT, addresses, state)
+            }
           }
         }
     }.map(_.reduce)
