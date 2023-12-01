@@ -1,48 +1,31 @@
 package com.my.nft_example.shared_data
 
-import com.my.nft_example.shared_data.Data.{NFTUpdate, State}
-import io.circe.parser
-import io.circe.syntax.EncoderOps
+import cats.data.NonEmptySet
+import cats.effect.Async
+import cats.syntax.foldable.toFoldableOps
+import cats.syntax.traverse.toTraverseOps
+import org.tessellation.schema.address.Address
+import org.tessellation.security.SecurityProvider
+import org.tessellation.security.signature.signature.SignatureProof
 
-import java.net.{MalformedURLException, URISyntaxException, URL}
-import java.nio.charset.StandardCharsets
+import java.net.URL
+import scala.util.Try
 
 object Utils {
+  def isValidURL(url: String): Boolean =
+    Try(new URL(url).toURI).isSuccess
 
-  @throws[MalformedURLException]
-  @throws[URISyntaxException]
-  def isValidURL(url: String): Boolean = try {
-    new URL(url).toURI
-    true
-  } catch {
-    case _: MalformedURLException =>
-      false
-    case _: URISyntaxException =>
-      false
-  }
+  def getAllAddressesFromProofs[F[_] : Async : SecurityProvider](
+    proofs: NonEmptySet[SignatureProof]
+  ): F[List[Address]] =
+    proofs
+      .map(_.id)
+      .toList
+      .traverse(_.toAddress[F])
 
-  def customUpdateSerialization(update: NFTUpdate): Array[Byte] = {
-    println("Serialize UPDATE event received")
-    println(update.asJson.deepDropNullValues.noSpaces)
-    update.asJson.deepDropNullValues.noSpaces.getBytes(StandardCharsets.UTF_8)
-  }
-
-  def customStateSerialization(state: State): Array[Byte] = {
-    println("Serialize STATE event received")
-    println(state.asJson.deepDropNullValues.noSpaces)
-    state.asJson.deepDropNullValues.noSpaces.getBytes(StandardCharsets.UTF_8)
-  }
-
-  def customStateDeserialization(bytes: Array[Byte]): Either[Throwable, State] = {
-    parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
-      json.as[State]
-    }
-  }
-
-  def customUpdateDeserialization(bytes: Array[Byte]): Either[Throwable, NFTUpdate] = {
-    parser.parse(new String(bytes, StandardCharsets.UTF_8)).flatMap { json =>
-      json.as[NFTUpdate]
-    }
-  }
+  def getFirstAddressFromProofs[F[_] : Async : SecurityProvider](
+    proofs: NonEmptySet[SignatureProof]
+  ): F[Address] =
+    proofs.head.id.toAddress[F]
 }
 
