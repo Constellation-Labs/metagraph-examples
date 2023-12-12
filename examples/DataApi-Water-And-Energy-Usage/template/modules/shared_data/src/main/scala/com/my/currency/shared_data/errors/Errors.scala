@@ -1,8 +1,29 @@
-package com.my.currency.shared_data
+package com.my.currency.shared_data.errors
 
+import cats.syntax.validated.catsSyntaxValidatedIdBinCompat0
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
+import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 
 object Errors {
+  type DataApplicationValidationType = DataApplicationValidationErrorOr[Unit]
+
+  val valid: DataApplicationValidationType =
+    ().validNec[DataApplicationValidationError]
+
+  implicit class DataApplicationValidationTypeOps[E <: DataApplicationValidationError](err: E) {
+    def invalid: DataApplicationValidationType =
+      err.invalidNec[Unit]
+
+    def unless(
+      cond: Boolean
+    ): DataApplicationValidationType =
+      if (cond) valid else invalid
+
+    def when(
+      cond: Boolean
+    ): DataApplicationValidationType =
+      if (cond) invalid else valid
+  }
   case object EnergyNotPositive extends DataApplicationValidationError {
     val message = "Energy usage must be positive"
   }
@@ -25,13 +46,5 @@ object Errors {
 
   case object InvalidAddress extends DataApplicationValidationError {
     val message = "Provided address different than proof"
-  }
-
-  case object CouldNotGetLatestState extends DataApplicationValidationError {
-    val message = "Could not get latest state!"
-  }
-
-  case object CouldNotGetLatestCurrencySnapshot extends DataApplicationValidationError {
-    val message = "Could not get latest currency snapshot!"
   }
 }
