@@ -2,9 +2,7 @@ package com.my.currency.l0
 
 import cats.data.NonEmptyList
 import cats.effect.{IO, Resource}
-import cats.syntax.applicative.catsSyntaxApplicativeId
-import cats.syntax.option.catsSyntaxOptionId
-import cats.syntax.validated.catsSyntaxValidatedIdBinCompat0
+import cats.syntax.all._
 import com.my.currency.l0.custom_routes.CustomRoutes
 import com.my.currency.shared_data.LifecycleSharedFunctions
 import com.my.currency.shared_data.calculated_state.CalculatedStateService
@@ -62,10 +60,8 @@ object Main
         override def combine(
           state  : DataState[UsageUpdateState, UsageUpdateCalculatedState],
           updates: List[Signed[UsageUpdate]]
-        )(implicit context: L0NodeContext[IO]): IO[DataState[UsageUpdateState, UsageUpdateCalculatedState]] = {
-          implicit val sp: SecurityProvider[IO] = context.securityProvider
+        )(implicit context: L0NodeContext[IO]): IO[DataState[UsageUpdateState, UsageUpdateCalculatedState]] =
           LifecycleSharedFunctions.combine[IO](state, updates)
-        }
 
         override def dataEncoder: Encoder[UsageUpdate] =
           implicitly[Encoder[UsageUpdate]]

@@ -2,9 +2,7 @@ package com.my.currency.data_l1
 
 import cats.data.NonEmptyList
 import cats.effect.{IO, Resource}
-import cats.syntax.validated._
-import cats.syntax.applicative.catsSyntaxApplicativeId
-import cats.syntax.option.catsSyntaxOptionId
+import cats.syntax.all._
 import com.my.currency.shared_data.LifecycleSharedFunctions
 import com.my.currency.shared_data.calculated_state.CalculatedStateService
 import com.my.currency.shared_data.deserializers.Deserializers

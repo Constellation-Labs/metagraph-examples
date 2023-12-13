@@ -1,6 +1,6 @@
 package com.my.currency.shared_data.errors
 
-import cats.syntax.validated.catsSyntaxValidatedIdBinCompat0
+import cats.syntax.all._
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 

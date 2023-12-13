@@ -1,10 +1,7 @@
 package com.my.currency.l0.custom_routes
 
 import cats.effect.Async
-import cats.syntax.applicative.catsSyntaxApplicativeId
-import cats.syntax.applicativeError.catsSyntaxApplicativeErrorId
-import cats.syntax.flatMap.toFlatMapOps
-import cats.syntax.functor.toFunctorOps
+import cats.syntax.all._
 import com.my.currency.shared_data.calculated_state.CalculatedStateService
 import com.my.currency.shared_data.deserializers.Deserializers
 import com.my.currency.shared_data.types.Types.{AddressTransactionsWithLastRef, TxnRef, UpdateUsageTransaction}
@@ -37,7 +34,7 @@ case class CustomRoutes[F[_] : Async](
   )
 
   private object TransactionResponse {
-    def make(updateUsageTransaction: UpdateUsageTransaction, snapshotOrdinal: SnapshotOrdinal, txnRef: String): TransactionResponse = {
+    def apply(updateUsageTransaction: UpdateUsageTransaction, snapshotOrdinal: SnapshotOrdinal, txnRef: String): TransactionResponse = {
       TransactionResponse(
         updateUsageTransaction.transactionType,
         updateUsageTransaction.energyUpdateAmount,
@@ -59,12 +56,14 @@ case class CustomRoutes[F[_] : Async](
         value.dataApplication
           .fold(
             AddressTransactionsWithLastRef(TxnRef.empty, List.empty[UpdateUsageTransaction]).pure
-          )(value =>
-            Deserializers.deserializeState(value.onChainState) match {
+          )(dataApplicationPart =>
+            Deserializers.deserializeState(dataApplicationPart.onChainState) match {
               case Left(_) => new Exception(s"Could not deserialize state of snapshot: ${ordinal.value.value}").raiseError[F, AddressTransactionsWithLastRef]
               case Right(value) =>
                 Async[F].delay {
-                  val updateUsageTransactions =  value.updates.filter { t => t.owner == address }.sortBy(_.lastTxnOrdinal)(Ordering[SnapshotOrdinal].reverse)
+                  val updateUsageTransactions = value.updates.filter {
+                    _.owner == address
+                  }.sortBy(_.lastTxnOrdinal)(Ordering[SnapshotOrdinal].reverse)
                   val referenceTransaction = updateUsageTransactions.head
 
                   AddressTransactionsWithLastRef(
@@ -83,20 +82,20 @@ case class CustomRoutes[F[_] : Async](
     txnHash        : String,
     transactions   : List[TransactionResponse]
   ): F[List[TransactionResponse]] = {
-    getAddressTransactionsFromState(startingOrdinal, address).flatMap { addressTransactionsWithLastRef =>
-      if (addressTransactionsWithLastRef.txnRef.txnSnapshotOrdinal == SnapshotOrdinal.MinValue) {
-        Async[F].delay {
-          transactions ++ addressTransactionsWithLastRef.txns.map(TransactionResponse.make(_, startingOrdinal, txnHash))
+    (address, startingOrdinal, txnHash, transactions).tailRecM {
+      case (add, ord, hash, txns) =>
+        getAddressTransactionsFromState(ord, add).map { addressTransactionsWithLastRef =>
+          if (addressTransactionsWithLastRef.txnRef.txnSnapshotOrdinal == SnapshotOrdinal.MinValue) {
+            (txns ++ addressTransactionsWithLastRef.txns.map(TransactionResponse(_, ord, hash))).asRight
+          } else {
+            (
+              address,
+              addressTransactionsWithLastRef.txnRef.txnSnapshotOrdinal,
+              addressTransactionsWithLastRef.txnRef.txnHash,
+              addressTransactionsWithLastRef.txns.map(TransactionResponse(_, ord, hash)) ++ txns
+            ).asLeft
+          }
         }
-      } else {
-        traverseSnapshotsWithTransactions(
-          address,
-          addressTransactionsWithLastRef.txnRef.txnSnapshotOrdinal,
-          addressTransactionsWithLastRef.txnRef.txnHash,
-          transactions
-        )
-          .map(_ ++ addressTransactionsWithLastRef.txns.map(TransactionResponse.make(_, startingOrdinal, txnHash)))
-      }
     }
   }
 
@@ -110,6 +109,7 @@ case class CustomRoutes[F[_] : Async](
           val txnSnapshotOrdinal: SnapshotOrdinal = deviceCalculatedState.currentTxnRef.txnSnapshotOrdinal
           val txnHash: String = deviceCalculatedState.currentTxnRef.txnHash
           traverseSnapshotsWithTransactions(address, txnSnapshotOrdinal, txnHash, List.empty[TransactionResponse])
+            .handleErrorWith(err => new Exception(s"Error when getting all address transaction: ${err.getMessage}").raiseError[F, List[TransactionResponse]])
         }
     }
   }
@@ -132,10 +132,10 @@ case class CustomRoutes[F[_] : Async](
   private def getDeviceTransactions(
     address: Address
   ): F[Response[F]] = {
-    Ok(
-      getAllAddressTransactions(address)
-        .map(_.sortBy(_.txnSnapshotOrdinal)(Ordering[SnapshotOrdinal].reverse))
-    )
+    getAllAddressTransactions(address)
+      .map(_.sortBy(_.txnSnapshotOrdinal)(Ordering[SnapshotOrdinal].reverse))
+      .flatMap(Ok(_))
+
   }
 
   private val routes: HttpRoutes[F] = HttpRoutes.of[F] {

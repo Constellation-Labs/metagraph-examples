@@ -2,16 +2,16 @@ package com.my.currency.shared_data
 
 import cats.data.NonEmptyList
 import cats.effect.Async
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.currency.dataApplication.{DataState, L0NodeContext}
-import org.tessellation.security.signature.Signed
 import cats.syntax.all._
-import com.my.currency.shared_data.types.Types.{UsageUpdate, UsageUpdateCalculatedState, UsageUpdateState}
 import com.my.currency.shared_data.Utils.getAllAddressesFromProofs
 import com.my.currency.shared_data.combiners.Combiners.combineUpdateUsage
+import com.my.currency.shared_data.types.Types.{UsageUpdate, UsageUpdateCalculatedState, UsageUpdateState}
 import com.my.currency.shared_data.validations.Validations.{validateUsageUpdate, validateUsageUpdateSigned}
+import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import org.tessellation.currency.dataApplication.{DataState, L0NodeContext}
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.security.SecurityProvider
+import org.tessellation.security.signature.Signed
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
@@ -29,12 +29,11 @@ object LifecycleSharedFunctions {
     updates : NonEmptyList[Signed[UsageUpdate]]
   ): F[DataApplicationValidationErrorOr[Unit]] =
     updates.traverse { update =>
-      val addressesF = getAllAddressesFromProofs(update.proofs)
-      addressesF
+      getAllAddressesFromProofs(update.proofs)
         .flatMap(addresses => Async[F].delay(validateUsageUpdateSigned(update, oldState.calculated, addresses)))
     }.map(_.reduce)
 
-  def combine[F[_] : Async : SecurityProvider](
+  def combine[F[_] : Async](
     oldState: DataState[UsageUpdateState, UsageUpdateCalculatedState],
     updates : List[Signed[UsageUpdate]]
   )(implicit context: L0NodeContext[F]): F[DataState[UsageUpdateState, UsageUpdateCalculatedState]] = {
@@ -54,9 +53,7 @@ object LifecycleSharedFunctions {
       logger.info("Snapshot without any check-ins, updating the state to empty updates").as(newState)
     } else {
       updates.foldLeftM(newState) { (acc, signedUpdate) =>
-        lastSnapshotOrdinal.flatMap(ordinal =>
-          Async[F].delay(combineUpdateUsage(signedUpdate, acc, ordinal))
-        )
+        lastSnapshotOrdinal.map(combineUpdateUsage(signedUpdate, acc, _))
       }
     }
   }

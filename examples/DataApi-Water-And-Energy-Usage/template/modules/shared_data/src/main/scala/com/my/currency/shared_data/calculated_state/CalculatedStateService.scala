@@ -2,14 +2,11 @@ package com.my.currency.shared_data.calculated_state
 
 import cats.effect.Ref
 import cats.effect.kernel.Async
-import cats.syntax.functor.toFunctorOps
+import cats.syntax.all._
 import com.my.currency.shared_data.types.Types.UsageUpdateCalculatedState
-import io.circe.Json
-import io.circe.syntax.EncoderOps
+import com.my.currency.shared_data.types.Types.UsageUpdateCalculatedState.hash
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.security.hash.Hash
-
-import java.nio.charset.StandardCharsets
 
 trait CalculatedStateService[F[_]] {
   def getCalculatedState: F[CalculatedState]
@@ -34,36 +31,15 @@ object CalculatedStateService {
           snapshotOrdinal: SnapshotOrdinal,
           state          : UsageUpdateCalculatedState
         ): F[Boolean] =
-          stateRef.update { currentState =>
-            val updatedDevices = state.devices.foldLeft(currentState.state.devices) {
-              case (acc, (address, value)) =>
-                acc.updated(address, value)
-            }
-
-            CalculatedState(
-              snapshotOrdinal,
-              UsageUpdateCalculatedState(updatedDevices)
-            )
-          }.as(true)
+          stateRef.modify { currentState =>
+            val devices = currentState.state.devices ++ state.devices
+            CalculatedState(snapshotOrdinal, UsageUpdateCalculatedState(devices)) -> true
+          }
 
         override def hashCalculatedState(
           state: UsageUpdateCalculatedState
         ): F[Hash] = Async[F].delay {
-          def removeKey(json: Json, keyToRemove: String): Json =
-            json.mapObject { obj =>
-              obj.filterKeys(_ != keyToRemove).mapValues {
-                case objValue: Json => removeKey(objValue, keyToRemove)
-                case other => other
-              }
-            }.mapArray { arr =>
-              arr.map(removeKey(_, keyToRemove))
-            }
-
-          val stateAsString = removeKey(state.asJson, "timestamp")
-            .deepDropNullValues
-            .noSpaces
-
-          Hash.fromBytes(stateAsString.getBytes(StandardCharsets.UTF_8))
+          hash(state)
         }
       }
     }

@@ -1,10 +1,15 @@
 package com.my.currency.shared_data.types
 
+import com.my.currency.shared_data.Utils.removeKeyFromJSON
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
+import io.circe.syntax.EncoderOps
 import org.tessellation.currency.dataApplication.{DataCalculatedState, DataOnChainState, DataUpdate}
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.schema.address.Address
+import org.tessellation.security.hash.Hash
+
+import java.nio.charset.StandardCharsets
 
 object Types {
   val EnergyAndWaterUpdate = "EnergyAndWaterUsage"
@@ -50,11 +55,11 @@ object Types {
   @derive(decoder, encoder)
   case class TxnRef(
     txnSnapshotOrdinal: SnapshotOrdinal,
-    txnHash: String
+    txnHash           : String
   )
 
   object TxnRef {
-    def empty: TxnRef = TxnRef(SnapshotOrdinal.MinValue, "0000000000000000000000000000000000000000000000000000000000000000")
+    def empty: TxnRef = TxnRef(SnapshotOrdinal.MinValue, Hash.empty.value)
   }
 
   @derive(decoder, encoder)
@@ -83,6 +88,16 @@ object Types {
   case class UsageUpdateCalculatedState(
     devices: Map[Address, DeviceCalculatedState]
   ) extends DataCalculatedState
+
+  object UsageUpdateCalculatedState {
+    def hash(state: UsageUpdateCalculatedState): Hash =
+      Hash.fromBytes(
+        removeKeyFromJSON(state.asJson, "timestamp")
+          .deepDropNullValues
+          .noSpaces
+          .getBytes(StandardCharsets.UTF_8)
+      )
+  }
 
   @derive(decoder, encoder)
   case class UpdateUsageTransaction(
