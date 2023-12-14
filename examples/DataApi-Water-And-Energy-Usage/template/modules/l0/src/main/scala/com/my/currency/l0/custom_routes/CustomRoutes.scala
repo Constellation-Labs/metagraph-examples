@@ -1,5 +1,7 @@
 package com.my.currency.l0.custom_routes
 
+import cats.MonadThrow
+import cats.data.OptionT
 import cats.effect.Async
 import cats.syntax.all._
 import com.my.currency.shared_data.calculated_state.CalculatedStateService
@@ -13,6 +15,7 @@ import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.middleware.CORS
 import org.tessellation.currency.dataApplication.L0NodeContext
+import org.tessellation.currency.schema.currency.DataApplicationPart
 import org.tessellation.ext.http4s.AddressVar
 import org.tessellation.routes.internal.{InternalUrlPrefix, PublicRoutes}
 import org.tessellation.schema.SnapshotOrdinal
@@ -50,31 +53,30 @@ case class CustomRoutes[F[_] : Async](
     ordinal: SnapshotOrdinal,
     address: Address
   ): F[AddressTransactionsWithLastRef] = {
-    context.getCurrencySnapshot(ordinal).flatMap {
-      case None => new Exception(s"Could not fetch snapshot: ${ordinal.value.value}").raiseError[F, AddressTransactionsWithLastRef]
-      case Some(value) =>
-        value.dataApplication
-          .fold(
-            AddressTransactionsWithLastRef(TxnRef.empty, List.empty[UpdateUsageTransaction]).pure
-          )(dataApplicationPart =>
-            Deserializers.deserializeState(dataApplicationPart.onChainState) match {
-              case Left(_) => new Exception(s"Could not deserialize state of snapshot: ${ordinal.value.value}").raiseError[F, AddressTransactionsWithLastRef]
-              case Right(value) =>
-                Async[F].delay {
-                  val updateUsageTransactions = value.updates.filter {
-                    _.owner == address
-                  }.sortBy(_.lastTxnOrdinal)(Ordering[SnapshotOrdinal].reverse)
-                  val referenceTransaction = updateUsageTransactions.head
-
-                  AddressTransactionsWithLastRef(
-                    TxnRef(referenceTransaction.lastTxnOrdinal, referenceTransaction.lastTxnHash),
-                    updateUsageTransactions
-                  )
-                }
-            }
-          )
-    }
+    val dataApplicationPart: F[Option[DataApplicationPart]] =
+      OptionT(context.getCurrencySnapshot(ordinal))
+        .getOrRaise(new Exception(s"Could not fetch snapshot: ${ordinal.show}, ${address.show}"))
+        .map(_.dataApplication)
+    OptionT(dataApplicationPart)
+      .semiflatMap(da => MonadThrow[F].fromEither(Deserializers.deserializeState(da.onChainState)))
+      .map(_.updates.filter(_.owner === address))
+      .map(_.sortBy(_.lastTxnOrdinal)(Ordering[SnapshotOrdinal].reverse))
+      .mapFilter(txs => txs.lastOption.map(t => AddressTransactionsWithLastRef(TxnRef(t.lastTxnOrdinal, t.lastTxnHash), txs)))
+      .getOrElse(AddressTransactionsWithLastRef(TxnRef.empty, List.empty[UpdateUsageTransaction]))
   }
+
+  private def getTransactionsResponse(
+    updateUsageTransactions: List[UpdateUsageTransaction],
+    snapshotOrdinal        : SnapshotOrdinal,
+    txnHash                : String
+  ): List[TransactionResponse] =
+    updateUsageTransactions.foldLeft(List.empty[TransactionResponse]) { (acc, signedUpdate) =>
+      if (acc.isEmpty) {
+        acc :+ TransactionResponse(signedUpdate, snapshotOrdinal, txnHash)
+      } else {
+        acc :+ TransactionResponse(signedUpdate, acc.last.lastRef.txnSnapshotOrdinal, acc.last.lastRef.txnHash)
+      }
+    }
 
   private def traverseSnapshotsWithTransactions(
     address        : Address,
@@ -86,13 +88,13 @@ case class CustomRoutes[F[_] : Async](
       case (add, ord, hash, txns) =>
         getAddressTransactionsFromState(ord, add).map { addressTransactionsWithLastRef =>
           if (addressTransactionsWithLastRef.txnRef.txnSnapshotOrdinal == SnapshotOrdinal.MinValue) {
-            (txns ++ addressTransactionsWithLastRef.txns.map(TransactionResponse(_, ord, hash))).asRight
+            (txns ++ getTransactionsResponse(addressTransactionsWithLastRef.txns, ord, hash)).asRight
           } else {
             (
               address,
               addressTransactionsWithLastRef.txnRef.txnSnapshotOrdinal,
               addressTransactionsWithLastRef.txnRef.txnHash,
-              addressTransactionsWithLastRef.txns.map(TransactionResponse(_, ord, hash)) ++ txns
+              txns ++ getTransactionsResponse(addressTransactionsWithLastRef.txns, ord, hash)
             ).asLeft
           }
         }
