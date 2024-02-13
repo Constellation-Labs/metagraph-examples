@@ -1,7 +1,7 @@
 import Dependencies._
 import sbt._
 
-ThisBuild / organization := "com.my.currency"
+ThisBuild / organization := "com.my.nft_example"
 ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / evictionErrorLevel := Level.Warn
 
