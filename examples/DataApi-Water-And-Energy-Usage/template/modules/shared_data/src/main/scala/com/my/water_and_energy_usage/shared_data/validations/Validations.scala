@@ -1,10 +1,10 @@
-package com.my.currency.shared_data.validations
+package com.my.water_and_energy_usage.shared_data.validations
 
 import cats.syntax.apply.catsSyntaxApply
-import cats.syntax.option.{none, catsSyntaxOptionId}
-import TypeValidators._
-import com.my.currency.shared_data.errors.Errors.EmptyUpdate
-import com.my.currency.shared_data.types.Types._
+import cats.syntax.option.{catsSyntaxOptionId, none}
+import com.my.water_and_energy_usage.shared_data.errors.Errors.EmptyUpdate
+import com.my.water_and_energy_usage.shared_data.types.Types._
+import com.my.water_and_energy_usage.shared_data.validations.TypeValidators._
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.schema.address.Address
 import org.tessellation.security.signature.Signed
@@ -12,7 +12,7 @@ import org.tessellation.security.signature.Signed
 
 object Validations {
   private def getDeviceByAddress(
-    address   : Address,
+    address             : Address,
     maybeCalculatedState: Option[UsageUpdateCalculatedState]
   ): Option[DeviceCalculatedState] = {
     maybeCalculatedState
@@ -21,7 +21,7 @@ object Validations {
   }
 
   def validateUsageUpdate(
-    update    : UsageUpdate,
+    update              : UsageUpdate,
     maybeCalculatedState: Option[UsageUpdateCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] = {
     val energyUsage = update.energyUsage.getOrElse(EnergyUsage.empty)
@@ -49,9 +49,9 @@ object Validations {
   }
 
   def validateUsageUpdateSigned(
-    signedUpdate: Signed[UsageUpdate],
+    signedUpdate   : Signed[UsageUpdate],
     calculatedState: UsageUpdateCalculatedState,
-    addresses: List[Address]
+    addresses      : List[Address]
   ): DataApplicationValidationErrorOr[Unit] =
     validateProvidedAddress(addresses, signedUpdate.value.address)
       .productR(validateUsageUpdate(signedUpdate.value, calculatedState.some))

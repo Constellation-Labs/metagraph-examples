@@ -1,20 +1,20 @@
-package com.my.currency.l0
+package com.my.water_and_energy_usage.l0
 
 import cats.data.NonEmptyList
 import cats.effect.{IO, Resource}
 import cats.syntax.all._
-import com.my.currency.l0.custom_routes.CustomRoutes
-import com.my.currency.shared_data.LifecycleSharedFunctions
-import com.my.currency.shared_data.calculated_state.CalculatedStateService
-import com.my.currency.shared_data.deserializers.Deserializers
-import com.my.currency.shared_data.serializers.Serializers
-import com.my.currency.shared_data.types.Types.{UsageUpdate, UsageUpdateCalculatedState, UsageUpdateState}
+import com.my.water_and_energy_usage.l0.custom_routes.CustomRoutes
+import com.my.water_and_energy_usage.shared_data.LifecycleSharedFunctions
+import com.my.water_and_energy_usage.shared_data.calculated_state.CalculatedStateService
+import com.my.water_and_energy_usage.shared_data.deserializers.Deserializers
+import com.my.water_and_energy_usage.shared_data.serializers.Serializers
+import com.my.water_and_energy_usage.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.{EntityDecoder, HttpRoutes}
 import org.tessellation.BuildInfo
 import org.tessellation.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
-import org.tessellation.currency.dataApplication.{BaseDataApplicationL0Service, DataApplicationL0Service, DataState, DataUpdate, L0NodeContext}
+import org.tessellation.currency.dataApplication._
 import org.tessellation.currency.l0.CurrencyL0App
 import org.tessellation.currency.schema.currency.{CurrencyIncrementalSnapshot, CurrencySnapshotStateProof}
 import org.tessellation.ext.cats.effect.ResourceIO

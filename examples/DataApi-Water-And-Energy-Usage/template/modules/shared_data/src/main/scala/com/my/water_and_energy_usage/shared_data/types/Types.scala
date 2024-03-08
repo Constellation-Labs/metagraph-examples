@@ -1,6 +1,6 @@
-package com.my.currency.shared_data.types
+package com.my.water_and_energy_usage.shared_data.types
 
-import com.my.currency.shared_data.Utils.removeKeyFromJSON
+import com.my.water_and_energy_usage.shared_data.Utils.removeKeyFromJSON
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 import io.circe.syntax.EncoderOps

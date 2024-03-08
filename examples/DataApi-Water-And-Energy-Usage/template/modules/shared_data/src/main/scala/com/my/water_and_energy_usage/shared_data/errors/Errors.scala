@@ -1,4 +1,4 @@
-package com.my.currency.shared_data.errors
+package com.my.water_and_energy_usage.shared_data.errors
 
 import cats.syntax.all._
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
@@ -24,6 +24,7 @@ object Errors {
     ): DataApplicationValidationType =
       if (cond) invalid else valid
   }
+
   case object EnergyNotPositive extends DataApplicationValidationError {
     val message = "Energy usage must be positive"
   }

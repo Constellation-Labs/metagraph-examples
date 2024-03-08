@@ -1,10 +1,10 @@
-package com.my.currency.shared_data.calculated_state
+package com.my.water_and_energy_usage.shared_data.calculated_state
 
 import cats.effect.Ref
 import cats.effect.kernel.Async
 import cats.syntax.all._
-import com.my.currency.shared_data.types.Types.UsageUpdateCalculatedState
-import com.my.currency.shared_data.types.Types.UsageUpdateCalculatedState.hash
+import com.my.water_and_energy_usage.shared_data.types.Types.UsageUpdateCalculatedState
+import com.my.water_and_energy_usage.shared_data.types.Types.UsageUpdateCalculatedState.hash
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.security.hash.Hash
 

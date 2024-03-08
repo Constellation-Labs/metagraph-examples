@@ -1,7 +1,7 @@
-package com.my.currency.shared_data.combiners
+package com.my.water_and_energy_usage.shared_data.combiners
 
-import com.my.currency.shared_data.Utils.getUsageUpdateHash
-import com.my.currency.shared_data.types.Types._
+import com.my.water_and_energy_usage.shared_data.Utils.getUsageUpdateHash
+import com.my.water_and_energy_usage.shared_data.types.Types._
 import eu.timepit.refined.types.numeric.NonNegLong
 import monocle.Monocle.toAppliedFocusOps
 import org.tessellation.currency.dataApplication.DataState

@@ -1,7 +1,7 @@
-package com.my.currency.shared_data.validations
+package com.my.water_and_energy_usage.shared_data.validations
 
-import com.my.currency.shared_data.errors.Errors.{EnergyNotPositive, EnergyUpdateOutdated, InvalidAddress, WaterNotPositive, WaterUpdateOutdated}
-import com.my.currency.shared_data.types.Types.{DeviceCalculatedState, EnergyUsage, WaterUsage}
+import com.my.water_and_energy_usage.shared_data.errors.Errors._
+import com.my.water_and_energy_usage.shared_data.types.Types._
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.schema.address.Address
 

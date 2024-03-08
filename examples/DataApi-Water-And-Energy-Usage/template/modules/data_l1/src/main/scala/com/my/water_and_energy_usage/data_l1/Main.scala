@@ -1,26 +1,25 @@
-package com.my.currency.data_l1
+package com.my.water_and_energy_usage.data_l1
 
 import cats.data.NonEmptyList
 import cats.effect.{IO, Resource}
 import cats.syntax.all._
-import com.my.currency.shared_data.LifecycleSharedFunctions
-import com.my.currency.shared_data.calculated_state.CalculatedStateService
-import com.my.currency.shared_data.deserializers.Deserializers
-import com.my.currency.shared_data.serializers.Serializers
-import com.my.currency.shared_data.types.Types.{UsageUpdate, UsageUpdateCalculatedState, UsageUpdateState}
+import com.my.water_and_energy_usage.shared_data.LifecycleSharedFunctions
+import com.my.water_and_energy_usage.shared_data.calculated_state.CalculatedStateService
+import com.my.water_and_energy_usage.shared_data.deserializers.Deserializers
+import com.my.water_and_energy_usage.shared_data.serializers.Serializers
+import com.my.water_and_energy_usage.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
-import org.http4s._
-import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.l1.CurrencyL1App
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.security.signature.Signed
-import org.http4s.EntityDecoder
+import org.http4s.{EntityDecoder, _}
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
+import org.tessellation.BuildInfo
+import org.tessellation.currency.dataApplication._
+import org.tessellation.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
+import org.tessellation.currency.l1.CurrencyL1App
 import org.tessellation.ext.cats.effect.ResourceIO
 import org.tessellation.schema.SnapshotOrdinal
+import org.tessellation.schema.cluster.ClusterId
 import org.tessellation.security.hash.Hash
+import org.tessellation.security.signature.Signed
 
 import java.util.UUID
 

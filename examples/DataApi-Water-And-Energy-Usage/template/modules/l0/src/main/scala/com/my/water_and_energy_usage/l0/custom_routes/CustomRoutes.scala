@@ -1,12 +1,12 @@
-package com.my.currency.l0.custom_routes
+package com.my.water_and_energy_usage.l0.custom_routes
 
 import cats.MonadThrow
 import cats.data.OptionT
 import cats.effect.Async
 import cats.syntax.all._
-import com.my.currency.shared_data.calculated_state.CalculatedStateService
-import com.my.currency.shared_data.deserializers.Deserializers
-import com.my.currency.shared_data.types.Types.{AddressTransactionsWithLastRef, TxnRef, UpdateUsageTransaction}
+import com.my.water_and_energy_usage.shared_data.calculated_state.CalculatedStateService
+import com.my.water_and_energy_usage.shared_data.deserializers.Deserializers
+import com.my.water_and_energy_usage.shared_data.types.Types._
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 import eu.timepit.refined.auto._

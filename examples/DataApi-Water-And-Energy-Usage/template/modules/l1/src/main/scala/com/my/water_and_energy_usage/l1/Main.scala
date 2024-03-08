@@ -1,9 +1,10 @@
-package com.my.currency.l1
+package com.my.water_and_energy_usage.l1
 
-import java.util.UUID
 import org.tessellation.BuildInfo
 import org.tessellation.currency.l1.CurrencyL1App
 import org.tessellation.schema.cluster.ClusterId
+
+import java.util.UUID
 
 object Main extends CurrencyL1App(
   "currency-l1",

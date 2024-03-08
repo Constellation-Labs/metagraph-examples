@@ -1,6 +1,6 @@
-package com.my.currency.shared_data.serializers
+package com.my.water_and_energy_usage.shared_data.serializers
 
-import com.my.currency.shared_data.types.Types.{UsageUpdate, UsageUpdateCalculatedState, UsageUpdateState}
+import com.my.water_and_energy_usage.shared_data.types.Types.{UsageUpdate, UsageUpdateCalculatedState, UsageUpdateState}
 import io.circe.Encoder
 import io.circe.syntax.EncoderOps
 import org.tessellation.currency.dataApplication.DataUpdate
