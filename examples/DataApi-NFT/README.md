@@ -1,10 +1,10 @@
 
-# Metagraph - Data API for NFT Management
-  
+# Example NFT Metagraph using the Data API
 
 This example demonstrates an example use case of NFTs (Non-Fungible Tokens) based on the ERC-721 standard. Note that this shows a custom implementation of NFTs within a single metagraph using the Data API. It is not meant to describe a cross-metagraph standard for Constellation Network NFTs. 
 
- 
+The following actions are supported:
+
 - Minting NFT Collections
 
 - Minting NFTs
@@ -13,19 +13,17 @@ This example demonstrates an example use case of NFTs (Non-Fungible Tokens) base
 
 - Transferring NFTs
 
-  
 
-In addition to these operations, the client can also fetch the following information:
+In addition to these operations, the client also has access following information via the metagraph REST APIs:
 
-  
 
 - Retrieve all NFT collections
 
-- Fetch a specific collection by ID
+- Retrieve a specific collection by ID
 
-- Access all NFTs within a collection
+- Retrieve all NFTs within a collection
 
-- Fetch a specific NFT within a collection by ID
+- Retrieve a specific NFT within a collection by ID
 
 - Find all collections owned by a specific address
 
@@ -37,18 +35,14 @@ e.g, https://localhost:8000/data-application/collections
 
 Updates involving NFTs and collections undergo validation before being applied to the state.
 
-  
 
 ## How the NFT System Works
   
-
 The NFT management system operates as follows:
 
-  
+- Users can create collections to organize NFTs. Collections are owned by the user that creates them. 
 
-- Users can create collections associated with their signing address.
-
-- Users can mint NFTs and assign them to a specific collection.
+- Users can mint NFTs into a specific collection that they own.
 
 - Collection owners can transfer ownership of their collections to other wallets.
 
@@ -68,23 +62,13 @@ The NFT management system operates as follows:
 
 Primary code for the example can be found in the following files:
 
-
-
 `modules/l0/src/main/scala/com/my/currency/l0/*`
-
-
 
 `modules/l1/src/main/scala/com/my/currency/l1/*`
 
-
-
 `modules/data_l1/src/main/scala/com/my/currency/data_l1/*`
 
-
-
 `modules/shared_data/src/main/scala/com/my/currency/shared_data/*`
-
-
 
 ### Application Lifecycle
 
@@ -150,7 +134,7 @@ For a more detailed understanding, please refer to the [complete documentation](
 
 #### -> `setCalculatedState`
 
-* This function sets the calculatedState. You can store this as a variable in memory or use external services such as databases. In this example, we use in-memory storage.
+* This function sets calculatedState based on updates in the current snapshot. calculatedState is a state construct that is built up by traversing all snapshots in the chain since genesis. You can store this as a variable in memory or use external services such as databases. In this example, we use in-memory storage.
 
 #### -> `getCalculatedState`
 
@@ -162,7 +146,7 @@ For a more detailed understanding, please refer to the [complete documentation](
 
 #### -> `routes`
 
-Customizes routes for our application.
+Custom API routes can be created to provide views into specific slices of metagraph state. 
 
 In this example, the following endpoints are implemented:
 - `GET <metagraph l0 url>/data-application/collections`: Retrieves all collections.
@@ -172,12 +156,8 @@ In this example, the following endpoints are implemented:
 - `GET <metagraph l0 url>/data-application/addresses/:address/collections`: Retrieves all collections associated with an address.
 - `GET <metagraph l0 url>/data-application/addresses/:address/nfts`: Retrieves all NFTs associated with an address.
 
-## Scripts
+## Sample UI
 
-On the sample-ui directory, we have better instructions on how send transactions to this Metagraph, such as:
+In the sample-ui directory, you'll find a react-based frontend that connects to the metagraph and displays data returned from the metagraph's API endpoints. 
 
-`yarn script scripts/mint-collection-nft.ts`
-`yarn script scripts/mint-collection.ts`
-`yarn script scripts/mint-sample-collection.ts`
-`yarn script scripts/transfer-collection-nft.ts`
-`yarn script scripts/transfer-collection.ts`
+The directory also includes scripts for signing and sending data to the metagraph /data endpoint. See the additional [README.MD](./sample-ui/README.md) included in that directory for additional detail. 
