@@ -1,6 +1,6 @@
-package com.my.nft_example.shared_data.serializers
+package com.my.nft.shared_data.serializers
 
-import com.my.nft_example.shared_data.types.Types.{NFTUpdate, NFTUpdatesCalculatedState, NFTUpdatesState}
+import com.my.nft.shared_data.types.Types._
 import io.circe.Encoder
 import io.circe.syntax.EncoderOps
 import org.tessellation.currency.dataApplication.DataUpdate

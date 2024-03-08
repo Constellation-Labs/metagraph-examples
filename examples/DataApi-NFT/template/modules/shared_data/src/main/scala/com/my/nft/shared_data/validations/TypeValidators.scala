@@ -1,9 +1,9 @@
-package com.my.nft_example.shared_data.validations
+package com.my.nft.shared_data.validations
 
-import com.my.nft_example.shared_data.errors.Errors._
-import com.my.nft_example.shared_data.Utils.isValidURL
-import com.my.nft_example.shared_data.serializers.Serializers
-import com.my.nft_example.shared_data.types.Types._
+import com.my.nft.shared_data.Utils.isValidURL
+import com.my.nft.shared_data.errors.Errors._
+import com.my.nft.shared_data.serializers.Serializers
+import com.my.nft.shared_data.types.Types._
 import org.tessellation.currency.dataApplication.DataState
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.schema.address.Address
@@ -103,8 +103,8 @@ object TypeValidators {
     InvalidFieldSize(fieldName, maxSize).whenA(value.length > maxSize)
 
   def validateMapMaxSize(
-    value: Map[String, String],
-    maxSize: Long,
+    value    : Map[String, String],
+    maxSize  : Long,
     fieldName: String
   ): DataApplicationValidationErrorOr[Unit] =
     InvalidFieldSize(fieldName, maxSize).whenA(value.size > maxSize)

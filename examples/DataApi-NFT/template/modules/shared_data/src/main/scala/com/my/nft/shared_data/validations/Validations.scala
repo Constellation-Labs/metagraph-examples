@@ -1,10 +1,10 @@
-package com.my.nft_example.shared_data.validations
+package com.my.nft.shared_data.validations
 
 import cats.syntax.apply.catsSyntaxApply
 import cats.syntax.option.catsSyntaxOptionId
-import com.my.nft_example.shared_data.errors.Errors.valid
-import com.my.nft_example.shared_data.types.Types._
-import com.my.nft_example.shared_data.validations.TypeValidators._
+import com.my.nft.shared_data.errors.Errors.valid
+import com.my.nft.shared_data.types.Types._
+import com.my.nft.shared_data.validations.TypeValidators._
 import org.tessellation.currency.dataApplication.DataState
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.schema.address.Address

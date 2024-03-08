@@ -1,27 +1,27 @@
-package com.my.nft_example.data_l1
+package com.my.nft.data_l1
 
 import cats.data.NonEmptyList
 import cats.effect.{IO, Resource}
-import cats.syntax.option.catsSyntaxOptionId
 import cats.syntax.applicative.catsSyntaxApplicativeId
-import com.my.nft_example.shared_data.LifecycleSharedFunctions
-import com.my.nft_example.shared_data.calculated_state.CalculatedStateService
-import com.my.nft_example.shared_data.deserializers.Deserializers
-import com.my.nft_example.shared_data.errors.Errors.valid
-import com.my.nft_example.shared_data.serializers.Serializers
-import com.my.nft_example.shared_data.types.Types._
+import cats.syntax.option.catsSyntaxOptionId
+import com.my.nft.shared_data.LifecycleSharedFunctions
+import com.my.nft.shared_data.calculated_state.CalculatedStateService
+import com.my.nft.shared_data.deserializers.Deserializers
+import com.my.nft.shared_data.errors.Errors.valid
+import com.my.nft.shared_data.serializers.Serializers
+import com.my.nft.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
 import org.http4s._
-import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication.dataApplication._
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.l1.CurrencyL1App
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.security.signature.Signed
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
+import org.tessellation.BuildInfo
+import org.tessellation.currency.dataApplication._
+import org.tessellation.currency.dataApplication.dataApplication._
+import org.tessellation.currency.l1.CurrencyL1App
 import org.tessellation.ext.cats.effect.ResourceIO
 import org.tessellation.schema.SnapshotOrdinal
+import org.tessellation.schema.cluster.ClusterId
 import org.tessellation.security.hash.Hash
+import org.tessellation.security.signature.Signed
 
 import java.util.UUID
 

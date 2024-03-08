@@ -1,4 +1,4 @@
-package com.my.nft_example.shared_data
+package com.my.nft.shared_data
 
 import cats.data.NonEmptySet
 import cats.effect.Async

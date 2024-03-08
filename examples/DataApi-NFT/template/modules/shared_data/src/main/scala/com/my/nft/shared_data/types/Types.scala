@@ -1,4 +1,4 @@
-package com.my.nft_example.shared_data.types
+package com.my.nft.shared_data.types
 
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive

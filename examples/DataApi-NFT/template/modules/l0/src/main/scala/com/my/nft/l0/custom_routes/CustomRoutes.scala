@@ -1,18 +1,18 @@
-package com.my.nft_example.l0.custom_routes
+package com.my.nft.l0.custom_routes
 
 import cats.effect.Async
 import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
-import com.my.nft_example.shared_data.calculated_state.CalculatedStateService
-import com.my.nft_example.shared_data.types.Types._
+import com.my.nft.shared_data.calculated_state.CalculatedStateService
+import com.my.nft.shared_data.types.Types._
+import eu.timepit.refined.auto._
 import org.http4s._
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 import org.http4s.dsl.Http4sDsl
-import org.tessellation.ext.http4s.AddressVar
-import org.tessellation.http.routes.internal.{InternalUrlPrefix, PublicRoutes}
-import org.tessellation.schema.address.Address
-import eu.timepit.refined.auto._
 import org.http4s.server.middleware.CORS
+import org.tessellation.ext.http4s.AddressVar
+import org.tessellation.routes.internal.{InternalUrlPrefix, PublicRoutes}
+import org.tessellation.schema.address.Address
 
 case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateService[F]) extends Http4sDsl[F] with PublicRoutes[F] {
 

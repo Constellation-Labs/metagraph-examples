@@ -1,7 +1,7 @@
-package com.my.nft_example.shared_data.combiners
+package com.my.nft.shared_data.combiners
 
-import com.my.nft_example.shared_data.serializers.Serializers
-import com.my.nft_example.shared_data.types.Types._
+import com.my.nft.shared_data.serializers.Serializers
+import com.my.nft.shared_data.types.Types._
 import monocle.Monocle.toAppliedFocusOps
 import org.tessellation.currency.dataApplication.DataState
 import org.tessellation.schema.address.Address

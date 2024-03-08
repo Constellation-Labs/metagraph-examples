@@ -1,30 +1,26 @@
-package com.my.nft_example.l0
+package com.my.nft.l0
 
 import cats.data.NonEmptyList
 import cats.effect.{IO, Resource}
-import cats.syntax.option.catsSyntaxOptionId
 import cats.syntax.applicative.catsSyntaxApplicativeId
-import com.my.nft_example.l0.custom_routes.CustomRoutes
-import com.my.nft_example.shared_data.LifecycleSharedFunctions
-import com.my.nft_example.shared_data.calculated_state.CalculatedStateService
-import com.my.nft_example.shared_data.deserializers.Deserializers
-import com.my.nft_example.shared_data.errors.Errors.valid
-import com.my.nft_example.shared_data.serializers.Serializers
-import com.my.nft_example.shared_data.types.Types._
+import cats.syntax.option.catsSyntaxOptionId
+import com.my.nft.l0.custom_routes.CustomRoutes
+import com.my.nft.shared_data.LifecycleSharedFunctions
+import com.my.nft.shared_data.calculated_state.CalculatedStateService
+import com.my.nft.shared_data.deserializers.Deserializers
+import com.my.nft.shared_data.errors.Errors.valid
+import com.my.nft.shared_data.serializers.Serializers
+import com.my.nft.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.{EntityDecoder, HttpRoutes}
 import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication.dataApplication._
 import org.tessellation.currency.dataApplication._
+import org.tessellation.currency.dataApplication.dataApplication._
 import org.tessellation.currency.l0.CurrencyL0App
-import org.tessellation.currency.schema.currency
 import org.tessellation.ext.cats.effect.ResourceIO
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.sdk.domain.rewards.Rewards
-import org.tessellation.sdk.snapshot.currency.CurrencySnapshotEvent
-import org.tessellation.security.SecurityProvider
 import org.tessellation.security.hash.Hash
 import org.tessellation.security.signature.Signed
 
@@ -137,7 +133,4 @@ object Main
 
   override def dataApplication: Option[Resource[IO, BaseDataApplicationL0Service[IO]]] =
     makeL0Service.asResource.some
-
-  override def rewards(implicit sp: SecurityProvider[IO]): Option[Rewards[IO, currency.CurrencySnapshotStateProof, currency.CurrencyIncrementalSnapshot, CurrencySnapshotEvent]] =
-    None
 }

@@ -1,9 +1,9 @@
-package com.my.nft_example.shared_data.calculated_state
+package com.my.nft.shared_data.calculated_state
 
 import cats.effect.Ref
 import cats.effect.kernel.Async
 import cats.syntax.functor.toFunctorOps
-import com.my.nft_example.shared_data.types.Types.NFTUpdatesCalculatedState
+import com.my.nft.shared_data.types.Types._
 import io.circe.Json
 import io.circe.syntax.EncoderOps
 import org.tessellation.schema.SnapshotOrdinal

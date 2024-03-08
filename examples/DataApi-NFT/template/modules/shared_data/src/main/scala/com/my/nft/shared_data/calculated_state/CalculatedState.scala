@@ -1,6 +1,6 @@
-package com.my.nft_example.shared_data.calculated_state
+package com.my.nft.shared_data.calculated_state
 
-import com.my.nft_example.shared_data.types.Types.NFTUpdatesCalculatedState
+import com.my.nft.shared_data.types.Types._
 import eu.timepit.refined.types.all.NonNegLong
 import org.tessellation.schema.SnapshotOrdinal
 

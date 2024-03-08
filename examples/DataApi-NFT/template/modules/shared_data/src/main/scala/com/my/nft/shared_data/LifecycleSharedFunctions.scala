@@ -1,16 +1,16 @@
-package com.my.nft_example.shared_data
+package com.my.nft.shared_data
 
 import cats.data.NonEmptyList
 import cats.effect.Async
+import cats.syntax.all._
+import com.my.nft.shared_data.Utils._
+import com.my.nft.shared_data.combiners.Combiners._
+import com.my.nft.shared_data.types.Types._
+import com.my.nft.shared_data.validations.Validations._
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.currency.dataApplication.{DataState, L0NodeContext}
-import org.tessellation.security.signature.Signed
-import cats.syntax.all._
-import com.my.nft_example.shared_data.Utils._
-import com.my.nft_example.shared_data.combiners.Combiners._
-import com.my.nft_example.shared_data.types.Types._
-import com.my.nft_example.shared_data.validations.Validations._
 import org.tessellation.security.SecurityProvider
+import org.tessellation.security.signature.Signed
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 

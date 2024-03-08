@@ -1,4 +1,4 @@
-package com.my.nft_example.shared_data.errors
+package com.my.nft.shared_data.errors
 
 import cats.syntax.validated.catsSyntaxValidatedIdBinCompat0
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
