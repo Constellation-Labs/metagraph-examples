@@ -1,4 +1,4 @@
-package com.my.currency.shared_data.types
+package com.my.voting_poll.shared_data.types
 
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive

@@ -1,12 +1,12 @@
-package com.my.currency.shared_data.validations
+package com.my.voting_poll.shared_data.validations
 
 import cats.data.NonEmptySet
 import cats.effect.Async
 import cats.implicits.{catsSyntaxApply, catsSyntaxOptionId, toFlatMapOps, toFoldableOps, toFunctorOps, toTraverseOps}
-import com.my.currency.shared_data.errors.Errors.valid
-import com.my.currency.shared_data.serializers.Serializers
-import com.my.currency.shared_data.types.Types.{CreatePoll, VoteCalculatedState, VoteInPoll, VoteStateOnChain}
-import com.my.currency.shared_data.validations.TypeValidators._
+import com.my.voting_poll.shared_data.errors.Errors.valid
+import com.my.voting_poll.shared_data.serializers.Serializers
+import com.my.voting_poll.shared_data.types.Types.{CreatePoll, VoteCalculatedState, VoteInPoll, VoteStateOnChain}
+import com.my.voting_poll.shared_data.validations.TypeValidators._
 import org.tessellation.currency.dataApplication.DataState
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.currency.schema.currency.CurrencySnapshotInfo

@@ -1,6 +1,6 @@
-package com.my.currency.shared_data.serializers
+package com.my.voting_poll.shared_data.serializers
 
-import com.my.currency.shared_data.types.Types.{PollUpdate, VoteCalculatedState, VoteStateOnChain}
+import com.my.voting_poll.shared_data.types.Types.{PollUpdate, VoteCalculatedState, VoteStateOnChain}
 import io.circe.Encoder
 import io.circe.syntax.EncoderOps
 import org.tessellation.currency.dataApplication.DataUpdate

@@ -1,10 +1,10 @@
-package com.my.currency.shared_data.calculated_state
+package com.my.voting_poll.shared_data.calculated_state
 
 import cats.effect.Ref
 import cats.effect.kernel.Async
 import cats.syntax.applicative._
 import cats.syntax.functor._
-import com.my.currency.shared_data.types.Types.VoteCalculatedState
+import com.my.voting_poll.shared_data.types.Types.VoteCalculatedState
 import io.circe.syntax.EncoderOps
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.security.hash.Hash

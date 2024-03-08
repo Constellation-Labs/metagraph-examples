@@ -1,7 +1,7 @@
-package com.my.currency.shared_data.validations
+package com.my.voting_poll.shared_data.validations
 
-import com.my.currency.shared_data.errors.Errors._
-import com.my.currency.shared_data.types.Types.{VoteCalculatedState, CreatePoll, VoteStateOnChain, VoteInPoll}
+import com.my.voting_poll.shared_data.errors.Errors._
+import com.my.voting_poll.shared_data.types.Types.{CreatePoll, VoteCalculatedState, VoteInPoll, VoteStateOnChain}
 import org.tessellation.currency.dataApplication.DataState
 import org.tessellation.currency.schema.currency.CurrencySnapshotInfo
 import org.tessellation.schema.SnapshotOrdinal

@@ -1,19 +1,19 @@
-package com.my.currency.l0.custom_routes
+package com.my.voting_poll.l0.custom_routes
 
 import cats.effect.Async
 import cats.syntax.applicativeError._
 import cats.syntax.flatMap._
 import cats.syntax.functor._
-import com.my.currency.shared_data.calculated_state.CalculatedStateService
-import com.my.currency.shared_data.types.Types.Poll
+import com.my.voting_poll.shared_data.calculated_state.CalculatedStateService
+import com.my.voting_poll.shared_data.types.Types._
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 import eu.timepit.refined.auto._
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
-import org.http4s.{HttpRoutes, Response}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.middleware.CORS
-import org.tessellation.http.routes.internal.{InternalUrlPrefix, PublicRoutes}
+import org.http4s.{HttpRoutes, Response}
+import org.tessellation.routes.internal.{InternalUrlPrefix, PublicRoutes}
 import org.tessellation.schema.address.Address
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.slf4j.Slf4jLogger

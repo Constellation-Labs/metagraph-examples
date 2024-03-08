@@ -1,27 +1,27 @@
-package com.my.currency.data_l1
+package com.my.voting_poll.data_l1
 
 import cats.data.NonEmptyList
 import cats.effect.{IO, Resource}
 import cats.implicits.catsSyntaxOptionId
 import cats.syntax.applicative._
 import cats.syntax.validated._
-import com.my.currency.shared_data.LifecycleSharedFunctions
-import com.my.currency.shared_data.calculated_state.CalculatedStateService
-import com.my.currency.shared_data.deserializers.Deserializers
-import com.my.currency.shared_data.serializers.Serializers
-import com.my.currency.shared_data.types.Types.{PollUpdate, VoteCalculatedState, VoteStateOnChain}
+import com.my.voting_poll.shared_data.LifecycleSharedFunctions
+import com.my.voting_poll.shared_data.calculated_state.CalculatedStateService
+import com.my.voting_poll.shared_data.deserializers.Deserializers
+import com.my.voting_poll.shared_data.serializers.Serializers
+import com.my.voting_poll.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
+import org.http4s.{EntityDecoder, HttpRoutes}
 import org.tessellation.BuildInfo
+import org.tessellation.currency.dataApplication._
 import org.tessellation.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
-import org.tessellation.currency.dataApplication.{BaseDataApplicationL1Service, DataApplicationL1Service, DataState, DataUpdate, L1NodeContext}
 import org.tessellation.currency.l1.CurrencyL1App
+import org.tessellation.ext.cats.effect.ResourceIO
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.schema.cluster.ClusterId
 import org.tessellation.security.hash.Hash
 import org.tessellation.security.signature.Signed
-import org.http4s.{EntityDecoder, HttpRoutes}
-import org.tessellation.ext.cats.effect.ResourceIO
 
 import java.util.UUID
 

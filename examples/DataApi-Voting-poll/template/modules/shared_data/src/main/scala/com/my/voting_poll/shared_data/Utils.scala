@@ -1,4 +1,4 @@
-package com.my.currency.shared_data
+package com.my.voting_poll.shared_data
 
 import cats.Functor
 import cats.syntax.functor._

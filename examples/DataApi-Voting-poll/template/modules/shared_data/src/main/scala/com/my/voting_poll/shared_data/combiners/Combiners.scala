@@ -1,7 +1,7 @@
-package com.my.currency.shared_data.combiners
+package com.my.voting_poll.shared_data.combiners
 
-import com.my.currency.shared_data.serializers.Serializers
-import com.my.currency.shared_data.types.Types.{CreatePoll, Poll, VoteCalculatedState, VoteInPoll, VoteStateOnChain}
+import com.my.voting_poll.shared_data.serializers.Serializers
+import com.my.voting_poll.shared_data.types.Types._
 import monocle.Monocle.toAppliedFocusOps
 import org.tessellation.currency.dataApplication.DataState
 import org.tessellation.currency.schema.currency.CurrencySnapshotInfo

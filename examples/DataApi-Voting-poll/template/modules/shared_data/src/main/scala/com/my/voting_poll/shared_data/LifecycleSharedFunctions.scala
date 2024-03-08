@@ -1,4 +1,4 @@
-package com.my.currency.shared_data
+package com.my.voting_poll.shared_data
 
 import cats.data.NonEmptyList
 import cats.effect.Async
@@ -7,17 +7,16 @@ import cats.syntax.either._
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 import cats.syntax.option._
-import com.my.currency.shared_data.Utils.getLastMetagraphIncrementalSnapshotInfo
+import com.my.voting_poll.shared_data.Utils.getLastMetagraphIncrementalSnapshotInfo
+import com.my.voting_poll.shared_data.combiners.Combiners.{combineCreatePoll, combineVoteInPoll}
+import com.my.voting_poll.shared_data.errors.Errors.{CouldNotGetLatestCurrencySnapshot, DataApplicationValidationTypeOps}
+import com.my.voting_poll.shared_data.types.Types._
+import com.my.voting_poll.shared_data.validations.Validations.{createPollValidations, createPollValidationsWithSignature, voteInPollValidations, voteInPollValidationsWithSignature}
+import org.slf4j.LoggerFactory
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.currency.dataApplication.{DataState, L0NodeContext, L1NodeContext}
-import org.tessellation.security.signature.Signed
-import com.my.currency.shared_data.combiners.Combiners.{combineCreatePoll, combineVoteInPoll}
-import com.my.currency.shared_data.errors.Errors.CouldNotGetLatestCurrencySnapshot
-import com.my.currency.shared_data.errors.Errors.DataApplicationValidationTypeOps
-import com.my.currency.shared_data.validations.Validations.{createPollValidations, createPollValidationsWithSignature, voteInPollValidations, voteInPollValidationsWithSignature}
-import com.my.currency.shared_data.types.Types.{CreatePoll, PollUpdate, VoteCalculatedState, VoteInPoll, VoteStateOnChain}
-import org.slf4j.LoggerFactory
 import org.tessellation.security.SecurityProvider
+import org.tessellation.security.signature.Signed
 
 object LifecycleSharedFunctions {
 
