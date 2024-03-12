@@ -66,11 +66,9 @@ object Validations {
 
   def mintNFTValidationsWithSignature(
     update   : MintNFT,
-    addresses: List[Address],
     state    : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] =
     mintNFTValidations(update, state.some)
-      .productR(validateProvidedAddress(addresses, update.owner))
 
   def transferCollectionValidationsWithSignature(
     update   : TransferCollection,
