@@ -112,4 +112,4 @@ Due to the nature of how signatures are validated by the nodes is particularly i
 
 ## Cluster Propagation & Changes
 
-Sometimes Euclid nodes will need to propagate changes among the cluster members completely for an operation to be valid, so if for example you're creating a collection and then and NFT inside, make sure the collection is correctly created (give it time to propagate) so you don't get errors like "CollectionDoesNotExist".
+Sometimes Euclid nodes will need to propagate changes among the cluster members completely for an operation to be valid, so if for example you're creating a collection and then an NFT inside, make sure the collection is correctly created (give it time to propagate) so you don't get errors like "CollectionDoesNotExist".
