@@ -45,7 +45,7 @@ object LifecycleSharedFunctions {
               case mintCollection: MintCollection =>
                 mintCollectionValidations(mintCollection, state.some)
               case mintNFT: MintNFT =>
-                mintNFTValidationsWithSignature(mintNFT, addresses, state)
+                mintNFTValidationsWithSignature(mintNFT, state)
               case transferCollection: TransferCollection =>
                 transferCollectionValidationsWithSignature(transferCollection, addresses, state)
               case transferNFT: TransferNFT =>
