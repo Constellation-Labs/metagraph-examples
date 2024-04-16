@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 import { MetagraphNftCollectionAction } from 'scripts/types/nft_actions.ts';
 import axios, { AxiosError } from 'axios';
 
@@ -15,18 +13,10 @@ const generateActionMessageProof = async (
   actionMessage: MetagraphNftCollectionAction,
   signingAccount: typeof dag4.account
 ) => {
-  const encodedMessage = Buffer.from(
-    JSON.stringify(actionMessage),
-    'utf-8'
-  ).toString('hex');
-
-  const hasher = crypto.createHash('sha256');
-  hasher.update(Buffer.from(encodedMessage, 'hex'));
-  const hash = hasher.digest('hex');
-
-  const signature = await dag4.keyStore.sign(
+  const encodedMessage = Buffer.from(JSON.stringify(actionMessage)).toString('base64')
+  const signature = await dag4.keyStore.dataSign(
     signingAccount.keyTrio.privateKey,
-    hash
+    encodedMessage
   );
 
   const publicKey = signingAccount.keyTrio.publicKey;

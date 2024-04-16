@@ -22,6 +22,7 @@ import org.tessellation.node.shared.domain.rewards.Rewards
 import org.tessellation.node.shared.snapshot.currency.CurrencySnapshotEvent
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.schema.cluster.ClusterId
+import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
 import org.tessellation.security.SecurityProvider
 import org.tessellation.security.hash.Hash
 import org.tessellation.security.signature.Signed
@@ -33,7 +34,8 @@ object Main
     "currency-l0",
     "currency L0 node",
     ClusterId(UUID.fromString("517c3a05-9219-471b-a54c-21b7d72f4ae5")),
-    version = BuildInfo.version
+    metagraphVersion = MetagraphVersion.unsafeFrom(BuildInfo.version),
+    tessellationVersion = TessellationVersion.unsafeFrom(BuildInfo.version)
   ) {
 
   private def makeBaseDataApplicationL0Service(
