@@ -1,10 +1,44 @@
 # Metagraph NFTs UI App
 
-This app demonstrates demonstrates basic NFT functionality using the Constellation Metagraph Data API. This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This simple web app provides a front end to view data stored on the metagraph. It provides scripts to help sign data and submit it to a metagraph node in the proper format. It's important to remember that this web app is just a view into the state stored on the metagraph using the custom API endpoints built into the mL0 layer. For debugging and learning purposes, it's highly recommended to focus on the outputs of the metagraph API endpoints rather than on this demo UI. 
+
+See the metagraph L0 [CustomRoutes.scala](../template/modules/l0/src/main/scala/com/my/nft/l0/custom_routes/CustomRoutes.scala) file to understand how the API endpoints used in this app are constructed. 
+
+
+Be sure to also examine the source code of the [scripts](./scripts) described below to better understand how to construct requests to the metagraph. 
+
+
+## Installation
+Install package dependencies with yarn
+
+`yarn install`
+
+
+## Running the Web App
+Start the web app in development mode with yarn start. Open [http://localhost:6542](http://localhost:6542) to view it in the browser.
+
+`yarn start`
+
+## Wallets and Private Keys
+All of the scripts below require a private key as an input parameter in order to sign the data sent to the metagraph. Private keys can be generated using [dag4.js](https://docs.constellationnetwork.io/hypergraph/dag4-wallets#interacting-with-wallets) or exported from [Stargazer wallet](https://play.google.com/store/apps/details?id=com.stargazer). 
+
+You can find more information on [Accounts and Keys](https://docs.constellationnetwork.io/metagraphs/accounts) on Constellation Network in the docs.
 
 ## Available Scripts
 
-In the project directory, you can run:
+### `yarn script scripts/mint-collection.ts`
+
+```
+Options:
+  -k, --account-pk <account-pk>            Account private key to use (hex)
+  -n, --collection-name <collection-name>  Collection Name (must be unique)
+  -h, --help                               display help for command
+```
+
+This script mints a new collection into state. Collections have a hasMany relationship with NFTs - they can contain multiple or none. In this step, we create a collection with a name which will be owned by the wallet associated with the provided private key. 
+
+After minting a collection, you can see the updated state at `http://YOUR_NODE_IP:PORT/data-application/collections` (e.g. `http://localhost:9400/data-application/collections`) or in the web app.
+
 
 ### `yarn script scripts/mint-collection-nft.ts`
 
@@ -19,19 +53,16 @@ Options:
   -o, --nft-owner <nft-owner>              NFT owner (address)
   -h, --help                               display help for command
 ```
+This allows you to create a new NFT record inside an existing collection. 
 
-Lets you create a new NFT inside a collection, collection IDs are the hashes returned by the cluster when creating a collection.
+The collection ID is returned after creating the collection, or it can be found via the `/data-application/collections` endpoint. 
 
-### `yarn script scripts/mint-collection.ts`
+NFT id, name, and description can be anything you choose. NFT URI should be a link to the NFT image, hosted somewhere externally. 
 
-```
-Options:
-  -k, --account-pk <account-pk>            Account private key to use (hex)
-  -n, --collection-name <collection-name>  Collection Name (must be unique)
-  -h, --help                               display help for command
-```
+The NFT owner can be any DAG address. It can be the owner of the collection or a different address. 
 
-Lets you create a new collection inside the cluster, collection names must be unique.
+After minting an NFT, you can view the updated state at: `http://YOUR_NODE_IP:PORT/data-application/collections/COLLECTION_ID/nfts` (e.g. `http://localhost:9400/data-application/collections/6237c03d8fc53711a4d0423d707f7deae84336fe0510ae66366de8e3321e00a7/nfts`) or in the web app UI.
+
 
 ### `yarn script scripts/mint-sample-collection.ts`
 
@@ -43,7 +74,7 @@ Options:
   -h, --help                               display help for command
 ```
 
-Lets you create a new collection inside the cluster, populates the collection with new NFTs based on the `--nft-count` argument.
+This helper script creates a new collection, then populates the collection with new sample NFTs based on the `--nft-count` argument.
 
 _Note: This command may produce errors related to [Cluster Propagation & Changes](#cluster-propagation--changes)._
 
@@ -59,7 +90,7 @@ Options:
   -h, --help                           display help for command
 ```
 
-Transfers an existing NFT to a new owner.
+Transfers an existing NFT to a new owner. The `from` address is always the wallet address associated with the provided account-pk.
 
 ### `yarn script scripts/transfer-collection.ts`
 
@@ -74,33 +105,6 @@ Options:
 
 Transfers an existing collection to a new owner.
 
-### `yarn start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
 ## Action Encoding & Bad Signatures
 
@@ -108,10 +112,4 @@ Due to the nature of how signatures are validated by the nodes is particularly i
 
 ## Cluster Propagation & Changes
 
-Some times Euclid nodes will need to propagate changes among the cluster members completely for an operation to be valid, so if for example you're creating a collection and then and NFT inside, make sure the collection is correctly created (give it time to propagate) so you don't get errors like "CollectionDoesNotExist".
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Sometimes Euclid nodes will need to propagate changes among the cluster members completely for an operation to be valid, so if for example you're creating a collection and then an NFT inside, make sure the collection is correctly created (give it time to propagate) so you don't get errors like "CollectionDoesNotExist".

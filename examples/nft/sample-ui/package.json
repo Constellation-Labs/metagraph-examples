@@ -10,7 +10,7 @@
     "eject": "react-scripts eject",
     "tscheck": "tsc --noEmit",
     "lint": "eslint . --fix",
-    "script": "ts-node-esm --files --cwdMode -r tsconfig-paths/register"
+    "script": "node --no-warnings=ExperimentalWarning --loader ts-node/esm"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -67,6 +67,5 @@
       "last 1 safari version"
     ]
   },
-  "config-overrides-path": "./config-overrides.cjs",
-  "proxy": "http://localhost:8000"
+  "config-overrides-path": "./config-overrides.cjs"
 }
