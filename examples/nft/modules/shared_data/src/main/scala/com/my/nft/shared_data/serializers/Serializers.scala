@@ -8,6 +8,7 @@ import org.tessellation.currency.dataApplication.dataApplication.DataApplication
 import org.tessellation.security.signature.Signed
 
 import java.nio.charset.StandardCharsets
+import java.util.Base64
 
 object Serializers {
   private def serialize[A: Encoder](
@@ -18,8 +19,18 @@ object Serializers {
 
   def serializeUpdate(
     update: NFTUpdate
-  ): Array[Byte] =
-    serialize[NFTUpdate](update)
+  ): Array[Byte] = {
+    val encoder = Base64.getEncoder
+    val data_sign_prefix = "\u0019Constellation Signed Data:\n"
+
+    val updateBytes = update.asJson.deepDropNullValues.noSpaces.getBytes(StandardCharsets.UTF_8)
+    val encodedBytes = encoder.encode(updateBytes)
+
+    val encodedString = new String(encodedBytes, "UTF-8")
+    val completeString = s"$data_sign_prefix${encodedString.length}\n$encodedString"
+
+    completeString.getBytes(StandardCharsets.UTF_8)
+  }
 
   def serializeState(
     state: NFTUpdatesState

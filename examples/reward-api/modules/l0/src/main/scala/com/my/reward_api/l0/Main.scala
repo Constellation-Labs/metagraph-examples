@@ -19,6 +19,7 @@ import org.tessellation.node.shared.infrastructure.consensus.trigger.ConsensusTr
 import org.tessellation.schema.address.Address
 import org.tessellation.schema.balance.Balance
 import org.tessellation.schema.cluster.ClusterId
+import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
 import org.tessellation.schema.transaction.{RewardTransaction, Transaction, TransactionAmount}
 import org.tessellation.security.SecurityProvider
 import org.tessellation.security.signature.Signed
@@ -100,7 +101,8 @@ object Main
     "custom-rewards-l0",
     "custom-rewards L0 node",
     ClusterId(UUID.fromString("517c3a05-9219-471b-a54c-21b7d72f4ae5")),
-    version = BuildInfo.version
+    metagraphVersion = MetagraphVersion.unsafeFrom(BuildInfo.version),
+    tessellationVersion = TessellationVersion.unsafeFrom(BuildInfo.version)
   ) {
 
   override def rewards(implicit sp: SecurityProvider[IO]): Some[Rewards[IO, CurrencySnapshotStateProof, CurrencyIncrementalSnapshot, CurrencySnapshotEvent]] = Some(

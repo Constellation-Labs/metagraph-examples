@@ -16,7 +16,7 @@
     "@emotion/react": "^11.11.1",
     "@mantine/core": "^6.0.16",
     "@mantine/hooks": "^6.0.16",
-    "@stardust-collective/dag4": "^2.2.0",
+    "@stardust-collective/dag4": "^2.2.2",
     "axios": "^1.4.0",
     "boxen": "^7.1.0",
     "clsx": "^2.0.0",
