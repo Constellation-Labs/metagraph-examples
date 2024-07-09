@@ -1,6 +1,6 @@
 package com.my.water_and_energy_usage.shared_data.validations
 
-import cats.syntax.apply.catsSyntaxApply
+import cats.syntax.apply.catsSyntaxApplyOps
 import cats.syntax.option.{catsSyntaxOptionId, none}
 import com.my.water_and_energy_usage.shared_data.errors.Errors.EmptyUpdate
 import com.my.water_and_energy_usage.shared_data.types.Types._
