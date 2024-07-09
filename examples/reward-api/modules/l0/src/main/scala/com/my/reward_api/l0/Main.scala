@@ -12,10 +12,10 @@ import io.circe.parser.decode
 import org.tessellation.BuildInfo
 import org.tessellation.currency.dataApplication.DataCalculatedState
 import org.tessellation.currency.l0.CurrencyL0App
-import org.tessellation.currency.l0.snapshot.CurrencySnapshotEvent
 import org.tessellation.currency.schema.currency.{CurrencyIncrementalSnapshot, CurrencySnapshotStateProof}
 import org.tessellation.node.shared.domain.rewards.Rewards
 import org.tessellation.node.shared.infrastructure.consensus.trigger.ConsensusTrigger
+import org.tessellation.node.shared.snapshot.currency.CurrencySnapshotEvent
 import org.tessellation.schema.address.Address
 import org.tessellation.schema.balance.Balance
 import org.tessellation.schema.cluster.ClusterId
