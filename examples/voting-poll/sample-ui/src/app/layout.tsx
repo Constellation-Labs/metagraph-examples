@@ -4,6 +4,7 @@ import '../styles/fonts.scss';
 import type { Metadata } from 'next';
 
 import { Header } from '../components';
+import { WalletProvider } from '../providers';
 
 export const metadata: Metadata = {
   title: 'Voting Poll Example'
@@ -40,8 +41,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
       </head>
       <body>
-        <Header />
-        {children}
+        <WalletProvider>
+          <Header />
+          {children}
+        </WalletProvider>
       </body>
     </html>
   );
