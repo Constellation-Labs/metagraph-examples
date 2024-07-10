@@ -1,0 +1,20 @@
+.main {
+  display: flex;
+  width: 100%;
+
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  row-gap: 32px;
+  margin: 79px 0px 64px;
+
+  span {
+    font-family: Everett;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 36.81px;
+    letter-spacing: -0.02em;
+    text-align: left;
+    color: #174cd3;
+  }
+}
