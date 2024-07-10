@@ -1,3 +1,5 @@
+import { PageFrame } from '../components';
+
 export default async function HomePage() {
-  return <div>Home</div>;
+  return <PageFrame></PageFrame>;
 }
