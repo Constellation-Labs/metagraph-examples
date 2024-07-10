@@ -3,9 +3,10 @@ import '../styles/fonts.scss';
 
 import type { Metadata } from 'next';
 
+import { Header } from '../components';
+
 export const metadata: Metadata = {
-  title: 'Hypercore',
-  description: '@todo'
+  title: 'Voting Poll Example'
 };
 
 export default function RootLayout({
@@ -38,7 +39,10 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#00aba9" />
         <meta name="theme-color" content="#000000" />
       </head>
-      <body>{children}</body>
+      <body>
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }
