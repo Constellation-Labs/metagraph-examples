@@ -12,6 +12,7 @@
     "lint-fix": "eslint . --fix"
   },
   "dependencies": {
+    "@svgr/webpack": "^8.1.0",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",
