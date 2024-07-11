@@ -1,63 +1,77 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { dag4 } from '@stardust-collective/dag4';
 
-import { Input, PageFrame } from '../components';
-import { buildRegisterField } from '../utils';
+import { PageFrame, PollCard } from '../components';
+
+import styles from './page.module.scss';
 
 export default function HomePage() {
-  const form = useForm();
-
-  const register = buildRegisterField(
-    form.register,
-    form.formState,
-    form.control
-  );
   return (
     <PageFrame>
-      <Input label="label" {...register('a')} />
-      <Input label="label" description="decription" {...register('a')} />
-      <Input
-        label="label"
-        description="decription"
-        placeholder="placeholder"
-        {...register('a')}
-      />
-      <Input
-        type="select"
-        label="label"
-        options={[{ value: 'opt1' }, { value: 'opt2' }]}
-        {...register('b')}
-      />
-      <Input
-        type="select"
-        description="decription"
-        label="label"
-        options={[{ value: 'opt1' }, { value: 'opt2' }]}
-        {...register('b')}
-      />
-      <Input
-        type="select"
-        description="decription"
-        label="label"
-        placeholder="placeholder"
-        options={[{ value: 'opt1' }, { value: 'opt2' }]}
-        {...register('b')}
-      />
-      <Input type="add-options" label="label" {...register('c')} />
-      <Input
-        type="add-options"
-        label="label"
-        description="decription"
-        {...register('c')}
-      />
-      <Input
-        type="add-options"
-        label="label"
-        description="decription"
-        placeholder="placeholder"
-        {...register('c')}
-      />
+      <section className={styles.main}>
+        <PollCard
+          poll={{
+            name: '$poll_name$',
+            owner: dag4.keyStore.getDagAddressFromPrivateKey(
+              dag4.keyStore.generatePrivateKey()
+            ),
+            pollOptions: ['Opt1', 'Opt2', 'Opt3', 'Opt4'],
+            startSnapshotOrdinal: 1129321,
+            endSnapshotOrdinal: 1229321,
+            results: [
+              { option: 'Opt1', votes: 1281 },
+              { option: 'Opt2', votes: 4352 },
+              { option: 'Opt3', votes: 1733 },
+              { option: 'Opt4', votes: 2957 }
+            ]
+          }}
+        />
+        <PollCard
+          poll={{
+            name: '$poll_name$',
+            owner: dag4.keyStore.getDagAddressFromPrivateKey(
+              dag4.keyStore.generatePrivateKey()
+            ),
+            pollOptions: ['Opt1', 'Opt2', 'Opt3', 'Opt4'],
+            startSnapshotOrdinal: 1129321,
+            endSnapshotOrdinal: 1229321
+          }}
+        />
+        <PollCard
+          poll={{
+            name: '$poll_name$',
+            owner: dag4.keyStore.getDagAddressFromPrivateKey(
+              dag4.keyStore.generatePrivateKey()
+            ),
+            pollOptions: ['Opt1', 'Opt2', 'Opt3', 'Opt4'],
+            startSnapshotOrdinal: 1129321,
+            endSnapshotOrdinal: 1229321
+          }}
+        />
+        <PollCard
+          poll={{
+            name: '$poll_name$',
+            owner: dag4.keyStore.getDagAddressFromPrivateKey(
+              dag4.keyStore.generatePrivateKey()
+            ),
+            pollOptions: ['Opt1', 'Opt2', 'Opt3', 'Opt4'],
+            startSnapshotOrdinal: 1129321,
+            endSnapshotOrdinal: 1229321
+          }}
+        />
+        <PollCard
+          poll={{
+            name: '$poll_name$',
+            owner: dag4.keyStore.getDagAddressFromPrivateKey(
+              dag4.keyStore.generatePrivateKey()
+            ),
+            pollOptions: ['Opt1', 'Opt2', 'Opt3', 'Opt4'],
+            startSnapshotOrdinal: 1129321,
+            endSnapshotOrdinal: 1229321
+          }}
+        />
+      </section>
     </PageFrame>
   );
 }
