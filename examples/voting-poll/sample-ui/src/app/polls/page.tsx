@@ -1,17 +1,16 @@
-'use client';
-
 import { dag4 } from '@stardust-collective/dag4';
 
-import { PageFrame, PollCard } from '../components';
+import { PageFrame, PollCard } from '../../components';
 
 import styles from './page.module.scss';
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <PageFrame>
       <section className={styles.main}>
         <PollCard
           poll={{
+            id: 'hash1',
             name: '$poll_name$',
             owner: dag4.keyStore.getDagAddressFromPrivateKey(
               dag4.keyStore.generatePrivateKey()
@@ -29,6 +28,7 @@ export default function HomePage() {
         />
         <PollCard
           poll={{
+            id: 'hash2',
             name: '$poll_name$',
             owner: dag4.keyStore.getDagAddressFromPrivateKey(
               dag4.keyStore.generatePrivateKey()
@@ -40,6 +40,7 @@ export default function HomePage() {
         />
         <PollCard
           poll={{
+            id: 'hash3',
             name: '$poll_name$',
             owner: dag4.keyStore.getDagAddressFromPrivateKey(
               dag4.keyStore.generatePrivateKey()
@@ -51,6 +52,7 @@ export default function HomePage() {
         />
         <PollCard
           poll={{
+            id: 'hash4',
             name: '$poll_name$',
             owner: dag4.keyStore.getDagAddressFromPrivateKey(
               dag4.keyStore.generatePrivateKey()
@@ -62,6 +64,7 @@ export default function HomePage() {
         />
         <PollCard
           poll={{
+            id: 'hash5',
             name: '$poll_name$',
             owner: dag4.keyStore.getDagAddressFromPrivateKey(
               dag4.keyStore.generatePrivateKey()

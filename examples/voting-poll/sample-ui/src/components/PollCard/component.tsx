@@ -5,7 +5,7 @@ import Blockies from 'react-blockies';
 import { IPoll } from '../../types';
 import { shorten } from '../../utils';
 import { Card } from '../Card/component';
-import { Button } from '../Button/component';
+import { ButtonLink } from '../Button/ButtonLink/component';
 
 import styles from './component.module.scss';
 
@@ -66,7 +66,9 @@ export const PollCard = ({ poll }: IPollCardProps) => {
           );
         })}
       </div>
-      <Button variants={['primary']}>Cast your vote</Button>
+      <ButtonLink variants={['primary']} href={`/polls/${poll.id}`}>
+        Cast your vote
+      </ButtonLink>
     </Card>
   );
 };

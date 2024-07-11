@@ -7,6 +7,9 @@ const nextConfig = {
     });
 
     return config;
+  },
+  redirects: async () => {
+    return [{ source: '/', destination: '/polls', permanent: false }];
   }
 };
 

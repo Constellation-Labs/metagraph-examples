@@ -1,4 +1,5 @@
 export type IPoll = {
+  id: string;
   name: string;
   owner: string;
   pollOptions: string[];
