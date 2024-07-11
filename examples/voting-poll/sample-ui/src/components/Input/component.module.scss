@@ -119,7 +119,7 @@
     }
 
     .inputBar {
-      border: 1px solid #ef4444;
+      border-bottom: 2px solid #ef4444;
 
       span.staticPrefix {
         color: #ef44449f;
@@ -136,11 +136,11 @@
   }
 
   .box.error {
-    font-family: IBM Plex Mono;
+    font-family: Everett;
     font-size: 12px;
-    font-weight: 400;
-    line-height: 20px;
-    letter-spacing: 0.002em;
+    font-weight: 300;
+    line-height: 24px;
+    letter-spacing: 0.20000000298023224px;
     text-align: right;
 
     color: #ef4444;

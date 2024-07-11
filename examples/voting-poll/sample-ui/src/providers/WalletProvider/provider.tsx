@@ -10,8 +10,7 @@ import { WALLET_COOKIE_NAME } from './consts';
 type IWalletProviderContext = {
   wallet: ReturnType<typeof useStargazerWallet>;
   requestDataSignature: (
-    message: string,
-    data: Record<string, any>
+    payload: Record<string, any>
   ) => Promise<{ pub: string; signature: string; payload: string }>;
 };
 
@@ -45,16 +44,16 @@ export const WalletProvider = ({
   }, [addressCookie]);
 
   const requestDataSignature: IWalletProviderContext['requestDataSignature'] =
-    async (message, data) => {
+    async (payload) => {
       if (!wallet.active) {
         throw new Error('Wallet is not active, cannot sign messages');
       }
 
-      const payload = btoa(JSON.stringify({ message, data }));
+      const payloadEncoded = btoa(JSON.stringify(payload));
 
       const signature = await wallet.request({
         method: 'dag_signData',
-        params: [wallet.account, payload]
+        params: [wallet.account, payloadEncoded]
       });
 
       const pub = await wallet.request({
@@ -62,7 +61,7 @@ export const WalletProvider = ({
         params: [wallet.account]
       });
 
-      return { pub, signature, payload };
+      return { pub, signature, payload: payloadEncoded };
     };
 
   return (
