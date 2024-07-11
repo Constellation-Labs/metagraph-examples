@@ -72,7 +72,7 @@ export const CreatePollForm = () => {
           <Input
             label="Name"
             description="Maximum of 128 characters"
-            placeholder="Enter a space name"
+            placeholder="Enter a poll name"
             {...registerField('name')}
           />
           <Input
