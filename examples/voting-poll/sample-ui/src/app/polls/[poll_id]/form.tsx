@@ -4,25 +4,28 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useEffect } from 'react';
+import { useParams } from 'next/navigation';
 
 import { ButtonLink } from '../../../components/Button/ButtonLink/component.tsx';
 import { useWalletProvider } from '../../../providers/index.ts';
-import { PollSchema } from '../../../schemas/index.ts';
+import { VoteSchema } from '../../../schemas/index.ts';
 import { buildRegisterField } from '../../../utils/forms.ts';
 import { Button, Card, Input } from '../../../components/index.ts';
 
 import styles from './page.module.scss';
-import { createPoll } from './actions.ts';
+import { castVote } from './actions.ts';
 
-const FormPollSchema = PollSchema.extend({
+const FormVoteSchema = VoteSchema.extend({
   signature: z
     .string({ invalid_type_error: 'Invalid signature' })
     .regex(/^([a-fA-F0-9]{2,})$/, 'Invalid hex character')
 });
 
-type IFormPollSchema = z.infer<typeof FormPollSchema>;
+type IFormVoteSchema = z.infer<typeof FormVoteSchema>;
 
-export const CreatePollForm = () => {
+export const CastVoteForm = () => {
+  const { poll_id } = useParams<{ poll_id: string }>();
+
   const { wallet, requestDataSignature } = useWalletProvider();
 
   const {
@@ -33,19 +36,20 @@ export const CreatePollForm = () => {
     setValue,
     getValues,
     watch
-  } = useForm<IFormPollSchema>({
+  } = useForm<IFormVoteSchema>({
     mode: 'onTouched',
-    resolver: zodResolver(FormPollSchema)
+    resolver: zodResolver(FormVoteSchema),
+    defaultValues: { pollId: poll_id }
   });
 
   const registerField = buildRegisterField(register, formState, control);
 
   const onFormSubmit = handleSubmit(async (values) => {
-    await createPoll(values);
+    await castVote(values);
   });
 
   useEffect(() => {
-    setValue('owner', wallet.active ? wallet.account : '', {
+    setValue('address', wallet.active ? wallet.account : '', {
       shouldTouch: true,
       shouldDirty: true
     });
@@ -68,36 +72,24 @@ export const CreatePollForm = () => {
   return (
     <form className={styles.content} onSubmit={onFormSubmit}>
       <div className={styles.cards}>
-        <Card variants={['full-width', 'padding-m']} header={'Poll'}>
+        <Card variants={['full-width', 'padding-m']} header={'Cast vote'}>
           <Input
-            label="Name"
-            description="Maximum of 128 characters"
-            placeholder="Enter a poll name"
-            {...registerField('name')}
-          />
-          <Input
-            label="Owner"
-            description="Owner address"
+            label="Poll id"
+            description="Your poll id"
+            placeholder="Enter a poll id"
             readOnly
-            {...registerField('owner')}
+            {...registerField('pollId')}
           />
           <Input
-            type="add-options"
-            label="Options"
-            description="Poll options"
-            {...registerField('options')}
+            label="Address"
+            description="Voter address"
+            readOnly
+            {...registerField('address')}
           />
           <Input
-            label="Start snaphot ordinal"
-            description="When the poll should start"
-            placeholder="Enter an ordinal number"
-            {...registerField('startSnapshotOrdinal')}
-          />
-          <Input
-            label="End snaphot ordinal"
-            description="When the poll should end"
-            placeholder="Enter an ordinal number"
-            {...registerField('endSnapshotOrdinal')}
+            label="Option"
+            description="Vote option"
+            {...registerField('option')}
           />
           <Input
             label="Signature"
@@ -111,12 +103,10 @@ export const CreatePollForm = () => {
             onClick={async () => {
               const values = getValues();
               const { signature } = await requestDataSignature({
-                CreatePoll: {
-                  name: values.name,
-                  owner: values.owner,
-                  pollOptions: values.options,
-                  startSnapshotOrdinal: values.startSnapshotOrdinal,
-                  endSnapshotOrdinal: values.endSnapshotOrdinal
+                VoteInPoll: {
+                  pollId: values.pollId,
+                  address: values.address,
+                  option: values.option
                 }
               });
               setValue('signature', signature, {
@@ -142,7 +132,7 @@ export const CreatePollForm = () => {
           type="submit"
           disabled={!formState.isValid}
         >
-          Create poll
+          Cast vote
         </Button>
       </Card>
     </form>

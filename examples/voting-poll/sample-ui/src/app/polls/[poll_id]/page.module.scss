@@ -1,7 +1,25 @@
-.main {
+.content {
   display: grid;
-  width: 100%;
 
-  grid-template-columns: 1fr 1fr;
-  gap: 25px;
+  margin-top: 24px;
+
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr;
+  column-gap: 34px;
+
+  .cards {
+    display: flex;
+    flex-flow: column nowrap;
+
+    row-gap: 40px;
+  }
+
+  .membersDescription {
+    font-family: Everett;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 28px;
+    text-align: left;
+    color: #f3f4f6;
+  }
 }
