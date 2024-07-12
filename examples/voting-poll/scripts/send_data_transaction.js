@@ -37,7 +37,7 @@ const serialize = ( msg ) => {
 
 const generateProof = async ( message, walletPrivateKey, account ) => {
     const encodedMessage = Buffer.from(JSON.stringify(message)).toString('base64')
-    const signature = await dag4.keyStore.sign( walletPrivateKey, encodedMessage );
+    const signature = await dag4.keyStore.dataSign( walletPrivateKey, encodedMessage );
 
     const publicKey = account.publicKey;
     const uncompressedPublicKey =
