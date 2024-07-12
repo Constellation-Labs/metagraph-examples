@@ -18,14 +18,10 @@ import org.tessellation.BuildInfo
 import org.tessellation.currency.dataApplication._
 import org.tessellation.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
 import org.tessellation.currency.l0.CurrencyL0App
-import org.tessellation.currency.l0.snapshot.CurrencySnapshotEvent
-import org.tessellation.currency.schema.currency
 import org.tessellation.ext.cats.effect.ResourceIO
-import org.tessellation.node.shared.domain.rewards.Rewards
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.schema.cluster.ClusterId
 import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
-import org.tessellation.security.SecurityProvider
 import org.tessellation.security.hash.Hash
 import org.tessellation.security.signature.Signed
 
@@ -95,6 +91,4 @@ object Main extends CurrencyL0App(
 
   override def dataApplication: Option[Resource[IO, BaseDataApplicationL0Service[IO]]] =
     makeL0Service.asResource.some
-
-  override def rewards(implicit sp: SecurityProvider[IO]): Option[Rewards[IO, currency.CurrencySnapshotStateProof, currency.CurrencyIncrementalSnapshot, CurrencySnapshotEvent]] = None
 }

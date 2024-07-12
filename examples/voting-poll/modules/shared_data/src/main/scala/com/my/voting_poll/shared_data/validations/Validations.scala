@@ -2,7 +2,7 @@ package com.my.voting_poll.shared_data.validations
 
 import cats.data.NonEmptySet
 import cats.effect.Async
-import cats.implicits.{catsSyntaxApply, catsSyntaxOptionId, toFlatMapOps, toFoldableOps, toFunctorOps, toTraverseOps}
+import cats.syntax.all._
 import com.my.voting_poll.shared_data.errors.Errors.valid
 import com.my.voting_poll.shared_data.serializers.Serializers
 import com.my.voting_poll.shared_data.types.Types.{CreatePoll, VoteCalculatedState, VoteInPoll, VoteStateOnChain}
