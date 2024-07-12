@@ -16,9 +16,12 @@ import styles from './page.module.scss';
 import { castVote } from './actions.ts';
 
 const FormVoteSchema = VoteSchema.extend({
-  signature: z
-    .string({ invalid_type_error: 'Invalid signature' })
-    .regex(/^([a-fA-F0-9]{2,})$/, 'Invalid hex character')
+  signedPayload: z
+    .string({ invalid_type_error: 'Invalid signed payload' })
+    .regex(
+      /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/,
+      'Invalid base64 character'
+    )
 });
 
 type IFormVoteSchema = z.infer<typeof FormVoteSchema>;
@@ -48,6 +51,31 @@ export const CastVoteForm = () => {
     await castVote(values);
   });
 
+  const buildAndSignPayload = async () => {
+    const values = getValues();
+
+    const basePayload = {
+      VoteInPoll: {
+        pollId: values.pollId,
+        address: values.address,
+        option: values.option
+      }
+    };
+
+    const { signature, pub } = await requestDataSignature(basePayload);
+
+    const uncompressedPublicKey = pub.length === 128 ? '04' + pub : pub;
+
+    const fullPayload = {
+      value: {
+        ...basePayload
+      },
+      proofs: [{ id: uncompressedPublicKey.substring(2), signature }]
+    };
+
+    return btoa(JSON.stringify(fullPayload));
+  };
+
   useEffect(() => {
     setValue('address', wallet.active ? wallet.account : '', {
       shouldTouch: true,
@@ -57,8 +85,8 @@ export const CastVoteForm = () => {
 
   useEffect(() => {
     const subscription = watch((_, { name }) => {
-      if (name !== 'signature') {
-        setValue('signature', '', {
+      if (name !== 'signedPayload') {
+        setValue('signedPayload', '', {
           shouldTouch: true,
           shouldDirty: true
         });
@@ -95,21 +123,13 @@ export const CastVoteForm = () => {
             label="Signature"
             description="Your account signature for this poll information"
             readOnly
-            {...registerField('signature')}
+            {...registerField('signedPayload')}
           />
           <Button
             type="button"
             variants={['primary']}
             onClick={async () => {
-              const values = getValues();
-              const { signature } = await requestDataSignature({
-                VoteInPoll: {
-                  pollId: values.pollId,
-                  address: values.address,
-                  option: values.option
-                }
-              });
-              setValue('signature', signature, {
+              setValue('signedPayload', await buildAndSignPayload(), {
                 shouldTouch: true,
                 shouldDirty: true,
                 shouldValidate: true

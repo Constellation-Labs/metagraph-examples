@@ -5,12 +5,15 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { VoteSchema } from '../../../schemas';
+import { MetagraphBaseURLs } from '../../../consts';
 
 const CastVoteSchema = VoteSchema.extend({
-  signature: z
-    .string({ invalid_type_error: 'Invalid signature' })
-    .length(128, 'Must contain 128 hex character(s)')
-    .regex(/^([a-fA-F0-9]{2,})$/, 'Invalid hex character')
+  signedPayload: z
+    .string({ invalid_type_error: 'Invalid signed payload' })
+    .regex(
+      /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/,
+      'Invalid base64 character'
+    )
 });
 
 type ICastVoteSchema = z.infer<typeof CastVoteSchema>;
@@ -18,15 +21,24 @@ type ICastVoteSchema = z.infer<typeof CastVoteSchema>;
 export const castVote = async (values: ICastVoteSchema) => {
   const validatedFields = CastVoteSchema.safeParse(values);
 
-  console.log(values);
-
   if (!validatedFields.success) {
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const pollHash = 'hash1';
+  const decodedSignedPayload = JSON.parse(
+    Buffer.from(validatedFields.data.signedPayload, 'base64').toString()
+  );
+
+  const response = await fetch(MetagraphBaseURLs.metagraphDataL1 + '/data', {
+    method: 'post',
+    body: decodedSignedPayload
+  });
+
+  const responseData = await response.json();
+
+  console.log(responseData);
 
   revalidateTag('polls');
   revalidatePath('/polls');
-  redirect(`/polls/${pollHash}`);
+  redirect(`/polls`);
 };

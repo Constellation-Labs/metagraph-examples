@@ -15,9 +15,12 @@ import styles from './page.module.scss';
 import { createPoll } from './actions.ts';
 
 const FormPollSchema = PollSchema.extend({
-  signature: z
-    .string({ invalid_type_error: 'Invalid signature' })
-    .regex(/^([a-fA-F0-9]{2,})$/, 'Invalid hex character')
+  signedPayload: z
+    .string({ invalid_type_error: 'Invalid signed payload' })
+    .regex(
+      /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/,
+      'Invalid base64 character'
+    )
 });
 
 type IFormPollSchema = z.infer<typeof FormPollSchema>;
@@ -44,6 +47,33 @@ export const CreatePollForm = () => {
     await createPoll(values);
   });
 
+  const buildAndSignPayload = async () => {
+    const values = getValues();
+
+    const basePayload = {
+      CreatePoll: {
+        name: values.name,
+        owner: values.owner,
+        pollOptions: values.options,
+        startSnapshotOrdinal: values.startSnapshotOrdinal,
+        endSnapshotOrdinal: values.endSnapshotOrdinal
+      }
+    };
+
+    const { signature, pub } = await requestDataSignature(basePayload);
+
+    const uncompressedPublicKey = pub.length === 128 ? '04' + pub : pub;
+
+    const fullPayload = {
+      value: {
+        ...basePayload
+      },
+      proofs: [{ id: uncompressedPublicKey.substring(2), signature }]
+    };
+
+    return btoa(JSON.stringify(fullPayload));
+  };
+
   useEffect(() => {
     setValue('owner', wallet.active ? wallet.account : '', {
       shouldTouch: true,
@@ -53,8 +83,8 @@ export const CreatePollForm = () => {
 
   useEffect(() => {
     const subscription = watch((_, { name }) => {
-      if (name !== 'signature') {
-        setValue('signature', '', {
+      if (name !== 'signedPayload') {
+        setValue('signedPayload', '', {
           shouldTouch: true,
           shouldDirty: true
         });
@@ -103,23 +133,13 @@ export const CreatePollForm = () => {
             label="Signature"
             description="Your account signature for this poll information"
             readOnly
-            {...registerField('signature')}
+            {...registerField('signedPayload')}
           />
           <Button
             type="button"
             variants={['primary']}
             onClick={async () => {
-              const values = getValues();
-              const { signature } = await requestDataSignature({
-                CreatePoll: {
-                  name: values.name,
-                  owner: values.owner,
-                  pollOptions: values.options,
-                  startSnapshotOrdinal: values.startSnapshotOrdinal,
-                  endSnapshotOrdinal: values.endSnapshotOrdinal
-                }
-              });
-              setValue('signature', signature, {
+              setValue('signedPayload', await buildAndSignPayload(), {
                 shouldTouch: true,
                 shouldDirty: true,
                 shouldValidate: true
