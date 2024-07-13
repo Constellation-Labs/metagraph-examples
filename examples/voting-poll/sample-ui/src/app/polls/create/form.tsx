@@ -35,7 +35,8 @@ export const CreatePollForm = () => {
     control,
     setValue,
     getValues,
-    watch
+    watch,
+    trigger
   } = useForm<IFormPollSchema>({
     mode: 'onTouched',
     resolver: zodResolver(FormPollSchema)
@@ -44,11 +45,23 @@ export const CreatePollForm = () => {
   const registerField = buildRegisterField(register, formState, control);
 
   const onFormSubmit = handleSubmit(async (values) => {
-    await createPoll(values);
+    const response = await createPoll(values);
+
+    if (response.errors.serverErrors) {
+      alert(JSON.stringify(response.errors.serverErrors));
+    }
   });
 
   const buildAndSignPayload = async () => {
-    const values = getValues();
+    const validatedValues = FormPollSchema.safeParse(getValues());
+
+    if (!validatedValues.data) {
+      throw new Error('Inconsistency Error');
+    }
+
+    const values = validatedValues.data;
+
+    console.log(values);
 
     const basePayload = {
       CreatePoll: {
