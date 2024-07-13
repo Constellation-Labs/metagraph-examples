@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { PageFrame } from '../../../components';
+import { PageFrame, RequiredWallet } from '../../../components';
 import { MetagraphBaseURLs } from '../../../consts';
 import { IPoll } from '../../../types';
 
@@ -37,9 +37,11 @@ export default async function CastVotePage({
 
   return (
     <PageFrame>
-      <section className={styles.main}>
-        <CastVoteForm poll={poll} />
-      </section>
+      <RequiredWallet>
+        <section className={styles.main}>
+          <CastVoteForm poll={poll} />
+        </section>
+      </RequiredWallet>
     </PageFrame>
   );
 }

@@ -1,4 +1,4 @@
-import { PageFrame } from '../../../components';
+import { PageFrame, RequiredWallet } from '../../../components';
 
 import { CreatePollForm } from './form';
 import styles from './page.module.scss';
@@ -6,9 +6,11 @@ import styles from './page.module.scss';
 export default async function CreatePollPage() {
   return (
     <PageFrame>
-      <section className={styles.main}>
-        <CreatePollForm />
-      </section>
+      <RequiredWallet>
+        <section className={styles.main}>
+          <CreatePollForm />
+        </section>
+      </RequiredWallet>
     </PageFrame>
   );
 }
