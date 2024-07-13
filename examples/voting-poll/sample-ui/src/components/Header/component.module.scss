@@ -1,3 +1,5 @@
+@use 'src/styles/breakpoints.scss' as *;
+
 .main {
   display: grid;
   width: 100%;
@@ -29,10 +31,30 @@
     border-radius: 100%;
   }
 
-  .buttons{
+  .buttons {
     display: flex;
 
     flex-flow: row nowrap;
     column-gap: 20px;
+  }
+
+  @include respond-below(sm) {
+    height: unset;
+
+    grid-template-columns: 1fr;
+    grid-auto-rows: min-content;
+    padding: 24px 48px;
+    row-gap: 12px;
+
+    .constellationLogo {
+      display: none;
+    }
+
+    .buttons {
+      display: flex;
+
+      flex-flow: column nowrap;
+      row-gap: 20px;
+    }
   }
 }

@@ -1,3 +1,5 @@
+@use 'src/styles/breakpoints.scss' as *;
+
 .content {
   display: grid;
 
@@ -21,5 +23,11 @@
     line-height: 28px;
     text-align: left;
     color: #f3f4f6;
+  }
+
+  @include respond-below(sm) {
+    padding: 12px;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content;
   }
 }
