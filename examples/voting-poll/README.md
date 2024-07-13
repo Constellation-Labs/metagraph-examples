@@ -119,6 +119,8 @@ This example includes a script to generate, sign, and send data updates to the m
 
 - Query the state GET endpoint at `<your metagraph L0 base url>/data-application/addresses` to see the updated state after each update.
 
-### Sample UI Project
+
+
+## Sample UI Project
 
 This example comes with a Next.js based demo, you can set it up and run it from the instructions in the [sample-ui](./sample-ui/README.md) folder.

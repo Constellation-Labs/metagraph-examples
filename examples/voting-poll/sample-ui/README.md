@@ -45,6 +45,6 @@ Users need to have a balance in their DAG wallet to vote. The application checks
 #### Adding balance via genesis file
 To set up a wallet with balance, you can modify the genesis file on euclid-development-environment located at `euclid-development-environment/source/metagraph-l0/genesis/genesis.csv`. 
 
-The file is a csv file, first column indicates the target address for funds, the second column indicates how much vp to allocate for the wallet (remember this value is raw value, so the actual value would be (rawValue/1e8)).
+The file is a csv file, first column indicates the target address for funds, the second column indicates how much vp to allocate for the wallet (remember this value is raw value, so the actual value would be `(rawValue/1e8)`).
 
 Re-build tessellation images to see the reflected balance on the network.
