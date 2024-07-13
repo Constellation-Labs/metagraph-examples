@@ -14,8 +14,10 @@ export type IPollCardProps = {
 };
 
 export const PollCard = ({ poll }: IPollCardProps) => {
-  const resultsTotal =
-    poll.results?.reduce((pv, result) => pv + result.votes, 0) ?? 0;
+  const resultsTotal = Object.values(poll.result).reduce(
+    (pv, votes) => pv + votes,
+    0
+  );
 
   return (
     <Card
@@ -24,7 +26,7 @@ export const PollCard = ({ poll }: IPollCardProps) => {
       header={
         <span className={styles.header}>
           <span>Poll - {poll.name}</span>
-          <span>Open</span>
+          <span>{poll.status}</span>
         </span>
       }
     >
@@ -39,14 +41,11 @@ export const PollCard = ({ poll }: IPollCardProps) => {
         - {shorten(poll.owner)}
       </span>
       <div className={styles.options}>
-        {poll.pollOptions.map((option) => {
-          const resultVotes =
-            poll.results?.find((result) => result.option === option)?.votes ??
-            0;
+        {Object.entries(poll.result).map(([option, votes]) => {
           const resultPercentage =
             resultsTotal === 0
               ? 0
-              : Math.floor((resultVotes / resultsTotal) * 100 * 100) / 100;
+              : Math.floor((votes / resultsTotal) * 100 * 100) / 100;
 
           return (
             <div className={styles.option} key={option}>
@@ -58,9 +57,9 @@ export const PollCard = ({ poll }: IPollCardProps) => {
               <div className={styles.content}>
                 <span>
                   {option}
-                  {resultVotes !== 0 && ` (${resultVotes} votes)`}
+                  {votes !== 0 && ` (${votes} votes)`}
                 </span>
-                {!!resultVotes && <span>{resultPercentage}%</span>}
+                {!!votes && <span>{resultPercentage}%</span>}
               </div>
             </div>
           );
