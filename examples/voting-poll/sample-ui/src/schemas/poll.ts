@@ -20,10 +20,14 @@ export const PollSchema = z.object({
       }
     )
     .nonempty({ message: 'Invalid poll options, must specify at least one' }),
-  startSnapshotOrdinal: z.coerce.number({
-    invalid_type_error: 'Invalid poll start'
-  }),
-  endSnapshotOrdinal: z.coerce.number({
-    invalid_type_error: 'Invalid poll end'
-  })
+  startSnapshotOrdinal: z.coerce
+    .number({
+      invalid_type_error: 'Invalid poll start'
+    })
+    .max(1e9, { message: 'Snapshot must not be larger than 1E9' }),
+  endSnapshotOrdinal: z.coerce
+    .number({
+      invalid_type_error: 'Invalid poll end'
+    })
+    .max(1e9, { message: 'Snapshot must not be larger than 1E9' })
 });

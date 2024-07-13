@@ -47,7 +47,7 @@ export const CreatePollForm = () => {
   const onFormSubmit = handleSubmit(async (values) => {
     const response = await createPoll(values);
 
-    if (response.errors.serverErrors) {
+    if (response?.errors.serverErrors) {
       alert(JSON.stringify(response.errors.serverErrors));
     }
   });

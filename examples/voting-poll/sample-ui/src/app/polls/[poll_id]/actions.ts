@@ -49,4 +49,6 @@ export const castVote = async (values: ICastVoteSchema) => {
   revalidateTag('polls');
   revalidatePath('/polls');
   redirect(`/polls`);
+
+  return undefined;
 };

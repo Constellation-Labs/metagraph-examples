@@ -53,4 +53,6 @@ export const createPoll = async (values: ICreatePollSchema) => {
   revalidateTag('polls');
   revalidatePath('/polls');
   redirect(`/polls`);
+
+  return undefined;
 };
