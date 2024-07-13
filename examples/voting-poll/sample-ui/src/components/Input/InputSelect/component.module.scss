@@ -2,7 +2,7 @@
   display: grid;
   padding: 4px 8px;
 
-  border-bottom: 2px solid #174cd3;
+  border-bottom: 2px solid #171717;
 
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
@@ -27,7 +27,7 @@
     font-weight: 400;
     line-height: 24px;
     text-align: left;
-    color: #174cd3;
+    color: #171717;
   }
 
   &.error {
