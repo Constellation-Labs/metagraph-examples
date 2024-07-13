@@ -65,7 +65,7 @@ export const PollCard = ({ poll }: IPollCardProps) => {
           );
         })}
       </div>
-      <ButtonLink variants={['primary']} href={`/polls/${poll.id}`}>
+      <ButtonLink variants={['secondary']} href={`/polls/${poll.id}`}>
         Cast your vote
       </ButtonLink>
     </Card>

@@ -35,7 +35,7 @@
       text-align: left;
       color: #fff;
 
-      background-color: #174cd3;
+      background-color: #e4e4e4;
       border-radius: 48px;
       padding: 4px 8px;
 
@@ -45,7 +45,7 @@
 
       .bar {
         height: 100%;
-        background-color: #113387;
+        background-color: #cccccc;
         border-radius: 48px;
 
         position: absolute;
@@ -65,6 +65,8 @@
         position: absolute;
         top: 0;
         left: 0;
+
+        color: #000;
       }
     }
   }
