@@ -16,7 +16,7 @@ export const Header = () => {
 
   return (
     <div className={styles.main}>
-      <Link href="/">
+      <Link href="/" className={styles.constellationLogo}>
         <ConstellationLogo width={90} height={90} />
       </Link>
       <Link href="/">Voting Poll Example</Link>
@@ -43,7 +43,10 @@ export const Header = () => {
         >
           {wallet.active ? shorten(wallet.account) : 'Connect wallet'}
         </Button>
-        <ButtonLink variants={['secondary', 'outline']} href={'/polls/create'}>
+        <ButtonLink
+          variants={['secondary', 'outline', 'centered']}
+          href={'/polls/create'}
+        >
           Create Poll
         </ButtonLink>
       </div>
