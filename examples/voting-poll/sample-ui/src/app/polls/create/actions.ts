@@ -22,19 +22,31 @@ export const createPoll = async (values: ICreatePollSchema) => {
   const validatedFields = CreatePollSchema.safeParse(values);
 
   if (!validatedFields.success) {
-    return { errors: validatedFields.error.flatten().fieldErrors };
+    return {
+      errors: { fieldErrors: validatedFields.error.flatten().fieldErrors }
+    };
   }
 
   const decodedSignedPayload = JSON.parse(
     Buffer.from(validatedFields.data.signedPayload, 'base64').toString()
   );
 
-  const response = await fetch(MetagraphBaseURLs.metagraphDataL1 + '/data', {
+  console.log('Sending request');
+
+  const response = await fetch(MetagraphBaseURLs.dataL1 + '/data', {
     method: 'post',
-    body: decodedSignedPayload
+    body: JSON.stringify(decodedSignedPayload)
   });
 
-  const responseData = await response.json();
+  console.log('Received response');
+
+  if (response.status !== 200) {
+    return {
+      errors: { serverErrors: [response.status, await response.text()] }
+    };
+  }
+
+  const responseData: [string, string] = await response.json();
 
   console.log(responseData);
 
