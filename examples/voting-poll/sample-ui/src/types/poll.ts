@@ -2,8 +2,8 @@ export type IPoll = {
   id: string;
   name: string;
   owner: string;
-  pollOptions: string[];
+  result: Record<string, number>;
   startSnapshotOrdinal: number;
   endSnapshotOrdinal: number;
-  results?: { option: string; votes: number }[];
+  status: 'Closed' | 'Open';
 };

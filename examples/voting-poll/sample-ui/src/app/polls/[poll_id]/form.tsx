@@ -4,13 +4,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useEffect } from 'react';
-import { useParams } from 'next/navigation';
 
 import { ButtonLink } from '../../../components/Button/ButtonLink/component.tsx';
 import { useWalletProvider } from '../../../providers/index.ts';
 import { VoteSchema } from '../../../schemas/index.ts';
 import { buildRegisterField } from '../../../utils/forms.ts';
 import { Button, Card, Input } from '../../../components/index.ts';
+import { IPoll } from '../../../types/poll.ts';
 
 import styles from './page.module.scss';
 import { castVote } from './actions.ts';
@@ -26,9 +26,9 @@ const FormVoteSchema = VoteSchema.extend({
 
 type IFormVoteSchema = z.infer<typeof FormVoteSchema>;
 
-export const CastVoteForm = () => {
-  const { poll_id } = useParams<{ poll_id: string }>();
+type ICastVoteFormProps = { poll: IPoll };
 
+export const CastVoteForm = ({ poll }: ICastVoteFormProps) => {
   const { wallet, requestDataSignature } = useWalletProvider();
 
   const {
@@ -42,18 +42,29 @@ export const CastVoteForm = () => {
   } = useForm<IFormVoteSchema>({
     mode: 'onTouched',
     resolver: zodResolver(FormVoteSchema),
-    defaultValues: { pollId: poll_id }
+    defaultValues: { pollId: poll.id }
   });
 
   const registerField = buildRegisterField(register, formState, control);
 
   const onFormSubmit = handleSubmit(async (values) => {
-    await castVote(values);
+    const response = await castVote(values);
+
+    if (response.errors.serverErrors) {
+      alert(JSON.stringify(response.errors.serverErrors));
+    }
   });
 
   const buildAndSignPayload = async () => {
-    const values = getValues();
+    const validatedValues = FormVoteSchema.safeParse(getValues());
 
+    if (!validatedValues.data) {
+      throw new Error('Inconsistency Error');
+    }
+
+    const values = validatedValues.data;
+
+    console.log(values);
     const basePayload = {
       VoteInPoll: {
         pollId: values.pollId,
@@ -115,8 +126,12 @@ export const CastVoteForm = () => {
             {...registerField('address')}
           />
           <Input
+            type="select"
             label="Option"
             description="Vote option"
+            options={Object.keys(poll.result).map((option) => ({
+              value: option
+            }))}
             {...registerField('option')}
           />
           <Input
