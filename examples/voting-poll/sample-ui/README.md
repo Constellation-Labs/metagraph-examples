@@ -2,14 +2,14 @@
 
 ## Description
 
-This is a demo application built using Next.js 14 and npm. The application allows users to create polls and vote on them using their Constellation DAG wallet. Users can only vote if they have a balance in their wallet.
+This is a demo application built using Next.js 14 and npm. The application allows users to create polls and vote on them using their Stargazer DAG wallet. Users can only vote if they have balance in their wallet.
 
 
 ## Features
 
 + Create new polls
 + Vote on existing polls
-+ Authentication via Constellation DAG wallet
++ Authentication via Stargazer DAG wallet
 + Check wallet balance before voting
   
 ## Prerequisites
