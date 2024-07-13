@@ -1,11 +1,13 @@
 'use client';
 
 import Blockies from 'react-blockies';
+import Link from 'next/link';
 
 import ConstellationLogo from '../../assets/logos/constellation.svg';
 import { useWalletProvider } from '../../providers';
 import { shorten } from '../../utils';
 import { Button } from '../Button/component';
+import { ButtonLink } from '../Button/ButtonLink/component';
 
 import styles from './component.module.scss';
 
@@ -14,30 +16,37 @@ export const Header = () => {
 
   return (
     <div className={styles.main}>
-      <ConstellationLogo width={90} height={90} />
-      <span>Voting Poll Example</span>
-      <Button
-        variants={['secondary', 'outline']}
-        onClick={async () => {
-          if (!wallet.active) {
-            wallet.activate();
-          } else {
-            wallet.deactivate();
+      <Link href="/">
+        <ConstellationLogo width={90} height={90} />
+      </Link>
+      <Link href="/">Voting Poll Example</Link>
+      <div className={styles.buttons}>
+        <Button
+          variants={['secondary', 'outline']}
+          onClick={async () => {
+            if (!wallet.active) {
+              wallet.activate();
+            } else {
+              wallet.deactivate();
+            }
+          }}
+          leftIcon={
+            wallet.active ? (
+              <Blockies
+                seed={wallet.account}
+                size={10}
+                scale={2}
+                className={styles.identicon}
+              />
+            ) : undefined
           }
-        }}
-        leftIcon={
-          wallet.active ? (
-            <Blockies
-              seed={wallet.account}
-              size={10}
-              scale={2}
-              className={styles.identicon}
-            />
-          ) : undefined
-        }
-      >
-        {wallet.active ? shorten(wallet.account) : 'Connect wallet'}
-      </Button>
+        >
+          {wallet.active ? shorten(wallet.account) : 'Connect wallet'}
+        </Button>
+        <ButtonLink variants={['secondary', 'outline']} href={'/polls/create'}>
+          Create Poll
+        </ButtonLink>
+      </div>
     </div>
   );
 };
