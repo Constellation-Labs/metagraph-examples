@@ -57,7 +57,7 @@ export const PollCard = ({ poll }: IPollCardProps) => {
               <div className={styles.content}>
                 <span>
                   {option}
-                  {votes !== 0 && ` (${votes} votes)`}
+                  {votes !== 0 && ` (${votes / 1e8} vp)`}
                 </span>
                 {!!votes && <span>{resultPercentage}%</span>}
               </div>

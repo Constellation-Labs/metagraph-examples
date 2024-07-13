@@ -1,14 +1,15 @@
 'use client';
 
 import { useStargazerWallet } from '@stardust-collective/web3-react-stargazer-connector';
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 
-import { loginWallet, logoutWallet } from './actions';
+import { loginWallet, logoutWallet, requestAddressBalance } from './actions';
 import { WALLET_COOKIE_NAME } from './consts';
 
 type IWalletProviderContext = {
   wallet: ReturnType<typeof useStargazerWallet>;
+  walletBalance: number | null;
   requestDataSignature: (
     payload: Record<string, any>
   ) => Promise<{ pub: string; signature: string; payload: string }>;
@@ -25,6 +26,8 @@ export const WalletProvider = ({
 }) => {
   const wallet = useStargazerWallet();
 
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+
   const addressCookie = Cookies.get(WALLET_COOKIE_NAME);
 
   useEffect(() => {
@@ -34,6 +37,14 @@ export const WalletProvider = ({
 
     if (!wallet.active && addressCookie) {
       logoutWallet();
+    }
+  }, [wallet.active && wallet.account]);
+
+  useEffect(() => {
+    if (wallet.active) {
+      (async () => {
+        setWalletBalance(await requestAddressBalance(wallet.account));
+      })();
     }
   }, [wallet.active && wallet.account]);
 
@@ -65,7 +76,9 @@ export const WalletProvider = ({
     };
 
   return (
-    <WalletProviderContext.Provider value={{ wallet, requestDataSignature }}>
+    <WalletProviderContext.Provider
+      value={{ wallet, walletBalance, requestDataSignature }}
+    >
       {children}
     </WalletProviderContext.Provider>
   );

@@ -12,7 +12,7 @@ import { ButtonLink } from '../Button/ButtonLink/component';
 import styles from './component.module.scss';
 
 export const Header = () => {
-  const { wallet } = useWalletProvider();
+  const { wallet, walletBalance } = useWalletProvider();
 
   return (
     <div className={styles.main}>
@@ -41,7 +41,9 @@ export const Header = () => {
             ) : undefined
           }
         >
-          {wallet.active ? shorten(wallet.account) : 'Connect wallet'}
+          {wallet.active
+            ? `${shorten(wallet.account)} : ${walletBalance} vp`
+            : 'Connect wallet'}
         </Button>
         <ButtonLink
           variants={['secondary', 'outline', 'centered']}
