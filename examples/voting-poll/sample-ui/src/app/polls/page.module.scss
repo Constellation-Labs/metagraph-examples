@@ -5,3 +5,18 @@
   grid-template-columns: 1fr 1fr;
   gap: 25px;
 }
+
+.noPolls {
+  display: flex;
+  width: 100%;
+
+  flex-flow: column nowrap;
+  align-items: center;
+  row-gap: 20px;
+
+  font-family: Everett;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: left;
+}
