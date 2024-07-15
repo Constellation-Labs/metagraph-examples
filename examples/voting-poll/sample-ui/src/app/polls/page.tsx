@@ -6,24 +6,30 @@ import { IPoll } from '../../types';
 import styles from './page.module.scss';
 
 export default async function HomePage() {
-  const response = await fetch(
-    MetagraphBaseURLs.metagraphL0 + '/data-application/polls',
-    { cache: 'no-store' }
-  );
+  const polls: [string, IPoll][] = [];
 
-  if (response.status !== 200) {
-    throw new Error(
-      JSON.stringify(
-        {
-          errors: { serverErrors: [response.status, await response.text()] }
-        },
-        null,
-        2
-      )
+  try {
+    const response = await fetch(
+      MetagraphBaseURLs.metagraphL0 + '/data-application/polls',
+      { cache: 'no-store' }
     );
-  }
 
-  const polls: [string, IPoll][] = await response.json();
+    if (response.status !== 200) {
+      throw new Error(
+        JSON.stringify(
+          {
+            errors: { serverErrors: [response.status, await response.text()] }
+          },
+          null,
+          2
+        )
+      );
+    }
+
+    polls.push(...(await response.json()));
+  } catch (e) {
+    console.log(e);
+  }
 
   return (
     <PageFrame>
