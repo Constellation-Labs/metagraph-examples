@@ -51,11 +51,20 @@ export const CastVoteForm = ({ poll }: ICastVoteFormProps) => {
 
   const onFormSubmit = handleSubmit(async (values) => {
     const response = await useToastAction(castVote, {
-      progress: (t) => t('Submitting vote'),
-      error: (t, e) => t(`Unknown error while submitting vote: ${e}`)
+      progress: (t) => t.info('Submitting vote'),
+      error: (t, e) => t.error(`Unknown error while submitting vote: ${e}`)
     })(values);
 
     if (response?.errors.serverErrors) {
+      if (
+        response.errors.serverErrors.content.includes('NotEnoughWalletBalance')
+      ) {
+        toast.error(
+          'Unable to cast the vote, you need to hold balance in your wallet, check the project README.md for more info',
+          { autoClose: false }
+        );
+        return;
+      }
       toast.error(response.errors.serverErrors.content, { autoClose: false });
     }
   });

@@ -48,11 +48,18 @@ export const CreatePollForm = () => {
 
   const onFormSubmit = handleSubmit(async (values) => {
     const response = await useToastAction(createPoll, {
-      progress: (t) => t('Creating poll'),
-      error: (t, e) => t(`Unknown error while submitting poll: ${e}`)
+      progress: (t) => t.info('Creating poll'),
+      error: (t, e) => t.error(`Unknown error while submitting poll: ${e}`)
     })(values);
 
     if (response?.errors.serverErrors) {
+      if (response.errors.serverErrors.content.includes('InvalidEndSnapshot')) {
+        toast.error(
+          'Unable to create the poll, check the end snapshot ordinal, must be greater than the current snapshot',
+          { autoClose: false }
+        );
+        return;
+      }
       toast.error(response.errors.serverErrors.content, { autoClose: false });
     }
   });
