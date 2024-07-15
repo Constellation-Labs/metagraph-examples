@@ -38,7 +38,12 @@ export const castVote = async (values: ICastVoteSchema) => {
 
   if (response.status !== 200) {
     return {
-      errors: { serverErrors: [response.status, await response.text()] }
+      errors: {
+        serverErrors: {
+          status: response.status,
+          content: await response.text()
+        }
+      }
     };
   }
 

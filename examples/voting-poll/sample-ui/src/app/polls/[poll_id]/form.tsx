@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 import { ButtonLink } from '../../../components/Button/ButtonLink/component.tsx';
 import { useWalletProvider } from '../../../providers/index.ts';
@@ -11,6 +12,7 @@ import { VoteSchema } from '../../../schemas/index.ts';
 import { buildRegisterField } from '../../../utils/forms.ts';
 import { Button, Card, Input } from '../../../components/index.ts';
 import { IPoll } from '../../../types/poll.ts';
+import { useToastAction } from '../../../utils/use_toast_action.ts';
 
 import styles from './page.module.scss';
 import { castVote } from './actions.ts';
@@ -48,10 +50,13 @@ export const CastVoteForm = ({ poll }: ICastVoteFormProps) => {
   const registerField = buildRegisterField(register, formState, control);
 
   const onFormSubmit = handleSubmit(async (values) => {
-    const response = await castVote(values);
+    const response = await useToastAction(castVote, {
+      progress: (t) => t('Submitting vote'),
+      error: (t, e) => t(`Unknown error while submitting vote: ${e}`)
+    })(values);
 
     if (response?.errors.serverErrors) {
-      alert(JSON.stringify(response.errors.serverErrors));
+      toast.error(response.errors.serverErrors.content, { autoClose: false });
     }
   });
 
@@ -73,7 +78,15 @@ export const CastVoteForm = ({ poll }: ICastVoteFormProps) => {
       }
     };
 
-    const { signature, pub } = await requestDataSignature(basePayload);
+    const { signature, pub } = await useToastAction(requestDataSignature, {
+      progress: (t) =>
+        t.info('Requesting wallet signature', {
+          autoClose: false
+        }),
+      success: (t) => t.success('Payload signed'),
+      error: (t, e) =>
+        t.error(`An error ocurred while signing the payload [${e}]`)
+    })(basePayload);
 
     const uncompressedPublicKey = pub.length === 128 ? '04' + pub : pub;
 
