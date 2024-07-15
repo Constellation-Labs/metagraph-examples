@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev -p 5431",
     "build": "next build",
-    "start": "next start",
+    "start": "next dev -p 5431",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix"
@@ -22,6 +22,7 @@
     "react-blockies": "^1.4.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.52.1",
+    "react-spinners-kit": "^1.9.1",
     "sass": "^1.77.8",
     "zod": "^3.23.8"
   },
