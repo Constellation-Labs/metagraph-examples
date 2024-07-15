@@ -1,36 +1,29 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
 /* eslint-disable react/no-unescaped-entities */
 import { Card, PageFrame, PollCard } from '../../components';
 import { ButtonLink } from '../../components/Button/ButtonLink/component';
-import { MetagraphBaseURLs } from '../../consts';
 import { IPoll } from '../../types';
 
 import styles from './page.module.scss';
+import { getPolls } from './actions';
 
-export default async function HomePage() {
-  const polls: [string, IPoll][] = [];
+export default function HomePage() {
+  const [polls, setPolls] = useState<[string, IPoll][]>([]);
 
-  try {
-    const response = await fetch(
-      MetagraphBaseURLs.metagraphL0 + '/data-application/polls',
-      { cache: 'no-store' }
-    );
+  const fetchPolls = async () => {
+    setPolls(await getPolls());
+  };
 
-    if (response.status !== 200) {
-      throw new Error(
-        JSON.stringify(
-          {
-            errors: { serverErrors: [response.status, await response.text()] }
-          },
-          null,
-          2
-        )
-      );
-    }
-
-    polls.push(...(await response.json()));
-  } catch (e) {
-    console.log(e);
-  }
+  useEffect(() => {
+    const iid = window.setInterval(fetchPolls, 5 * 1000);
+    fetchPolls();
+    return () => {
+      window.clearInterval(iid);
+    };
+  }, []);
 
   return (
     <PageFrame variants={['noSidebarMargin']}>
