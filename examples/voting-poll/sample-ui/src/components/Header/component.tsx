@@ -2,17 +2,29 @@
 
 import Blockies from 'react-blockies';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import ConstellationLogo from '../../assets/logos/constellation.svg';
 import { useWalletProvider } from '../../providers';
 import { shorten } from '../../utils';
 import { Button } from '../Button/component';
-import { ButtonLink } from '../Button/ButtonLink/component';
 
 import styles from './component.module.scss';
+import { getMetagraphLatestSnapshot } from './actions';
 
 export const Header = () => {
   const { wallet, walletBalance } = useWalletProvider();
+  const [latestOrdinal, setLatestOrdinal] = useState(0);
+
+  useEffect(() => {
+    const iid = window.setInterval(async () => {
+      const snapshot = await getMetagraphLatestSnapshot();
+      setLatestOrdinal(snapshot.value.ordinal);
+    }, 5 * 1000);
+    return () => {
+      window.clearInterval(iid);
+    };
+  }, []);
 
   return (
     <div className={styles.main}>
@@ -21,6 +33,11 @@ export const Header = () => {
       </Link>
       <Link href="/">Voting Poll Example</Link>
       <div className={styles.buttons}>
+        {latestOrdinal !== 0 && (
+          <Button variants={['secondary', 'outline', 'centered']}>
+            Snapshot Ordinal: {latestOrdinal}
+          </Button>
+        )}
         <Button
           variants={['secondary', 'outline']}
           onClick={async () => {
@@ -45,12 +62,6 @@ export const Header = () => {
             ? `${shorten(wallet.account)} : ${walletBalance} vp`
             : 'Connect wallet'}
         </Button>
-        <ButtonLink
-          variants={['secondary', 'outline', 'centered']}
-          href={'/polls/create'}
-        >
-          Create Poll
-        </ButtonLink>
       </div>
     </div>
   );
