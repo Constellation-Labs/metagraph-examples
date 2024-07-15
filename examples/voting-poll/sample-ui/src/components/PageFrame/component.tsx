@@ -6,7 +6,7 @@ import { Footer } from '../Footer/component.tsx';
 import styles from './component.module.scss';
 
 export type IPageFrameProps = {
-  variants?: 'noTopMargin'[];
+  variants?: ('noTopMargin' | 'noSidebarMargin')[];
   className?: string | { root?: string; content?: string };
   children?: React.ReactNode;
 };

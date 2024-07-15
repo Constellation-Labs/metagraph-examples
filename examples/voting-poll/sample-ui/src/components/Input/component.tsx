@@ -59,7 +59,7 @@ export const Input = React.forwardRef<HTMLInputElement, IInputProps>(
             )}
           </div>
         )}
-        <div className={clsx(styles.track, inputExtra && styles.inputExtra)}>
+        <div className={clsx(styles.track, !!inputExtra && styles.inputExtra)}>
           {props.type === 'select' ? (
             <InputSelect
               {...{
@@ -98,7 +98,7 @@ export const Input = React.forwardRef<HTMLInputElement, IInputProps>(
             <div
               className={clsx(
                 styles.inputBar,
-                staticPrefix && styles.staticPrefix,
+                !!staticPrefix && styles.staticPrefix,
                 props.className
               )}
             >

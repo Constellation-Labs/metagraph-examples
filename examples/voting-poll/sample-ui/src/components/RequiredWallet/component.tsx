@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
+
 import { useWalletProvider } from '../../providers';
-import styles from './component.module.scss';
 import { Button } from '../Button/component';
+
+import styles from './component.module.scss';
 
 export type IRequiredWalletProps = { children?: React.ReactNode };
 

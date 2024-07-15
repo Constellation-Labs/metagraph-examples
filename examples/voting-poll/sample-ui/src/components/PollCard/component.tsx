@@ -30,16 +30,21 @@ export const PollCard = ({ poll }: IPollCardProps) => {
         </span>
       }
     >
-      <span className={styles.creator}>
-        Creator:
-        <Blockies
-          seed={poll.owner}
-          size={10}
-          scale={2}
-          className={styles.identicon}
-        />{' '}
-        - {shorten(poll.owner)}
-      </span>
+      <div className={styles.info}>
+        <span className={styles.creator}>
+          Creator:
+          <Blockies
+            seed={poll.owner}
+            size={10}
+            scale={2}
+            className={styles.identicon}
+          />{' '}
+          - {shorten(poll.owner)}
+        </span>
+        <span>
+          Start: {poll.startSnapshotOrdinal} / End: {poll.endSnapshotOrdinal}
+        </span>
+      </div>
       <div className={styles.options}>
         {Object.entries(poll.result).map(([option, votes]) => {
           const resultPercentage =

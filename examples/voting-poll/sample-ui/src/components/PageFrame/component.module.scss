@@ -13,6 +13,11 @@
     margin-top: 64px;
     row-gap: 24px;
 
+    &.noSidebarMargin{
+      width: 100%;
+      padding: 0px 20px;
+    }
+
     &.noTopMargin {
       margin-top: 0px;
     }

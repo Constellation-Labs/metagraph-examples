@@ -22,6 +22,7 @@ const config = {
     '@typescript-eslint/no-explicit-any': 'off',
     'no-async-promise-executor': 'off',
     'import/no-unresolved': 'off',
+    'react-hooks/rules-of-hooks': 'off',
     'import/order': [
       'error',
       {

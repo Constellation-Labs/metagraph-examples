@@ -6,6 +6,12 @@
 }
 
 .main {
+  .info{
+    display: flex;
+    
+    justify-content: space-between;
+  }
+
   .creator {
     display: inline-flex;
 

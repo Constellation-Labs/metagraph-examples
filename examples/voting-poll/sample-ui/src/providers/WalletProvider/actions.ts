@@ -2,8 +2,9 @@
 
 import { cookies } from 'next/headers';
 
-import { WALLET_COOKIE_NAME } from './consts';
 import { MetagraphBaseURLs } from '../../consts';
+
+import { WALLET_COOKIE_NAME } from './consts';
 
 export const loginWallet = async (address: string) => {
   cookies().set(WALLET_COOKIE_NAME, address, { path: '/' });
