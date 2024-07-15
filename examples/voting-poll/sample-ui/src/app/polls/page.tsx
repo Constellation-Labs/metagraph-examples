@@ -27,14 +27,12 @@ export default async function HomePage() {
 
   return (
     <PageFrame>
-      {polls.length === 0 && (
-        <section className={styles.noPolls}>
-          <span>No polls yet, create one!</span>
-          <ButtonLink variants={['primary']} href={'/polls/create'}>
-            Create Poll
-          </ButtonLink>
-        </section>
-      )}
+      <section className={styles.noPolls}>
+        {polls.length === 0 && <span>No polls yet, create one!</span>}
+        <ButtonLink variants={['primary']} href={'/polls/create'}>
+          Create Poll
+        </ButtonLink>
+      </section>
       <section className={styles.main}>
         {polls.map(([id, poll]) => (
           <PollCard key={id} poll={poll} />
