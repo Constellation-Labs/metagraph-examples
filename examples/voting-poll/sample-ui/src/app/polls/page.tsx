@@ -32,7 +32,7 @@ export default async function HomePage() {
   }
 
   return (
-    <PageFrame>
+    <PageFrame variants={['noSidebarMargin']}>
       <section className={styles.noPolls}>
         {polls.length === 0 && <span>No polls yet, create one!</span>}
         <ButtonLink variants={['primary']} href={'/polls/create'}>
