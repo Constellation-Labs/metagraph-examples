@@ -4,6 +4,13 @@
   margin: 0;
 }
 
+:root{
+  --toastify-color-info: #8f8f8f;
+  --toastify-color-success: #174cd3;
+  --toastify-color-warning: #f1c40f;
+  --toastify-color-error: #ef4444;
+}
+
 html,
 body {
   width: 100%;
@@ -15,3 +22,5 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+

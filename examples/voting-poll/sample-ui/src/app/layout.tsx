@@ -1,7 +1,9 @@
 import '../styles/globals.scss';
 import '../styles/fonts.scss';
+import 'react-toastify/dist/ReactToastify.css';
 
 import type { Metadata } from 'next';
+import { ToastContainer } from 'react-toastify';
 
 import { Header } from '../components';
 import { WalletProvider } from '../providers';
@@ -44,6 +46,7 @@ export default function RootLayout({
         <WalletProvider>
           <Header />
           {children}
+          <ToastContainer position="bottom-right" pauseOnHover />
         </WalletProvider>
       </body>
     </html>
