@@ -7,7 +7,7 @@ import cats.syntax.either._
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 import cats.syntax.option._
-import com.my.voting_poll.shared_data.Utils.getLastMetagraphIncrementalSnapshotInfo
+import com.my.voting_poll.shared_data.Utils.{getLastCurrencySnapshotOrdinal, getLastMetagraphIncrementalSnapshotInfo}
 import com.my.voting_poll.shared_data.combiners.Combiners.{combineCreatePoll, combineVoteInPoll}
 import com.my.voting_poll.shared_data.errors.Errors.{CouldNotGetLatestCurrencySnapshot, DataApplicationValidationTypeOps}
 import com.my.voting_poll.shared_data.types.Types._
@@ -22,11 +22,10 @@ object LifecycleSharedFunctions {
 
   private val logger = LoggerFactory.getLogger("Data")
 
-  def validateUpdate[F[_] : Async](update: PollUpdate)(implicit context: L1NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] = {
-    context
-      .getLastCurrencySnapshot
-      .map(_.get.ordinal)
-      .flatMap { lastSnapshotOrdinal =>
+  def validateUpdate[F[_] : Async](update: PollUpdate)(implicit context: L1NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] =
+    for {
+      maybeLastSnapshotOrdinal <- getLastCurrencySnapshotOrdinal(context.asRight[L0NodeContext[F]])
+      response <- maybeLastSnapshotOrdinal.fold(CouldNotGetLatestCurrencySnapshot.invalid.pure[F]) { lastSnapshotOrdinal =>
         update match {
           case poll: CreatePoll => createPollValidations(poll, none, lastSnapshotOrdinal.some)
           case voteInPoll: VoteInPoll =>
@@ -37,21 +36,26 @@ object LifecycleSharedFunctions {
               }
         }
       }
-  }
+    } yield response
 
   def validateData[F[_] : Async](state: DataState[VoteStateOnChain, VoteCalculatedState], updates: NonEmptyList[Signed[PollUpdate]])(implicit context: L0NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] = {
     implicit val sp: SecurityProvider[F] = context.securityProvider
-    updates.traverse { signedUpdate =>
-      signedUpdate.value match {
-        case poll: CreatePoll =>
-          createPollValidationsWithSignature(poll, signedUpdate.proofs, state)
-        case voteInPoll: VoteInPoll =>
-          getLastMetagraphIncrementalSnapshotInfo(context.asLeft[L1NodeContext[F]]).flatMap {
-            case Some(snapshotInfo) => voteInPollValidationsWithSignature(voteInPoll, signedUpdate.proofs, state, snapshotInfo)
-            case None => CouldNotGetLatestCurrencySnapshot.invalid.pure[F]
-          }
+    for {
+      maybeLastSnapshotOrdinal <- getLastCurrencySnapshotOrdinal(context.asLeft[L1NodeContext[F]])
+      maybeLastSnapshotInfo <- getLastMetagraphIncrementalSnapshotInfo(context.asLeft[L1NodeContext[F]])
+      response <- (maybeLastSnapshotOrdinal, maybeLastSnapshotInfo) match {
+        case (Some(lastSnapshotOrdinal), Some(lastSnapshotInfo)) =>
+          updates.traverse { signedUpdate =>
+            signedUpdate.value match {
+              case poll: CreatePoll =>
+                createPollValidationsWithSignature(poll, signedUpdate.proofs, state)
+              case voteInPoll: VoteInPoll =>
+                voteInPollValidationsWithSignature(voteInPoll, signedUpdate.proofs, state, lastSnapshotOrdinal, lastSnapshotInfo)
+            }
+          }.map(_.reduce)
+        case _ => CouldNotGetLatestCurrencySnapshot.invalid.pure[F]
       }
-    }.map(_.reduce)
+    } yield response
   }
 
   def combine[F[_] : Async](state: DataState[VoteStateOnChain, VoteCalculatedState], updates: List[Signed[PollUpdate]])(implicit context: L0NodeContext[F]): F[DataState[VoteStateOnChain, VoteCalculatedState]] = {

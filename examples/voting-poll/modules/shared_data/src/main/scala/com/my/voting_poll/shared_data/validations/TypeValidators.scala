@@ -29,7 +29,13 @@ object TypeValidators {
   def validateSnapshotCreatePoll(snapshotOrdinal: SnapshotOrdinal, update: CreatePoll): DataApplicationValidationType =
     InvalidEndSnapshot.whenA(update.endSnapshotOrdinal < snapshotOrdinal.value.value)
 
-  def validatePollSnapshotInterval(lastSnapshotOrdinal: SnapshotOrdinal, state: DataState[VoteStateOnChain, VoteCalculatedState], voteInPoll: VoteInPoll): DataApplicationValidationType =
+  def validateNotStartedPollSnapshotInterval(lastSnapshotOrdinal: SnapshotOrdinal, state: DataState[VoteStateOnChain, VoteCalculatedState], voteInPoll: VoteInPoll): DataApplicationValidationType =
+    state.calculated.polls
+      .get(voteInPoll.pollId)
+      .map(value => NotStartedPool.whenA(value.startSnapshotOrdinal > lastSnapshotOrdinal.value.value))
+      .getOrElse(PollDoesNotExists.invalid)
+
+  def validateClosedPollSnapshotInterval(lastSnapshotOrdinal: SnapshotOrdinal, state: DataState[VoteStateOnChain, VoteCalculatedState], voteInPoll: VoteInPoll): DataApplicationValidationType =
     state.calculated.polls
       .get(voteInPoll.pollId)
       .map(value => ClosedPool.whenA(value.endSnapshotOrdinal < lastSnapshotOrdinal.value.value))

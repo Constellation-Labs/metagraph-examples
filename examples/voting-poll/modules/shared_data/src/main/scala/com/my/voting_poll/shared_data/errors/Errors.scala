@@ -45,8 +45,8 @@ object Errors {
     val message = "Could not get latest currency snapshot!"
   }
 
-  case object CouldNotGetLatestState extends DataApplicationValidationError {
-    val message = "Could not get latest state!"
+  case object NotStartedPool extends DataApplicationValidationError {
+    val message = "Not started pool"
   }
 
   case object ClosedPool extends DataApplicationValidationError {

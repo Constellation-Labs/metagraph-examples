@@ -27,6 +27,8 @@ case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateSer
   private def formatPoll(poll: Poll, lastOrdinal: Long): PollResponse = {
     if (poll.endSnapshotOrdinal < lastOrdinal) {
       PollResponse(poll.id, poll.name, poll.owner, poll.pollOptions, poll.startSnapshotOrdinal, poll.endSnapshotOrdinal, "Closed")
+    } else if (poll.startSnapshotOrdinal > lastOrdinal) {
+      PollResponse(poll.id, poll.name, poll.owner, poll.pollOptions, poll.startSnapshotOrdinal, poll.endSnapshotOrdinal, "Not Started")
     } else {
       PollResponse(poll.id, poll.name, poll.owner, poll.pollOptions, poll.startSnapshotOrdinal, poll.endSnapshotOrdinal, "Open")
     }
