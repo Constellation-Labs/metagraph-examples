@@ -1,0 +1,25 @@
+.main {
+  display: flex;
+  width: 100%;
+
+  justify-content: center;
+  align-items: flex-start;
+
+  > .content {
+    display: flex;
+    width: 1194px;
+
+    flex-flow: column nowrap;
+    margin-top: 64px;
+    row-gap: 24px;
+
+    &.noSidebarMargin{
+      width: 100%;
+      padding: 0px 20px;
+    }
+
+    &.noTopMargin {
+      margin-top: 0px;
+    }
+  }
+}

@@ -1,0 +1,64 @@
+@use 'src/styles/breakpoints.scss' as *;
+
+.main {
+  display: grid;
+  width: 100%;
+  height: 104px;
+
+  grid-template-columns: 2.5fr 5fr 2.5fr;
+  place-items: center;
+  padding: 0px 12px;
+
+  background-color: #174cd3;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+
+  &:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  > a {
+    font-family: Everett;
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 36.81px;
+    letter-spacing: -0.02em;
+    text-align: left;
+    color: #fff;
+  }
+
+  .identicon {
+    border-radius: 100%;
+  }
+
+  .buttons {
+    display: flex;
+
+    flex-flow: row nowrap;
+    gap: 5px;
+
+    > button {
+      padding: 8px 12px;
+    }
+  }
+
+  @include respond-below(sm) {
+    height: unset;
+
+    grid-template-columns: 1fr;
+    grid-auto-rows: min-content;
+    padding: 24px 48px;
+    row-gap: 12px;
+
+    .constellationLogo {
+      display: none;
+    }
+
+    .buttons {
+      display: flex;
+
+      flex-flow: column nowrap;
+      row-gap: 20px;
+    }
+  }
+}

@@ -1,0 +1,82 @@
+$breakpoints: (
+  sm: 576px,
+  md: 768px,
+  lg: 960px,
+  lg2: 1280px,
+  lg3: 1400px,
+  xlg: 1620px,
+);
+
+// DEFINE respond-above mixin
+@mixin respond-above($breakpoint) {
+  // if breakpoint exists in the map
+  @if map-has-key($breakpoints, $breakpoint) {
+    // for more on map-has-key, see: https://sass-lang.com/documentation/modules/map#has-key
+
+    // get the breakpoint value
+    $breakpoint-value: map-get(
+      $breakpoints,
+      $breakpoint
+    ); // for more on map-get, see: https://sass-lang.com/documentation/modules/map#get
+
+    // write the media query
+    @media (min-width: $breakpoint-value) {
+      @content;
+    }
+
+    // if breakpoint doesn't exist in the map
+  } @else {
+    // log a warning
+    @warn 'Invalid breakpoint: #{$breakpoint}.';
+  }
+}
+
+// DEFINE respond-below mixin
+@mixin respond-below($breakpoint) {
+  // if breakpoint exists in the map
+  @if map-has-key($breakpoints, $breakpoint) {
+    // get the breakpoint value
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+
+    // write the media query
+    @media (max-width: ($breakpoint-value - 1)) {
+      @content;
+    }
+
+    // if the breakpoint doesn't exist in the map
+  } @else {
+    // log a warning
+    @warn 'Invalid breakpoint: #{$breakpoint}.';
+  }
+}
+
+// DEFINE respond-between mixin
+// NOTE: our example in this tutorial only has one breakpoint and therefore will
+// not use respond-between. to use this mixin, simply pass it lower and upper breakpoints
+@mixin respond-between($lower, $upper) {
+  // if both the lower and upper breakpoints exist in the map
+  @if map-has-key($breakpoints, $lower) and map-has-key($breakpoints, $upper) {
+    // get the lower and upper breakpoints
+    $lower-breakpoint: map-get($breakpoints, $lower);
+    $upper-breakpoint: map-get($breakpoints, $upper);
+
+    // write the media query
+    @media (min-width: $lower-breakpoint) and (max-width: ($upper-breakpoint - 1)) {
+      @content;
+    }
+
+    // if one or both of breakpoints don't exist.
+  } @else {
+    // if lower breakpoint is invalid
+    @if (map-has-key($breakpoints, $lower) == false) {
+      // log a warning
+      @warn 'Your lower breakpoint was invalid: #{$lower}.';
+    }
+
+    // if upper breakpoint is invalid
+    @if (map-has-key($breakpoints, $upper) == false) {
+      // log a warning
+      @warn 'Your upper breakpoint was invalid: #{$upper}.';
+    }
+  }
+}

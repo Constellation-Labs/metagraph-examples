@@ -1,0 +1,148 @@
+.main {
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 4px;
+
+  .labelWrapper {
+    display: flex;
+    flex-flow: column nowrap;
+
+    .label {
+      font-family: Everett;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: 0.20000000298023224px;
+      text-align: left;
+      color: #000000;
+    }
+
+    .description {
+      font-family: Everett;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      letter-spacing: 0.20000000298023224px;
+      text-align: left;
+      color: #7b7b7b;
+    }
+  }
+
+  .track {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    column-gap: 16px;
+    align-items: center;
+
+    &.inputExtra {
+      grid-template-columns: 4fr 2fr;
+    }
+
+    .inputBar {
+      display: grid;
+      padding: 4px 8px;
+
+      border-bottom: 2px solid #171717;
+
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr;
+
+      &.staticPrefix {
+        grid-template-columns: min-content 1fr;
+        grid-template-rows: 1fr;
+      }
+
+      &.padding-sm {
+        padding: 12px 20px;
+      }
+
+      &.padding-m {
+        padding: 16px 20px;
+      }
+
+      span.staticPrefix {
+        display: inline-flex;
+
+        font-family: Everett;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
+        text-align: left;
+        color: #174cd3;
+
+        align-items: center;
+      }
+
+      input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background-color: rgba(0, 0, 0, 0);
+
+        font-family: Everett;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
+        text-align: left;
+        color: #282828;
+      }
+
+      input::placeholder {
+        font-family: Everett;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
+        text-align: left;
+        color: #7b7b7b;
+      }
+    }
+
+    .extra {
+      display: grid;
+      width: 100%;
+      grid-auto-columns: 1fr;
+      grid-template-rows: 1fr;
+
+      grid-auto-flow: column;
+      column-gap: 16px;
+    }
+  }
+
+  &.error {
+    .label {
+      color: #ef4444;
+    }
+
+    .description {
+      color: #ef44449f;
+    }
+
+    .inputBar {
+      border-bottom: 2px solid #ef4444;
+
+      span.staticPrefix {
+        color: #ef44449f;
+      }
+
+      input {
+        color: #ef4444;
+      }
+
+      input::placeholder {
+        color: #ef44449f;
+      }
+    }
+  }
+
+  .box.error {
+    font-family: Everett;
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 24px;
+    letter-spacing: 0.20000000298023224px;
+    text-align: right;
+
+    color: #ef4444;
+  }
+}

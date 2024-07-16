@@ -1,0 +1,53 @@
+@use 'src/styles/breakpoints.scss' as *;
+
+.main {
+  display: grid;
+  width: 100%;
+
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 25px;
+
+  @include respond-below(sm) {
+    padding: 12px;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content;
+  }
+}
+
+.introCard {
+  display: flex;
+
+  justify-content: center;
+
+  > * {
+    max-width: 600px;
+  }
+
+  p {
+    text-align: justify;
+    
+    a {
+      text-decoration: underline;
+      color: #174cd3;
+
+      word-break: break-all;
+    }
+  }
+
+  .createPolls {
+    display: flex;
+
+    flex-flow: column nowrap;
+    align-items: center;
+    row-gap: 20px;
+  }
+
+  @include respond-below(sm) {
+    padding: 12px;
+
+    > * {
+      max-width: 100%;
+    }
+  }
+}
