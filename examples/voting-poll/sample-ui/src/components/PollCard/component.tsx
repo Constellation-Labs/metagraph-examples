@@ -21,7 +21,7 @@ export const PollCard = ({ poll }: IPollCardProps) => {
 
   return (
     <Card
-      className={styles.main}
+      className={{ body: styles.main, root: styles.root }}
       variants={['padding-m']}
       header={
         <span className={styles.header}>
@@ -45,13 +45,13 @@ export const PollCard = ({ poll }: IPollCardProps) => {
           Start: {poll.startSnapshotOrdinal} / End: {poll.endSnapshotOrdinal}
         </span>
       </div>
+
       <div className={styles.options}>
         {Object.entries(poll.result).map(([option, votes]) => {
           const resultPercentage =
             resultsTotal === 0
               ? 0
               : Math.floor((votes / resultsTotal) * 100 * 100) / 100;
-
           return (
             <div className={styles.option} key={option}>
               <span className={styles.placeholder}>placeholder</span>
@@ -70,7 +70,11 @@ export const PollCard = ({ poll }: IPollCardProps) => {
           );
         })}
       </div>
-      <ButtonLink variants={['secondary']} href={`/polls/${poll.id}`}>
+      <ButtonLink
+        className={styles.buttonLink}
+        variants={['secondary']}
+        href={`/polls/${poll.id}`}
+      >
         Cast your vote
       </ButtonLink>
     </Card>
