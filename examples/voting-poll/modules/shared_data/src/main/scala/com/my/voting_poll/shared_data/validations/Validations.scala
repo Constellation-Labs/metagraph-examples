@@ -34,27 +34,22 @@ object Validations {
 
   def voteInPollValidations[F[_] : Async](update: VoteInPoll, maybeState: Option[DataState[VoteStateOnChain, VoteCalculatedState]], lastSnapshotOrdinal: Option[SnapshotOrdinal], snapshotInfo: CurrencySnapshotInfo): F[DataApplicationValidationErrorOr[Unit]] = Async[F].delay {
     val validateBalance = validateWalletBalance(snapshotInfo, update.address)
-    maybeState match {
-      case Some(state) =>
-        val validatedSnapshotInterval = lastSnapshotOrdinal match {
-          case Some(value) => validatePollSnapshotInterval(value, state, update)
-          case None => valid
-        }
+    maybeState.fold(validateBalance) { state =>
+      val validatedClosedPool = lastSnapshotOrdinal.fold(valid)(validateClosedPollSnapshotInterval(_, state, update))
+      val validatedNotStartedPool = lastSnapshotOrdinal.fold(valid)(validateNotStartedPollSnapshotInterval(_, state, update))
 
-        val validatedPoll = validateIfVotePollExists(state, update.pollId)
+      val validatedPoll = validateIfVotePollExists(state, update.pollId)
 
-        val validatedOption = validateIfOptionExists(state, update.pollId, update.option)
+      val validatedOption = validateIfOptionExists(state, update.pollId, update.option)
 
-        val validatedRepeatedVote = validateIfUserAlreadyVoted(state, update.pollId, update.address)
+      val validatedRepeatedVote = validateIfUserAlreadyVoted(state, update.pollId, update.address)
 
-        validatedSnapshotInterval
-          .productR(validatedPoll)
-          .productR(validatedOption)
-          .productR(validatedRepeatedVote)
-          .productR(validateBalance)
-
-      case None => validateBalance
-
+      validatedClosedPool
+        .productR(validatedNotStartedPool)
+        .productR(validatedPoll)
+        .productR(validatedOption)
+        .productR(validatedRepeatedVote)
+        .productR(validateBalance)
     }
   }
 
@@ -73,11 +68,11 @@ object Validations {
     } yield validatedAddress.productR(validatedPoll)
   }
 
-  def voteInPollValidationsWithSignature[F[_] : Async](update: VoteInPoll, proofs: NonEmptySet[SignatureProof], state: DataState[VoteStateOnChain, VoteCalculatedState], snapshotInfo: CurrencySnapshotInfo)(implicit sp: SecurityProvider[F]): F[DataApplicationValidationErrorOr[Unit]] = {
+  def voteInPollValidationsWithSignature[F[_] : Async](update: VoteInPoll, proofs: NonEmptySet[SignatureProof], state: DataState[VoteStateOnChain, VoteCalculatedState], snapshotOrdinal: SnapshotOrdinal, snapshotInfo: CurrencySnapshotInfo)(implicit sp: SecurityProvider[F]): F[DataApplicationValidationErrorOr[Unit]] = {
     for {
       addresses <- extractAddresses(proofs)
       validatedAddress = validateProvidedAddress(addresses, update.address)
-      validatedPoll <- voteInPollValidations(update, state.some, None, snapshotInfo)
+      validatedPoll <- voteInPollValidations(update, state.some, snapshotOrdinal.some, snapshotInfo)
     } yield validatedAddress.productR(validatedPoll)
   }
 }
