@@ -27,6 +27,8 @@
   p a {
     text-decoration: underline;
     color: #174cd3;
+
+    word-break: break-all;
   }
 
   .createPolls {
@@ -35,5 +37,13 @@
     flex-flow: column nowrap;
     align-items: center;
     row-gap: 20px;
+  }
+
+  @include respond-below(sm) {
+    padding: 12px;
+
+    > * {
+      max-width: 100%;
+    }
   }
 }
