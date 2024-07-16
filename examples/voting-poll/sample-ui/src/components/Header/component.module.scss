@@ -34,8 +34,8 @@
   .buttons {
     display: flex;
 
-    flex-flow: column nowrap;
-    row-gap: 5px;
+    flex-flow: row nowrap;
+    gap: 5px;
 
     > button {
       padding: 8px 12px;
