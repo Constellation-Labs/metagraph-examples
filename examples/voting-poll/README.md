@@ -105,6 +105,10 @@ In this example, the following endpoints are implemented:
 - GET `<metagraph l0 url>/data-application/polls`: Returns the polls.
 - GET `<metagraph l0 url>/data-application/polls/:poll_id`: Returns the poll by id.
 
+## Sample UI Project
+
+This example comes with a sample UI web app demonstrating integration with Stargazer Wallet and interaction with the metagraph APIs. You can set it up and run it from the instructions in the [sample-ui](./sample-ui/README.md) folder.
+
 ## Scripts
 
 This example includes a script to generate, sign, and send data updates to the metagraph in `scripts/send_data_transaction.js`. This is a simple script where you must provide the `globalL0Url` and the `metagraphL1DataUrl` to match the configuration of your metagraph. You also must provide a private key representing the user that will create or vote in a poll (client) that is sending the transaction, this key will be used to sign the transaction and to log in your wallet to the network.
@@ -121,6 +125,4 @@ This example includes a script to generate, sign, and send data updates to the m
 
 
 
-## Sample UI Project
 
-This example comes with a Next.js based demo, you can set it up and run it from the instructions in the [sample-ui](./sample-ui/README.md) folder.

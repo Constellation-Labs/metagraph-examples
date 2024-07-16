@@ -33,11 +33,13 @@ export default function HomePage() {
           variants={['padding-m']}
         >
           <p>
-            This application leverages Constellation's Hypergraph Transfer
-            Protocol (HGTP) to facilitate the creation and management of
-            decentralized polls and votes. By connecting to a custom metagraph
-            and interacting with the Stargazer Wallet, the app securely signs
-            and submits payloads to the network.
+            This application demonstrates the usage of a metagraph as a web
+            server backend and the integration of Stargazer wallet to securely
+            sign and send custom data updates to the metagraph. Polls can be
+            created with custom voting options, which can then be voted on using
+            the token balance of your wallet. Note that tokens are required in
+            your wallet to vote. Please see the included README.md file for
+            instructions on how to add L0 tokens to your wallet.
             <br />
             <br />
             Metagraph state can be queried through the following links:
@@ -49,7 +51,7 @@ export default function HomePage() {
                 >
                   http://localhost:9200/snapshots/latest/combined
                 </a>
-                : Access the latest snapshot data.{' '}
+                : View the latest snapshot data.{' '}
               </li>
               <li>
                 <a
@@ -58,7 +60,8 @@ export default function HomePage() {
                 >
                   http://localhost:9200/data-application/polls
                 </a>
-                : Monitor the current state of polls.
+                : View a custom GET endpoint, exposing all polls through
+                metagraph Calculated State.
               </li>
             </ul>
           </p>

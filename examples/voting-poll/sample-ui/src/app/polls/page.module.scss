@@ -24,11 +24,15 @@
     max-width: 600px;
   }
 
-  p a {
-    text-decoration: underline;
-    color: #174cd3;
+  p {
+    text-align: justify;
+    
+    a {
+      text-decoration: underline;
+      color: #174cd3;
 
-    word-break: break-all;
+      word-break: break-all;
+    }
   }
 
   .createPolls {
