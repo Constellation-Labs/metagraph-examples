@@ -28,7 +28,7 @@ case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateSer
     if (poll.endSnapshotOrdinal < lastOrdinal) {
       PollResponse(poll.id, poll.name, poll.owner, poll.pollOptions, poll.startSnapshotOrdinal, poll.endSnapshotOrdinal, "Closed")
     } else if (poll.startSnapshotOrdinal > lastOrdinal) {
-      PollResponse(poll.id, poll.name, poll.owner, poll.pollOptions, poll.startSnapshotOrdinal, poll.endSnapshotOrdinal, "NotStarted")
+      PollResponse(poll.id, poll.name, poll.owner, poll.pollOptions, poll.startSnapshotOrdinal, poll.endSnapshotOrdinal, "Not Started")
     } else {
       PollResponse(poll.id, poll.name, poll.owner, poll.pollOptions, poll.startSnapshotOrdinal, poll.endSnapshotOrdinal, "Open")
     }
