@@ -9,7 +9,7 @@ object Dependencies {
     val catsEffect = "3.4.2"
     val organizeImports = "0.5.0"
     val weaver = "0.8.1"
-    val scalapbCirce = "0.13.0"
+    val pureconfig = "0.17.4"
   }
   def tessellation(artifact: String): ModuleID = "org.constellation" %% s"tessellation-$artifact" % V.tessellation
 
@@ -17,6 +17,7 @@ object Dependencies {
     "com.monovore" %% {
       if (artifact.isEmpty) "decline" else s"decline-$artifact"
     } % V.decline
+
   object Libraries {
     val tessellationNodeShared = tessellation("node-shared")
     val tessellationCurrencyL0 = tessellation("currency-l0")
@@ -31,17 +32,9 @@ object Dependencies {
     val weaverDiscipline = "com.disneystreaming" %% "weaver-discipline" % V.weaver
     val weaverScalaCheck = "com.disneystreaming" %% "weaver-scalacheck" % V.weaver
     val organizeImports = "com.github.liancheng" %% "organize-imports" % V.organizeImports
-    val scalapbCirce = "io.github.scalapb-json" %% "scalapb-circe" % V.scalapbCirce
-    val scalapbCirceMacro = "io.github.scalapb-json" %% "scalapb-circe-macros" % V.scalapbCirce
-
-    // for scalapb/scalapb.proto or anything from google/protobuf/*.proto
-    val scalapbRuntime = "com.thesamet.scalapb" %% "scalapb-runtime" % "0.11.13" % "protobuf"
-    val scalapbValidate = "com.thesamet.scalapb" %% "scalapb-validate-core" % scalapb.validate.compiler.BuildInfo.version % "protobuf"
-
-    val pureconfigCore = "com.github.pureconfig" %% "pureconfig" % "0.17.4"
-    val pureconfigCats = "com.github.pureconfig" %% "pureconfig-cats-effect" % "0.17.4"
+    val pureconfigCore = "com.github.pureconfig" %% "pureconfig" % V.pureconfig
+    val pureconfigCats = "com.github.pureconfig" %% "pureconfig-cats-effect" % V.pureconfig
   }
-
 
   // Scalafix rules
   val organizeImports = "com.github.liancheng" %% "organize-imports" % "0.5.0"

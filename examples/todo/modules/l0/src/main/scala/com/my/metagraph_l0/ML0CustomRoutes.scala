@@ -11,7 +11,6 @@ import com.my.metagraph_l0.ML0NodeContext.syntax._
 import com.my.shared_data.lib.MetagraphPublicRoutes
 
 import org.http4s.HttpRoutes
-import scalapb_circe.codec._
 
 class ML0CustomRoutes[F[_]: Async: JsonSerializer](implicit context: L0NodeContext[F])
     extends MetagraphPublicRoutes[F] {

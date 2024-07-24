@@ -13,7 +13,6 @@ import com.my.shared_data.lib.MetagraphPublicRoutes
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 import org.http4s.HttpRoutes
-import scalapb_circe.codec._
 
 class DataL1CustomRoutes[F[_]: Async: JsonSerializer](implicit context: L1NodeContext[F])
     extends MetagraphPublicRoutes[F] {

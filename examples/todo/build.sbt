@@ -30,10 +30,6 @@ lazy val commonLibraryDependencies: Seq[ModuleID] = Seq(
   Libraries.tessellationNodeShared,
   Libraries.cats,
   Libraries.catsEffect,
-  Libraries.scalapbCirce,
-  Libraries.scalapbCirceMacro,
-  Libraries.scalapbRuntime,
-  Libraries.scalapbValidate,
   Libraries.pureconfigCore,
   Libraries.pureconfigCats
 )

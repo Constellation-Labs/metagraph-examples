@@ -28,8 +28,7 @@ import com.my.shared_data.schema.{CalculatedState, OnChain}
 import io.circe.{Decoder, Encoder}
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.{EntityDecoder, HttpRoutes}
-import org.typelevel.log4cats.slf4j.Slf4jLogger
-import org.typelevel.log4cats.{Logger, SelfAwareStructuredLogger}
+import org.typelevel.log4cats.Logger
 
 object ML0Service {
 
@@ -42,18 +41,13 @@ object ML0Service {
     dataApplicationL0Service = makeBaseApplicationL0Service(checkpointService, combiner, validator)
   } yield dataApplicationL0Service
 
-  private def makeBaseApplicationL0Service[F[+_]: Async: SecurityProvider: Hasher: JsonSerializer](
+  private def makeBaseApplicationL0Service[F[+_]: Async: SecurityProvider: Hasher: JsonSerializer: Logger](
     checkpointService: CheckpointService[F, CalculatedState],
     combiner:          SignedUpdateReducer[F, TodoUpdate, DataState[OnChain, CalculatedState]],
     validator:         LatestUpdateValidator[F, Signed[TodoUpdate], DataState[OnChain, CalculatedState]]
   ): BaseDataApplicationL0Service[F] =
     BaseDataApplicationL0Service[F, TodoUpdate, OnChain, CalculatedState](
       new DataApplicationL0Service[F, TodoUpdate, OnChain, CalculatedState] {
-
-        private val logger: SelfAwareStructuredLogger[F] = Slf4jLogger.getLoggerFromClass(ML0Service.getClass)
-
-        override def genesis: DataState[OnChain, CalculatedState] =
-          DataState(OnChain.genesis, CalculatedState.genesis)
 
         override def serializeState(state: OnChain): F[Array[Byte]] =
           JsonSerializer[F].serialize[OnChain](state)
@@ -89,15 +83,28 @@ object ML0Service {
 
         override val signedDataEntityDecoder: EntityDecoder[F, Signed[TodoUpdate]] = circeEntityDecoder
 
-        override def routes(implicit context: L0NodeContext[F]): HttpRoutes[F] = new ML0CustomRoutes[F].public
+        override def getCalculatedState(implicit
+          context: L0NodeContext[F]
+        ): F[(SnapshotOrdinal, CalculatedState)] =
+          checkpointService.get.map(checkpoint => (checkpoint.ordinal, checkpoint.state))
+
+        override def setCalculatedState(ordinal: SnapshotOrdinal, state: CalculatedState)(implicit
+          context: L0NodeContext[F]
+        ): F[Boolean] = checkpointService.set(Checkpoint(ordinal, state))
+
+        override def hashCalculatedState(state: CalculatedState)(implicit context: L0NodeContext[F]): F[Hash] =
+          Hasher[F].hash(state)
+
+        override def genesis: DataState[OnChain, CalculatedState] =
+          DataState(OnChain.genesis, CalculatedState.genesis)
 
         override def onSnapshotConsensusResult(snapshot: Hashed[CurrencyIncrementalSnapshot])(implicit
           A: Applicative[F]
         ): F[Unit] =
           for {
-            _ <- logger.debug("Evaluating onSnapshotConsensusResult")
+            _ <- Logger[F].debug("Evaluating onSnapshotConsensusResult")
             numberOfUpdates = snapshot.signed.value.countUpdates
-            _ <- logger.info(s"Got $numberOfUpdates updates for ordinal: ${snapshot.ordinal.value}")
+            _ <- Logger[F].info(s"Got $numberOfUpdates updates for ordinal: ${snapshot.ordinal.value}")
           } yield ()
 
         override def validateData(
@@ -116,17 +123,7 @@ object ML0Service {
         )(implicit context: L0NodeContext[F]): F[DataState[OnChain, CalculatedState]] =
           state.insert(updates.toSortedSet)(combiner)
 
-        override def getCalculatedState(implicit
-          context: L0NodeContext[F]
-        ): F[(SnapshotOrdinal, CalculatedState)] =
-          checkpointService.get.map(checkpoint => (checkpoint.ordinal, checkpoint.state))
-
-        override def setCalculatedState(ordinal: SnapshotOrdinal, state: CalculatedState)(implicit
-          context: L0NodeContext[F]
-        ): F[Boolean] = checkpointService.set(Checkpoint(ordinal, state))
-
-        override def hashCalculatedState(state: CalculatedState)(implicit context: L0NodeContext[F]): F[Hash] =
-          Hasher[F].hash(state)
+        override def routes(implicit context: L0NodeContext[F]): HttpRoutes[F] = new ML0CustomRoutes[F].public
       }
     )
 

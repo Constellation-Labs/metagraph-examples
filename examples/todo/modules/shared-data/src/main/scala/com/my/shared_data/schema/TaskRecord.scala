@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets
 import cats.effect.Async
 import cats.implicits.toFunctorOps
 
+import org.tessellation.schema.address.Address
+
 import com.my.shared_data.schema.Updates.CreateTask
 
 import derevo.circe.magnolia.{decoder, encoder}
@@ -18,7 +20,8 @@ final case class TaskRecord(
   creationDateTimestamp:    Long,
   lastUpdatedDateTimestamp: Long,
   dueDateTimestamp:         Long,
-  status:                   TaskStatus
+  status:                   TaskStatus,
+  reporter:                 Address
 )
 
 object TaskRecord {

@@ -19,13 +19,13 @@ trait ML0Validator[F[_], U, T] extends UpdateValidator[F, U, T]
 
 object ML0Validator {
 
-  type STX = Signed[TodoUpdate]
+  type TX = TodoUpdate
   type DS = DataState[OnChain, CalculatedState]
 
-  def make[F[_]: Async]: ML0Validator[F, STX, DS] =
-    new ML0Validator[F, STX, DS] {
+  def make[F[_]: Async]: ML0Validator[F, Signed[TX], DS] =
+    new ML0Validator[F, Signed[TX], DS] {
 
-      override def verify(state: DS, signedUpdate: STX): F[DataApplicationValidationErrorOr[Unit]] =
+      override def verify(state: DS, signedUpdate: Signed[TX]): F[DataApplicationValidationErrorOr[Unit]] =
         signedUpdate.value match {
           case u: Updates.CreateTask   => createTask(u)(state.onChain)
           case u: Updates.ModifyTask   => modifyTask(u)(state.onChain)
@@ -51,7 +51,8 @@ object ML0Validator {
         }).map { res1 =>
           List(
             res1,
-            ValidatorRules.taskDoesExist(update.id, state)
+            ValidatorRules.taskDoesExist(update.id, state),
+            ValidatorRules.hasValidStatus(update)
           ).combineAll
         }
 

@@ -38,29 +38,6 @@ object DataL1Service {
     BaseDataApplicationL1Service[F, TodoUpdate, OnChain, CalculatedState](
       new DataApplicationL1Service[F, TodoUpdate, OnChain, CalculatedState] {
 
-        override def validateData(
-          state:   DataState[OnChain, CalculatedState],
-          updates: NonEmptyList[Signed[TodoUpdate]]
-        )(implicit context: L1NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] =
-          ().validNec[DataApplicationValidationError].pure[F]
-
-        override def combine(
-          state:   DataState[OnChain, CalculatedState],
-          updates: List[Signed[TodoUpdate]]
-        )(implicit context: L1NodeContext[F]): F[DataState[OnChain, CalculatedState]] = state.pure[F]
-
-        override def getCalculatedState(implicit
-          context: L1NodeContext[F]
-        ): F[(SnapshotOrdinal, CalculatedState)] =
-          (SnapshotOrdinal.MinValue, CalculatedState.genesis).pure[F]
-
-        override def setCalculatedState(ordinal: SnapshotOrdinal, state: CalculatedState)(implicit
-          context: L1NodeContext[F]
-        ): F[Boolean] = true.pure[F]
-
-        override def hashCalculatedState(state: CalculatedState)(implicit context: L1NodeContext[F]): F[Hash] =
-          Hash.empty.pure[F]
-
         override def serializeState(state: OnChain): F[Array[Byte]] =
           JsonSerializer[F].serialize[OnChain](state)
 
@@ -95,6 +72,24 @@ object DataL1Service {
 
         override val signedDataEntityDecoder: EntityDecoder[F, Signed[TodoUpdate]] = circeEntityDecoder
 
+        override def getCalculatedState(implicit
+          context: L1NodeContext[F]
+        ): F[(SnapshotOrdinal, CalculatedState)] =
+          (SnapshotOrdinal.MinValue, CalculatedState.genesis).pure[F]
+
+        override def setCalculatedState(ordinal: SnapshotOrdinal, state: CalculatedState)(implicit
+          context: L1NodeContext[F]
+        ): F[Boolean] = true.pure[F]
+
+        override def hashCalculatedState(state: CalculatedState)(implicit context: L1NodeContext[F]): F[Hash] =
+          Hash.empty.pure[F]
+
+        override def validateData(
+          state:   DataState[OnChain, CalculatedState],
+          updates: NonEmptyList[Signed[TodoUpdate]]
+        )(implicit context: L1NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] =
+          ().validNec[DataApplicationValidationError].pure[F]
+
         override def validateUpdate(
           update: TodoUpdate
         )(implicit context: L1NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] =
@@ -105,9 +100,13 @@ object DataL1Service {
             )
           }
 
+        override def combine(
+          state:   DataState[OnChain, CalculatedState],
+          updates: List[Signed[TodoUpdate]]
+        )(implicit context: L1NodeContext[F]): F[DataState[OnChain, CalculatedState]] = state.pure[F]
+
         override def routes(implicit context: L1NodeContext[F]): HttpRoutes[F] =
           new DataL1CustomRoutes[F].public
       }
     )
-
 }

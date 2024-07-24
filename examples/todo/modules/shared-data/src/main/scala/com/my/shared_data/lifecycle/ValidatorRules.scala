@@ -3,11 +3,13 @@ package com.my.shared_data.lifecycle
 import cats.data.Validated
 import cats.effect.{Async, Clock}
 import cats.implicits.toFunctorOps
+import cats.syntax.validated._
 
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 
-import com.my.shared_data.schema.OnChain
+import com.my.shared_data.schema.Updates.ModifyTask
+import com.my.shared_data.schema.{OnChain, TaskStatus}
 
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
@@ -33,6 +35,18 @@ object ValidatorRules {
   ): DataApplicationValidationErrorOr[Unit] =
     Validated.condNec(state.activeTasks.contains(id), (), Errors.RecordDoesNotExist)
 
+  def hasValidStatus(
+    update: ModifyTask
+  ): DataApplicationValidationErrorOr[Unit] =
+    update.optStatus match {
+      case Some(status) =>
+        status match {
+          case TaskStatus.Closed => Errors.InvalidStatusForModify.invalidNec
+          case _                 => ().validNec
+        }
+      case None => ().validNec
+    }
+
   object Errors {
 
     @derive(decoder, encoder)
@@ -48,6 +62,11 @@ object ValidatorRules {
     @derive(decoder, encoder)
     case object TaskDueDateInPast extends DataApplicationValidationError {
       val message = s"The given task has a due date in the past"
+    }
+
+    @derive(decoder, encoder)
+    case object InvalidStatusForModify extends DataApplicationValidationError {
+      val message = s"Invalid status found in ModifyTask. Use RemoveTask to archive."
     }
   }
 }

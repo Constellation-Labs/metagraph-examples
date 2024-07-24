@@ -47,7 +47,8 @@ object DataL1Validator {
         }).map { res1 =>
           List(
             res1,
-            ValidatorRules.taskDoesExist(update.id, state)
+            ValidatorRules.taskDoesExist(update.id, state),
+            ValidatorRules.hasValidStatus(update)
           ).combineAll
         }
 
