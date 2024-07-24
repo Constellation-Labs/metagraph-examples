@@ -1,13 +1,14 @@
 package com.my.data_l1
 
-import cats.effect.Async
+import cats.effect.{Async, Clock}
 import cats.implicits.{toFlatMapOps, toFunctorOps}
+import cats.syntax.either._
 
 import org.tessellation.currency.dataApplication.{DataApplicationValidationError, L1NodeContext}
 import org.tessellation.json.JsonSerializer
 
 import com.my.data_l1.DataL1NodeContext.syntax._
-import com.my.shared_data.MetagraphPublicRoutes
+import com.my.shared_data.lib.MetagraphPublicRoutes
 
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
@@ -18,6 +19,13 @@ class DataL1CustomRoutes[F[_]: Async: JsonSerializer](implicit context: L1NodeCo
     extends MetagraphPublicRoutes[F] {
 
   protected val routes: HttpRoutes[F] = HttpRoutes.of[F] {
+    case GET -> Root / "current-time" =>
+      Clock[F].realTime
+        .map { now =>
+          now.toMillis.asRight[DataApplicationValidationError]
+        }
+        .flatMap(prepareResponse(_))
+
     case GET -> Root / "tasks" / "all" =>
       context.getOnChainState.map(_.map(_.activeTasks.toList)).flatMap(prepareResponse(_))
 

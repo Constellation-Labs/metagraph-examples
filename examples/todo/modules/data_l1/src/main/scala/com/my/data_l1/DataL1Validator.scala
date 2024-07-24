@@ -1,11 +1,17 @@
 package com.my.data_l1
 
 import cats.effect.Async
+import cats.implicits.{toFlatMapOps, toFoldableOps, toFunctorOps}
+import cats.syntax.applicative._
+import cats.syntax.validated._
 
+import org.tessellation.currency.dataApplication.DataApplicationValidationError
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 
 import com.my.shared_data.lib.UpdateValidator
-import com.my.shared_data.schema.Updates.TodoUpdate
+import com.my.shared_data.lifecycle.ValidatorRules
+import com.my.shared_data.schema.TaskRecord.generateId
+import com.my.shared_data.schema.Updates.{CompleteTask, ModifyTask, RemoveTask, TodoUpdate}
 import com.my.shared_data.schema.{OnChain, Updates}
 
 trait DataL1Validator[F[_], U, T] extends UpdateValidator[F, U, T]
@@ -17,53 +23,46 @@ object DataL1Validator {
 
       override def verify(state: OnChain, update: TodoUpdate): F[DataApplicationValidationErrorOr[Unit]] =
         update match {
-          case Updates.CreateTask(dueData) => ???
-          case Updates.ModifyTask(id)      => ???
-          case Updates.CompleteTask(id)    => ???
-          case Updates.RemoveTask(id)      => ???
+          case u: Updates.CreateTask   => createTask(u)(state)
+          case u: Updates.ModifyTask   => modifyTask(u)(state)
+          case u: Updates.CompleteTask => completeTask(u)(state)
+          case u: Updates.RemoveTask   => removeTask(u)(state)
         }
 
-//      private def nominateEvent(
-//        update: Updates.Nominate
-//      ): OnChain => DataApplicationValidationErrorOr[Unit] = (state: OnChain) =>
-//        List(
-//          ValidatorRules.isValidEventData[MissionTask](update.data)
-//        ).combineAll
-//
-//      private def collectEvent(
-//        update: Updates.Collect
-//      ): OnChain => DataApplicationValidationErrorOr[Unit] = (state: OnChain) =>
-//        List(
-//          ValidatorRules.isValidEventData[MissionTask](update.data)
-//        ).combineAll
-//
-//      private def closeEvent(
-//        update: Updates.Close
-//      ): OnChain => DataApplicationValidationErrorOr[Unit] = (state: OnChain) =>
-//        List(
-//          ValidatorRules.isValidEventData[MissionTask](update.data)
-//        ).combineAll
-//
-//      private def abortEvent(
-//        update: Updates.Abort
-//      ): OnChain => DataApplicationValidationErrorOr[Unit] = (state: OnChain) =>
-//        List(
-//          ValidatorRules.isValidEventData[MissionTask](update.data)
-//        ).combineAll
-//
-//      private def voteEvent(
-//        update: Updates.Vote
-//      ): OnChain => DataApplicationValidationErrorOr[Unit] = (state: OnChain) =>
-//        List(
-//          ValidatorRules.isValidEventData[MultiUserTask](update.data)
-//        ).combineAll
-//
-//      private def pushEvent(
-//        update: Updates.Push
-//      ): OnChain => DataApplicationValidationErrorOr[Unit] = (state: OnChain) =>
-//        List(
-//          ValidatorRules.isValidEventData[AircraftEvent](update.data),
-//          ValidatorRules.updateIncrementsCounter(update, state)
-//        ).combineAll
+      private def createTask(
+        update: Updates.CreateTask
+      ): OnChain => F[DataApplicationValidationErrorOr[Unit]] = (state: OnChain) =>
+        for {
+          id   <- generateId(update)
+          res1 <- ValidatorRules.dueDateInFuture(update.dueDate)
+          res2 = ValidatorRules.taskDoesNotExist(id, state)
+        } yield List(res1, res2).combineAll
+
+      private def modifyTask(
+        update: ModifyTask
+      ): OnChain => F[DataApplicationValidationErrorOr[Unit]] = (state: OnChain) =>
+        (update.optDueDate match {
+          case Some(newDate) => ValidatorRules.dueDateInFuture(newDate)
+          case None          => ().validNec[DataApplicationValidationError].pure[F]
+        }).map { res1 =>
+          List(
+            res1,
+            ValidatorRules.taskDoesExist(update.id, state)
+          ).combineAll
+        }
+
+      private def completeTask(
+        update: CompleteTask
+      ): OnChain => F[DataApplicationValidationErrorOr[Unit]] = (state: OnChain) =>
+        List(
+          ValidatorRules.taskDoesExist(update.id, state)
+        ).combineAll.pure[F]
+
+      private def removeTask(
+        update: RemoveTask
+      ): OnChain => F[DataApplicationValidationErrorOr[Unit]] = (state: OnChain) =>
+        List(
+          ValidatorRules.taskDoesExist(update.id, state)
+        ).combineAll.pure[F]
     }
 }

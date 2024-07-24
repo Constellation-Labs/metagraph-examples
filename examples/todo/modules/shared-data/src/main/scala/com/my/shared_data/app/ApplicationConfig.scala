@@ -2,21 +2,19 @@ package com.my.shared_data.app
 
 import scala.concurrent.duration._
 
+import com.my.shared_data.app.ApplicationConfig.ML0Daemon
+
 case class ApplicationConfig(
-  http4s:             ApplicationConfig.Http4sConfig,
-  syncDaemon:         ApplicationConfig.SyncDaemon,
-  transactionMonitor: ApplicationConfig.TransactionMonitor
+  http4s:    ApplicationConfig.Http4sConfig,
+  ml0Daemon: ML0Daemon
 )
 
 object ApplicationConfig {
 
   case class Http4sConfig(client: Http4sConfig.Client)
 
-  case class SyncDaemon(
-    idleTime: FiniteDuration
-  )
-
-  case class TransactionMonitor(
+  case class ML0Daemon(
+    msg:      String,
     idleTime: FiniteDuration
   )
 

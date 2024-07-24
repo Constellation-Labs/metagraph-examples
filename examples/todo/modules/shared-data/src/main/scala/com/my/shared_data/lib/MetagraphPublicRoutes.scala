@@ -1,4 +1,4 @@
-package com.my.shared_data
+package com.my.shared_data.lib
 
 import cats.effect.Async
 

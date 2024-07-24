@@ -8,7 +8,7 @@ import org.tessellation.json.JsonSerializer
 import org.tessellation.node.shared.ext.http4s.SnapshotOrdinalVar
 
 import com.my.metagraph_l0.ML0NodeContext.syntax._
-import com.my.shared_data.MetagraphPublicRoutes
+import com.my.shared_data.lib.MetagraphPublicRoutes
 
 import org.http4s.HttpRoutes
 import scalapb_circe.codec._
