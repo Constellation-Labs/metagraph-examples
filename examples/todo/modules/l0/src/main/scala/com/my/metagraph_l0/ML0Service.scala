@@ -123,8 +123,7 @@ object ML0Service {
         )(implicit context: L0NodeContext[F]): F[DataState[OnChain, CalculatedState]] =
           state.insert(updates.toSortedSet)(combiner)
 
-        override def routes(implicit context: L0NodeContext[F]): HttpRoutes[F] = new ML0CustomRoutes[F].public
+        override def routes(implicit context: L0NodeContext[F]): HttpRoutes[F] = new ML0CustomRoutes[F](checkpointService).public
       }
     )
-
 }

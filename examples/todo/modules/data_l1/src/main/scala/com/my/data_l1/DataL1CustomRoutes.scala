@@ -21,11 +21,11 @@ class DataL1CustomRoutes[F[_]: Async: JsonSerializer](implicit context: L1NodeCo
     case GET -> Root / "current-time" =>
       Clock[F].realTime
         .map { now =>
-          now.toMillis.asRight[DataApplicationValidationError]
+          ("epochMillis" -> now.toMillis).asRight[DataApplicationValidationError]
         }
         .flatMap(prepareResponse(_))
 
-    case GET -> Root / "tasks" / "all" =>
+    case GET -> Root / "active-tasks" / "all" =>
       context.getOnChainState.map(_.map(_.activeTasks.toList)).flatMap(prepareResponse(_))
 
     case GET -> Root / "snapshot" / "global" / "latest" =>
