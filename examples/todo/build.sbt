@@ -66,10 +66,6 @@ lazy val sharedData = (project in file("modules/shared-data"))
     commonSettings,
     commonTestSettings,
     name := "todo-shared-data",
-    Compile / PB.targets := Seq(
-      scalapb.gen() -> (Compile / sourceManaged).value / "scalapb",
-      scalapb.validate.gen() -> (Compile / sourceManaged).value / "scalapb"
-    ),
     libraryDependencies ++= commonLibraryDependencies
   )
 

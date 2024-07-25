@@ -112,8 +112,7 @@ object ML0Service {
         override def validateData(
           state:   DataState[OnChain, CalculatedState],
           updates: NonEmptyList[Signed[TodoUpdate]]
-        )(implicit context: L0NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] =
-          state.verify(updates)(validator)
+        )(implicit context: L0NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] = ???
 
         override def validateUpdate(update: TodoUpdate)(implicit
           context: L0NodeContext[F]
@@ -122,11 +121,10 @@ object ML0Service {
         override def combine(
           state:   DataState[OnChain, CalculatedState],
           updates: List[Signed[TodoUpdate]]
-        )(implicit context: L0NodeContext[F]): F[DataState[OnChain, CalculatedState]] =
-          state.insert(updates.toSortedSet)(combiner)
+        )(implicit context: L0NodeContext[F]): F[DataState[OnChain, CalculatedState]] = ???
 
         override def routes(implicit context: L0NodeContext[F]): HttpRoutes[F] =
-          new ML0CustomRoutes[F](checkpointService).public
+          new ML0CustomRoutes[F].public
       }
     )
 }

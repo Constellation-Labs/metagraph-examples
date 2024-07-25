@@ -40,26 +40,6 @@ object Main
     implicit0(json2bin: JsonSerializer[IO])          <- JsonBinaryCodec.forSync[IO].asResource
     implicit0(hasher: Hasher[IO])                    <- Hasher.forJson[IO].pure[IO].asResource
     implicit0(sp: SecurityProvider[IO])              <- SecurityProvider.forAsync[IO]
-//    _                                                <- makePeriodicDaemon.asResource
-//    _                                                <- makePeriodicConfigDaemon(config).asResource
     l0Service <- ML0Service.make[IO].asResource
   } yield l0Service).some
-
-  private def makePeriodicDaemon(implicit sup: Supervisor[IO], logger: Logger[IO]): IO[Unit] =
-    Daemon
-      .periodic[IO](
-        logger.info("[Daemon] Hello from the scheduler!"),
-        15.seconds
-      )
-      .start
-
-  private def makePeriodicConfigDaemon(
-    config: ApplicationConfig
-  )(implicit sup: Supervisor[IO], logger: Logger[IO]): IO[Unit] =
-    Daemon
-      .periodic[IO](
-        logger.info(s"[Daemon] ${config.ml0Daemon.msg}"),
-        config.ml0Daemon.idleTime
-      )
-      .start
 }

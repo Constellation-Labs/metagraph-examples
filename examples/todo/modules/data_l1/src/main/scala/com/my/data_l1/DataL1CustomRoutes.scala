@@ -18,23 +18,7 @@ import org.http4s.HttpRoutes
 class DataL1CustomRoutes[F[_]: Async: JsonSerializer](implicit context: L1NodeContext[F])
     extends MetagraphPublicRoutes[F] {
 
-  protected val routes: HttpRoutes[F] = HttpRoutes.of[F] {
-    case GET -> Root / "current-time" =>
-      Clock[F].realTime
-        .map { now =>
-          ("epochMillis" -> now.toMillis).asJson.asRight[DataApplicationValidationError]
-        }
-        .flatMap(prepareResponse(_))
-
-    case GET -> Root / "active-tasks" / "all" =>
-      context.getOnChainState.map(_.map(_.activeTasks.toList)).flatMap(prepareResponse(_))
-
-    case GET -> Root / "snapshot" / "global" / "latest" =>
-      context.getLatestGlobalSnapshot.flatMap(prepareResponse(_))
-
-    case GET -> Root / "snapshot" / "currency" / "latest" =>
-      context.getLatestCurrencySnapshot.flatMap(prepareResponse(_))
-  }
+  protected val routes: HttpRoutes[F] = HttpRoutes.empty
 }
 
 object DataL1CustomRoutes {

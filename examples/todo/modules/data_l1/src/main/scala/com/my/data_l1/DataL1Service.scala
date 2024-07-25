@@ -93,13 +93,7 @@ object DataL1Service {
 
         override def validateUpdate(
           update: TodoUpdate
-        )(implicit context: L1NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] =
-          context.getOnChainState.flatMap {
-            _.fold(
-              err => err.invalidNec[Unit].pure[F],
-              onchain => validator.verify(onchain, update)
-            )
-          }
+        )(implicit context: L1NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] = ???
 
         override def combine(
           state:   DataState[OnChain, CalculatedState],

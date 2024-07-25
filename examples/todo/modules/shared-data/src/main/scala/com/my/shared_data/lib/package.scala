@@ -17,19 +17,9 @@ import com.my.shared_data.lib.CirceOps.implicits._
 import com.my.shared_data.lib.OrderedOps.implicits._
 import com.my.shared_data.schema.Updates.TodoUpdate
 
-import com.google.protobuf.ByteString
-
 package object lib {
 
   object syntax {
-
-    implicit class HexOps(hex: Hex) {
-      def toByteString: ByteString = ByteString.copyFrom(hex.toBytes)
-    }
-
-    implicit class ByteArrayOps(arr: Array[Byte]) {
-      def toByteString: ByteString = ByteString.copyFrom(arr)
-    }
 
     implicit class ListSignedUpdateOps(lst: List[Signed[TodoUpdate]]) {
       def toSortedSet: SortedSet[Signed[TodoUpdate]] = SortedSet(lst: _*)
@@ -44,9 +34,7 @@ package object lib {
           .map {
             _.flatMap { block =>
               block.updates.toList.collect { case s: U =>
-                val flightUpdate = s.value.asInstanceOf[U]
-                val proofs = s.proofs
-                Signed(flightUpdate, proofs)
+                Signed(s.value.asInstanceOf[U], s.proofs)
               }
             }.distinct
           }
