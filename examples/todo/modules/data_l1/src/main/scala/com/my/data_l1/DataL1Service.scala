@@ -11,6 +11,7 @@ import org.tessellation.currency.dataApplication.dataApplication.{
 }
 import org.tessellation.json.JsonSerializer
 import org.tessellation.schema.SnapshotOrdinal
+import org.tessellation.security.Hasher
 import org.tessellation.security.hash.Hash
 import org.tessellation.security.signature.Signed
 import org.tessellation.security.signature.Signed._
@@ -26,7 +27,7 @@ import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 
 object DataL1Service {
 
-  def make[F[+_]: Async: JsonSerializer]: F[BaseDataApplicationL1Service[F]] =
+  def make[F[+_]: Async: JsonSerializer: Hasher]: F[BaseDataApplicationL1Service[F]] =
     for {
       validator <- Async[F].pure(DataL1Validator.make[F])
       dataApplicationL1Service = makeBaseApplicationL1Service(validator)

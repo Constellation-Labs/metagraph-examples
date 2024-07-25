@@ -39,7 +39,9 @@ object DataL1NodeContext {
               .traverse { part =>
                 JsonBinaryCodec[F]
                   .deserialize[OnChain](part.onChainState)
-                  .map(_.leftMap(_ => Errors.DataL1CtxFailedToDecodeState: DataApplicationValidationError))
+                  .map(_.leftMap { e =>
+                    Errors.DataL1CtxFailedToDecodeState(e.getMessage): DataApplicationValidationError
+                  })
               }
           }
           .value
@@ -68,8 +70,8 @@ object DataL1NodeContext {
     }
 
     @derive(decoder, encoder)
-    case object DataL1CtxFailedToDecodeState extends DataApplicationValidationError {
-      val message = "An error was encountered while decoding the state from L1 node context"
+    case class DataL1CtxFailedToDecodeState(e: String) extends DataApplicationValidationError {
+      val message = s"An error was encountered while decoding the state from L1 node context: $e"
     }
 
     @derive(decoder, encoder)

@@ -102,9 +102,11 @@ object ML0Service {
           A: Applicative[F]
         ): F[Unit] =
           for {
-            _ <- Logger[F].debug("Evaluating onSnapshotConsensusResult")
-            numberOfUpdates = snapshot.signed.value.countUpdates
-            _ <- Logger[F].info(s"Got $numberOfUpdates updates for ordinal: ${snapshot.ordinal.value}")
+            _               <- Logger[F].debug("Evaluating onSnapshotConsensusResult")
+            numberOfUpdates <- snapshot.signed.value.countUpdates
+            _ <- Logger[F].info(
+              s"[onSnapshotConsensusResult] Got $numberOfUpdates updates for ordinal: ${snapshot.ordinal.value}"
+            )
           } yield ()
 
         override def validateData(
@@ -123,7 +125,8 @@ object ML0Service {
         )(implicit context: L0NodeContext[F]): F[DataState[OnChain, CalculatedState]] =
           state.insert(updates.toSortedSet)(combiner)
 
-        override def routes(implicit context: L0NodeContext[F]): HttpRoutes[F] = new ML0CustomRoutes[F](checkpointService).public
+        override def routes(implicit context: L0NodeContext[F]): HttpRoutes[F] =
+          new ML0CustomRoutes[F](checkpointService).public
       }
     )
 }

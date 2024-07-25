@@ -12,6 +12,7 @@ import com.my.shared_data.lib.MetagraphPublicRoutes
 
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
+import io.circe.syntax.EncoderOps
 import org.http4s.HttpRoutes
 
 class DataL1CustomRoutes[F[_]: Async: JsonSerializer](implicit context: L1NodeContext[F])
@@ -21,7 +22,7 @@ class DataL1CustomRoutes[F[_]: Async: JsonSerializer](implicit context: L1NodeCo
     case GET -> Root / "current-time" =>
       Clock[F].realTime
         .map { now =>
-          ("epochMillis" -> now.toMillis).asRight[DataApplicationValidationError]
+          ("epochMillis" -> now.toMillis).asJson.asRight[DataApplicationValidationError]
         }
         .flatMap(prepareResponse(_))
 

@@ -69,7 +69,7 @@ object ML0NodeContext {
 
     implicit class dataStateOps[F[_]: Async: SecurityProvider](
       dataState: DataState[OnChain, CalculatedState]
-    ) {
+    )(implicit ctx: L0NodeContext[F]) {
 
       def insert(batch: SortedSet[Signed[TodoUpdate]])(implicit
         ev: SignedUpdateReducer[F, TodoUpdate, DataState[OnChain, CalculatedState]]

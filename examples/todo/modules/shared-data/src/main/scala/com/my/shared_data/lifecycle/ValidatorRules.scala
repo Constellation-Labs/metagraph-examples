@@ -5,6 +5,8 @@ import cats.effect.{Async, Clock}
 import cats.implicits.toFunctorOps
 import cats.syntax.validated._
 
+import scala.concurrent.duration.DurationInt
+
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 
@@ -20,7 +22,7 @@ object ValidatorRules {
     dueDate: Long
   ): F[DataApplicationValidationErrorOr[Unit]] =
     Clock[F].realTime.map { now =>
-      Validated.condNec(now.toMillis < dueDate, (), Errors.TaskDueDateInPast)
+      Validated.condNec((now + 1.hours).toMillis < dueDate, (), Errors.TaskDueDateInPast)
     }
 
   def taskDoesNotExist(
@@ -41,8 +43,9 @@ object ValidatorRules {
     update.optStatus match {
       case Some(status) =>
         status match {
-          case TaskStatus.Closed => Errors.InvalidStatusForModify.invalidNec
-          case _                 => ().validNec
+          case TaskStatus.Complete => Errors.InvalidStatusForModify.invalidNec
+          case TaskStatus.Closed   => Errors.InvalidStatusForModify.invalidNec
+          case _                   => ().validNec
         }
       case None => ().validNec
     }
@@ -61,7 +64,7 @@ object ValidatorRules {
 
     @derive(decoder, encoder)
     case object TaskDueDateInPast extends DataApplicationValidationError {
-      val message = s"The given task has a due date in the past"
+      val message = s"Task due date must be at least 1 hour in the future."
     }
 
     @derive(decoder, encoder)

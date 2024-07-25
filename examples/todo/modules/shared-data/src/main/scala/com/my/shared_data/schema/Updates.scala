@@ -12,7 +12,7 @@ object Updates {
 
   @derive(decoder, encoder)
   final case class CreateTask(
-    dueDate:     Long,
+    dueDate:     String,
     description: String,
     optStatus:   Option[TaskStatus]
   ) extends TodoUpdate
@@ -21,7 +21,7 @@ object Updates {
   final case class ModifyTask(
     id:         String,
     optStatus:  Option[TaskStatus],
-    optDueDate: Option[Long]
+    optDueDate: Option[String]
   ) extends TodoUpdate
 
   @derive(decoder, encoder)

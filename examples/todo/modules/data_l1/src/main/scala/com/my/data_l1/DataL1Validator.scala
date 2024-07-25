@@ -7,6 +7,7 @@ import cats.syntax.validated._
 
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import org.tessellation.security.Hasher
 
 import com.my.shared_data.lib.UpdateValidator
 import com.my.shared_data.lifecycle.ValidatorRules
@@ -18,7 +19,7 @@ trait DataL1Validator[F[_], U, T] extends UpdateValidator[F, U, T]
 
 object DataL1Validator {
 
-  def make[F[_]: Async]: DataL1Validator[F, TodoUpdate, OnChain] =
+  def make[F[_]: Async: Hasher]: DataL1Validator[F, TodoUpdate, OnChain] =
     new DataL1Validator[F, TodoUpdate, OnChain] {
 
       override def verify(state: OnChain, update: TodoUpdate): F[DataApplicationValidationErrorOr[Unit]] =
@@ -34,23 +35,21 @@ object DataL1Validator {
       ): OnChain => F[DataApplicationValidationErrorOr[Unit]] = (state: OnChain) =>
         for {
           id   <- generateId(update)
-          res1 <- ValidatorRules.dueDateInFuture(update.dueDate)
+          res1 <- ValidatorRules.dueDateInFuture(BigInt(update.dueDate).longValue)
           res2 = ValidatorRules.taskDoesNotExist(id, state)
         } yield List(res1, res2).combineAll
 
       private def modifyTask(
         update: ModifyTask
       ): OnChain => F[DataApplicationValidationErrorOr[Unit]] = (state: OnChain) =>
-        (update.optDueDate match {
-          case Some(newDate) => ValidatorRules.dueDateInFuture(newDate)
-          case None          => ().validNec[DataApplicationValidationError].pure[F]
-        }).map { res1 =>
-          List(
-            res1,
-            ValidatorRules.taskDoesExist(update.id, state),
-            ValidatorRules.hasValidStatus(update)
-          ).combineAll
-        }
+        for {
+          res1 <- update.optDueDate match {
+            case Some(newDate) => ValidatorRules.dueDateInFuture(BigInt(newDate).longValue)
+            case None          => ().validNec[DataApplicationValidationError].pure[F]
+          }
+          res2 = ValidatorRules.taskDoesExist(update.id, state)
+          res3 = ValidatorRules.hasValidStatus(update)
+        } yield List(res1, res2, res3).combineAll
 
       private def completeTask(
         update: CompleteTask
