@@ -34,17 +34,16 @@ object CalculatedStateService {
         override def set(
           snapshotOrdinal: SnapshotOrdinal,
           state          : SocialCalculatedState
-        ): F[Boolean] = for {
-          _ <- externalStorageService.set(snapshotOrdinal, state)
-          response <- stateRef.update { currentState =>
-            val currentCalculatedState = currentState.state
-            val updatedUsers = state.users.foldLeft(currentCalculatedState.users) {
-              case (acc, (address, value)) =>
-                acc.updated(address, value)
-            }
-            CalculatedState(snapshotOrdinal, SocialCalculatedState(updatedUsers))
-          }.as(true)
-        } yield response
+        ): F[Boolean] = stateRef.modify { currentState =>
+          val currentCalculatedState = currentState.state
+          val updatedUsers = state.users.foldLeft(currentCalculatedState.users) {
+            case (acc, (address, value)) =>
+              acc.updated(address, value)
+          }
+          val newState = CalculatedState(snapshotOrdinal, SocialCalculatedState(updatedUsers))
+
+          newState -> externalStorageService.set(snapshotOrdinal, state).as(true)
+        }.flatten
 
         override def hash(
           state: SocialCalculatedState

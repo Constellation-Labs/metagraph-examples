@@ -1,4 +1,4 @@
-Metagraph - Data API - Social
+Metagraph - Data Application - Social
 =============================
 
 This example demonstrates a basic social media use case using the Data API. In the example, a client can send four types of signed data updates to a metagraph: one to create a post, another to edit a post, another to delete a post, and another to subscribe to a user. These updates are validated before being merged into the snapshot state.
@@ -9,7 +9,9 @@ Here's how the social media system works:
 -   Each user can subscribe to other users to follow their posts.
 -   Posts and subscriptions are validated to ensure their integrity and consistency.
 -   Users cannot create duplicate posts with the same content.
-
+-   This example persists the calculatedState in an external database, in this example PostgresSQL.
+-   To use external storage, we've created a new service in the `Main.scala` files of both layers: l0 and data-l1. This new service implements the trait `ExternalStorageService`. Our `CalculatedStateService` receives an implementation of `ExternalStorageService` and calls the function to set the calculated state externally when we call the set function of `CalculatedStateService`. This function also was updated to work atomically.  
+-   For more information, please refer to the section `Persisting User Calculated State to PostgreSQL`.
 Template
 --------
 
@@ -47,65 +49,15 @@ The methods of the DataApplication are invoked in the following sequence:
 
 For a more detailed understanding, please refer to the [complete documentation](https://docs.constellationnetwork.io/sdk/frameworks/currency/data-api) on the Data API.
 
-### Lifecycle Functions
-
-#### -> `validateUpdate`
-
--   This method initiates the initial validation of updates on the L1 layer. Due to a lack of contextual information (state), its validation capabilities are constrained. Any errors arising from this method result in a 500 response from the `/data` POST endpoint.
-
-#### -> `validateData`
-
--   This method validates data on the L0 layer, with access to contextual information, including the current state. In this example, we ensure that the provided address matches the one that signed the message. Additionally, we verify the most recent update timestamp to prevent the acceptance of outdated or duplicated data.
-
-#### -> `combine`
-
--   This method takes validated data and the prior state, combining them to produce the new state. In this instance, we update the post information or subscriptions in the state based on the validated update.
-
-#### -> `dataEncoder` and `dataDecoder`
-
--   These are the encoder/decoder components used for incoming updates.
-
-#### -> `calculatedStateEncoder`
-
--   This encoder is employed for the calculatedState.
-
-#### -> `signedDataEntityDecoder`
-
--   This function handles the parsing of request body formats (JSON, string, xml) into a `Signed[Update]` class.
-
-#### -> `serializeBlock` and `deserializeBlock`
-
--   The serialize function accepts the block object and converts it into a byte array for storage within the snapshot. The deserialize function is responsible for deserializing into Blocks.
-
-#### -> `serializeState` and `deserializeState`
-
--   The serialize function accepts the state object and converts it into a byte array for storage within the snapshot. The deserialize function is responsible for deserializing into State.
-
-#### -> `serializeUpdate` and `deserializeUpdate`
-
--   The serialize function accepts the update object and converts it into a byte array for storage within the snapshot. The deserialize function is responsible for deserializing into Updates.
-
-#### -> `setCalculatedState`
-
--   This function sets the calculatedState. You can store this as a variable in memory or use external services such as databases. In this example, we use in-memory storage.
-
-#### -> `getCalculatedState`
-
--   This function retrieves the calculated state.
-
-#### -> `hashCalculatedState`
-
--   This function creates a hash of the calculatedState to be validated when rebuilding this state, in case of restarting the metagraph.
-
-#### -> `routes`
+### Routes
 
 Customizes routes for our application.
 
 In this example, the following endpoints are implemented:
 
 -   GET `<metagraph l0 url>/data-application/users/:user_id/posts`: Returns all user posts.
--   GET `<metagraph l0 url>/data-application/posts/:user_id/subscriptions`: Returns the subscriptions of a user.
--   GET `<metagraph l0 url>/data-application/users/:user_id/feed`: Returns the user feed.
+-   GET `<metagraph l0 url>/data-application/users/:user_id/subscriptions`: Returns the subscriptions of a user.
+-   GET `<metagraph l0 url>/data-application/users/:user_id/feed`: Returns the user's feed of posts from their subscriptions.
 
 Scripts
 -------
@@ -168,6 +120,6 @@ To set up PostgreSQL using Euclid, add the following tasks to the end of `nodes.
 - name: Clean up init.sql file
   file:
   path: /tmp/init.sql
-  state: absent`
+  state: absent
 ```
 This setup ensures that the user calculated state is persisted in the PostgreSQL database, providing a reliable and scalable way to store and retrieve state data.

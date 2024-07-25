@@ -21,6 +21,42 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateService[F]) extends Http4sDsl[F] with PublicRoutes[F] {
   implicit val logger: SelfAwareStructuredLogger[F] = Slf4jLogger.getLogger[F]
 
+  @derive(decoder, encoder)
+  case class UserFeedPost(userId: Address, userPost: UserPost)
+
+  private def getAllUsersWithPosts: F[Response[F]] = {
+    calculatedStateService.get
+      .map(_.state)
+      .map { state =>
+        state.users.filter { info =>
+            val (_, userInfo) = info
+            userInfo.posts.nonEmpty
+          }
+          .keySet
+      }
+      .flatMap { existingUsers =>
+        Ok(existingUsers)
+      }
+  }
+
+  private def getAllPosts: F[Response[F]] = {
+    calculatedStateService.get
+      .map(_.state)
+      .map { state =>
+        state.users
+          .map { info =>
+            val (address, userInfo) = info
+            userInfo.posts.map(UserFeedPost(address, _))
+          }
+          .toList
+          .flatten
+
+      }
+      .flatMap { allPosts =>
+        Ok(allPosts)
+      }
+  }
+
   private def getUserPosts(userId: Address): F[Response[F]] = {
     calculatedStateService.get
       .map(_.state)
@@ -40,9 +76,6 @@ case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateSer
   }
 
   private def getUserFeed(userId: Address): F[Response[F]] = {
-    @derive(decoder, encoder)
-    case class UserFeedPost(userId: Address, userPost: UserPost)
-
     for {
       calculatedState <- calculatedStateService.get
       userInformation = calculatedState.state.users
@@ -61,6 +94,8 @@ case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateSer
   }
 
   private val routes: HttpRoutes[F] = HttpRoutes.of[F] {
+    case GET -> Root / "users" => getAllUsersWithPosts
+    case GET -> Root / "posts" => getAllPosts
     case GET -> Root / "users" / AddressVar(userId) / "posts" => getUserPosts(userId)
     case GET -> Root / "users" / AddressVar(userId) / "subscriptions" => getUserSubscriptions(userId)
     case GET -> Root / "users" / AddressVar(userId) / "feed" => getUserFeed(userId)
