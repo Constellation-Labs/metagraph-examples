@@ -13,9 +13,26 @@ import com.my.shared_data.schema.CalculatedState
 
 import org.http4s.HttpRoutes
 
-class ML0CustomRoutes[F[_]: Async: JsonSerializer](
+class ML0CustomRoutes[F[_]: Async: JsonSerializer](calculatedStateService: CheckpointService[F, CalculatedState])(
   implicit context: L0NodeContext[F]
 ) extends MetagraphPublicRoutes[F] {
 
-  protected val routes: HttpRoutes[F] = HttpRoutes.empty
+  protected val routes: HttpRoutes[F] = HttpRoutes.of[F] {
+    case GET -> Root / "active-tasks" / "all" =>
+      context.getOnChainState.map(_.map(_.activeTasks.toList)).flatMap(prepareResponse(_))
+
+    case GET -> Root / "archive-tasks" / "all" =>
+      calculatedStateService.get
+        .map(_.state.history.toList.asRight[DataApplicationValidationError])
+        .flatMap(prepareResponse(_))
+
+    case GET -> Root / "snapshot" / "currency" / "latest" =>
+      context.getLatestCurrencySnapshot.flatMap(prepareResponse(_))
+
+    case GET -> Root / "snapshot" / "currency" / SnapshotOrdinalVar(ordinal) =>
+      context.getCurrencySnapshotAt(ordinal).flatMap(prepareResponse(_))
+
+    case GET -> Root / "snapshot" / "currency" / SnapshotOrdinalVar(ordinal) / "count-updates" =>
+      context.countUpdatesInSnapshotAt(ordinal).flatMap(prepareResponse(_))
+  }
 }
