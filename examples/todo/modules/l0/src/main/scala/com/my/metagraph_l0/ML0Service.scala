@@ -112,7 +112,8 @@ object ML0Service {
         override def validateData(
           state:   DataState[OnChain, CalculatedState],
           updates: NonEmptyList[Signed[TodoUpdate]]
-        )(implicit context: L0NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] = ???
+        )(implicit context: L0NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] =
+          state.verify(updates)(validator)
 
         override def validateUpdate(update: TodoUpdate)(implicit
           context: L0NodeContext[F]
