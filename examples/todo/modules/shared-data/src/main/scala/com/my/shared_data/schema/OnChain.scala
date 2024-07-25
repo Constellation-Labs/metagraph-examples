@@ -6,8 +6,10 @@ import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 
 @derive(decoder, encoder)
-final case class OnChain() extends DataOnChainState
+final case class OnChain(
+  activeTasks: Map[String, TaskRecord]
+) extends DataOnChainState
 
 object OnChain {
-  def genesis: OnChain = ???
+  val genesis: OnChain = OnChain(Map.empty)
 }
