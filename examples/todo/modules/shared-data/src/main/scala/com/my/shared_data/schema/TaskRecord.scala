@@ -2,11 +2,10 @@ package com.my.shared_data.schema
 
 import cats.effect.Async
 import cats.implicits.toFunctorOps
-
+import com.my.shared_data.schema.Updates.CreateTask
 import org.tessellation.schema.SnapshotOrdinal
 import org.tessellation.schema.address.Address
 import org.tessellation.security.Hasher
-
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 import io.circe.generic.extras.Configuration
@@ -22,6 +21,13 @@ final case class TaskRecord(
   status:             TaskStatus,
   reporter:           Address
 )
+
+object TaskRecord {
+
+  def generateId[F[_]: Async: Hasher](update: CreateTask): F[String] =
+    Hasher[F].hash(update).map(_.value)
+
+}
 
 sealed trait TaskStatus
 

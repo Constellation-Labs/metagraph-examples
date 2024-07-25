@@ -121,7 +121,8 @@ object ML0Service {
         override def combine(
           state:   DataState[OnChain, CalculatedState],
           updates: List[Signed[TodoUpdate]]
-        )(implicit context: L0NodeContext[F]): F[DataState[OnChain, CalculatedState]] = ???
+        )(implicit context: L0NodeContext[F]): F[DataState[OnChain, CalculatedState]] =
+          state.insert(updates.toSortedSet)(combiner)
 
         override def routes(implicit context: L0NodeContext[F]): HttpRoutes[F] =
           new ML0CustomRoutes[F].public
