@@ -10,7 +10,6 @@
     </root>
 
     <logger name="org.tessellation" level="DEBUG" />
-    <logger name="xyz.kd5ujc" level="DEBUG" />
     <logger name="org.http4s.server.middleware.RequestLogger" level="OFF" />
     <logger name="org.http4s.server.middleware.ResponseLogger" level="OFF" />
     <logger name="org.http4s.client.middleware.RequestLogger" level="OFF" />
