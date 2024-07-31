@@ -1,0 +1,185 @@
+
+### Development Environment and Editor Settings
+# General IDEs and Editors
+.idea
+.idea/*
+.idea_modules
+.vscode
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Ensime (Scala)
+.ensime
+.ensime_lucene
+.ensime_cache
+.ensime_snapshot
+ensime.sbt
+
+# Metals (Scala)
+.metals/
+.bloop/
+
+# Other
+.DS_Store
+.history
+.*.swp
+*~
+.#*
+
+### Build and Project Artifacts
+# SBT (Scala Build Tool)
+.scala-build
+.sbtrc
+.sbt
+target
+.project
+.lib
+.bsp/
+.logs/
+
+# General Build Artifacts
+artifacts
+cache
+node_modules
+out/
+run/
+.env
+.authconfig.json
+.simba.json
+
+# Auto-copied by sbt-microsites
+docs/src/main/tut/contributing.md
+
+# Test Results
+tests.iml
+result*
+
+### Docker and Infrastructure Configurations
+# Docker Shared Configurations
+infra/docker/shared/genesis/*
+infra/docker/shared/jars/**/*.jar
+
+# Docker Monitoring (Prometheus, Grafana)
+infra/docker/monitoring/grafana/config/
+infra/docker/monitoring/prometheus/data/
+infra/docker/monitoring/prometheus/monitoring/
+
+# Source Specific
+source/metagraph-l0/genesis/*
+
+### Miscellaneous
+# Various Config Files and Directories
+.ignore
+.envrc
+.direnv/
+TAGS
+
+# Additional General Filters
+*.log
+*.tmp
+*.temp
+
+# Scala and SBT Specific
+project/target/
+project/project/
+
+# NodeJS Specific
+.npm
+package-lock.json
+yarn.lock
+dist/
+
+# Local Environment Specific
+.env.local
+.env.*.local
+
+# Security and Private Keys
+*.pem
+*.key
+deploy_rsa
+
+# Ansible Specific
+.ansible/
+*.retry
+inventory
+
+# Vagrant
+.vagrant/
+
+# Bash Scripts
+.bash_history
+
+# Docker
+docker-compose.override.yml
+
+# ------------------------
+# Python
+# ------------------------
+*.pyc
+*.pyo
+*.pyd
+__pycache__
+*.so
+*.egg
+*.egg-info
+dist
+build
+
+# ------------------------
+# Development environment
+# ------------------------
+.vscode
+.idea
+*.swp
+*.swo
+*.swn
+*~
+# PyCharm, IntelliJ IDEA
+/.idea/
+
+# ------------------------
+# Poetry
+# ------------------------
+# Ignore poetry lock file (create consistent environments locally)
+/poetry.lock
+
+# ------------------------
+# Virtual environment
+# ------------------------
+.venv/
+.env
+
+# ------------------------
+# Test and coverage reports
+# ------------------------
+.tox/
+.coverage
+.coverage.*
+# py.test cache
+.cache
+.pytest_cache/
+htmlcov/
+
+# ------------------------
+# IPython, Jupyter notebooks
+# ------------------------
+.ipynb_checkpoints/
+
+# ------------------------
+# Miscellaneous
+# ------------------------
+.DS_Store
+*.log
+*.pot
+# Ignore generated/compiled files
+*.mo
+*.py[co]
+/node_modules/
+/jspm_packages/
+
+# ------------------------
+# Directories to ignore
+# ------------------------
+ENV/
+env/

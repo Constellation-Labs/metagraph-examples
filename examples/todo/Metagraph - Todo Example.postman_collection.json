@@ -1,0 +1,975 @@
+{
+	"info": {
+		"_postman_id": "8c95f24a-72ed-42f3-956d-3aaf9e76406c",
+		"name": "Metagraph - Todo Example",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6098735"
+	},
+	"item": [
+		{
+			"name": "Data-L1",
+			"item": [
+				{
+					"name": "Post Data Update",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"value\": {\n        \"ModifyEvent\": {\n            \"data\": {\n                \"alert\": 100,\n                \"altBaro\": 101,\n                \"altGeom\": 102,\n                \"baroRate\": 103,\n                \"calcTrack\": 104,\n                \"category\": \"category\",\n                \"dbFlags\": 105,\n                \"emergency\": \"emergency\",\n                \"flight\": \"WILL_FAIL\",\n                \"geomRate\": 100,\n                \"gpsOkBefore\": \"gpsOkBefore\",\n                \"gpsOkLat\": \"45.957\",\n                \"gpsOkLon\": \"-12.324\",\n                \"gs\": \"gs\",\n                \"gva\": 107,\n                \"hexString\": \"hex\",\n                \"ias\": 108,\n                \"lastPosition\": {\n                    \"lat\": \"10\",\n                    \"lon\": \"12.345\",\n                    \"nic\": 10,\n                    \"rc\": 1,\n                    \"seenPos\": \"789\"\n                },\n                \"lat\": \"45.324\",\n                \"lon\": \"-32.984\",\n                \"mach\": \"mach\",\n                \"magHeading\": \"mag_heading\",\n                \"messages\": \"1\",\n                \"mlat\": [\n                    \"mlat_0\",\n                    \"mlat_1\"\n                ],\n                \"nacP\": 110,\n                \"nacV\": 111,\n                \"navHeading\": \"nav_heading\",\n                \"navModes\": [\n                    \"nav_mode_0\",\n                    \"nav_mode_1\"\n                ],\n                \"navQnh\": \"nav_qnh\",\n                \"nic\": 115,\n                \"nicBaro\": 116,\n                \"oat\": 116,\n                \"r\": \"r\",\n                \"rc\": 117,\n                \"roll\": \"roll\",\n                \"rrLat\": \"45\",\n                \"rrLon\": \"0\",\n                \"rssi\": \"rssi\",\n                \"sda\": 118,\n                \"seen\": \"seen\",\n                \"seenPos\": \"seen_pos\",\n                \"sil\": 119,\n                \"silType\": \"sil_type\",\n                \"spi\": 120,\n                \"squawk\": \"squawk\",\n                \"t\": \"t\",\n                \"tas\": 121,\n                \"tat\": 122,\n                \"tisb\": [\n                    \"tisb_0\",\n                    \"tisb_1\"\n                ],\n                \"track\": \"track\",\n                \"trackRate\": \"track_rate\",\n                \"trueHeading\": \"true_heading\",\n                \"typeTag\": \"type\",\n                \"version\": 123,\n                \"wd\": 124,\n                \"ws\": 125\n            }\n        }\n    },\n    \"proofs\": [\n        {\n            \"id\": \"7b3d2646a726b7b5b2fd09fecec9885ba1aebf77f48ab40b5ff290dd6130ef9a05b8b0f629c5dfa061cacb4eb1f51017c7a0191a5ee76a60bce5ec0ff48d6a93\",\n            \"signature\": \"304402203aaf049e9f2a75f57ce55accc4f3f20d4e0aaddcf839227afed1ce94ba2a75320220426091f66148e2f8c96c70d70afc56b364bfcbef169b26bc3fa595ddced4159a\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{data-l1-port}}/data",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{data-l1-port}}",
+							"path": [
+								"data"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - create",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"value\": {\n        \"CreateEvent\": {\n            \"data\": {\n                \"alert\": 100,\n                \"altBaro\": 101,\n                \"altGeom\": 102,\n                \"baroRate\": 103,\n                \"calcTrack\": 104,\n                \"category\": \"category\",\n                \"dbFlags\": 105,\n                \"emergency\": \"emergency\",\n                \"flight\": \"JAA123\",\n                \"geomRate\": 106,\n                \"gpsOkBefore\": \"gpsOkBefore\",\n                \"gpsOkLat\": \"45.957\",\n                \"gpsOkLon\": \"-12.324\",\n                \"gs\": \"gs\",\n                \"gva\": 107,\n                \"hexString\": \"hex\",\n                \"ias\": 108,\n                \"lastPosition\": {\n                    \"lat\": \"10\",\n                    \"lon\": \"12.345\",\n                    \"nic\": 10,\n                    \"rc\": 1,\n                    \"seenPos\": \"789\"\n                },\n                \"lat\": \"45.324\",\n                \"lon\": \"-32.984\",\n                \"mach\": \"mach\",\n                \"magHeading\": \"mag_heading\",\n                \"messages\": \"1\",\n                \"mlat\": [\n                    \"mlat_0\",\n                    \"mlat_1\"\n                ],\n                \"nacP\": 110,\n                \"nacV\": 111,\n                \"navHeading\": \"nav_heading\",\n                \"navModes\": [\n                    \"nav_mode_0\",\n                    \"nav_mode_1\"\n                ],\n                \"navQnh\": \"nav_qnh\",\n                \"nic\": 115,\n                \"nicBaro\": 116,\n                \"oat\": 116,\n                \"r\": \"r\",\n                \"rc\": 117,\n                \"roll\": \"roll\",\n                \"rrLat\": \"45\",\n                \"rrLon\": \"0\",\n                \"rssi\": \"rssi\",\n                \"sda\": 118,\n                \"seen\": \"seen\",\n                \"seenPos\": \"seen_pos\",\n                \"sil\": 119,\n                \"silType\": \"sil_type\",\n                \"spi\": 120,\n                \"squawk\": \"squawk\",\n                \"t\": \"t\",\n                \"tas\": 121,\n                \"tat\": 122,\n                \"tisb\": [\n                    \"tisb_0\",\n                    \"tisb_1\"\n                ],\n                \"track\": \"track\",\n                \"trackRate\": \"track_rate\",\n                \"trueHeading\": \"true_heading\",\n                \"typeTag\": \"type\",\n                \"version\": 123,\n                \"wd\": 124,\n                \"ws\": 125\n            }\n        }\n    },\n    \"proofs\": [\n        {\n            \"id\": \"7b3d2646a726b7b5b2fd09fecec9885ba1aebf77f48ab40b5ff290dd6130ef9a05b8b0f629c5dfa061cacb4eb1f51017c7a0191a5ee76a60bce5ec0ff48d6a93\",\n            \"signature\": \"304402201dbe3d7b727bae5501b9f9011de6ef379d4910f6b0f7b750fd1f70e74fc13673022074e4f1110802a6cee08ce8cd8a0a4b9a2abaa96bad9a1d3aad3c004288c8f6be\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{data-l1-port}}/data",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{data-l1-port}}",
+									"path": [
+										"data"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Thu, 11 Apr 2024 18:53:10 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "75"
+								},
+								{
+									"key": "X-Id",
+									"value": "b1cf4d017eedb3e187b4d17cef9bdbcfdb2e57b26e346e9186da3a7a2b9110d73481fedbc6de23db51fb932371c54b02fff3388712dcb1e902870da7fa472f66"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"hash\": \"f11c2dc80c99edc33200162ef057b7f75b1845a24641da77fd8a20ee65513fb3\"\n}"
+						},
+						{
+							"name": "Success - modify",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"value\": {\n        \"ModifyEvent\": {\n            \"data\": {\n                \"alert\": 100,\n                \"altBaro\": 101,\n                \"altGeom\": 102,\n                \"baroRate\": 103,\n                \"calcTrack\": 104,\n                \"category\": \"category\",\n                \"dbFlags\": 105,\n                \"emergency\": \"emergency\",\n                \"flight\": \"JAA123\",\n                \"geomRate\": 100,\n                \"gpsOkBefore\": \"gpsOkBefore\",\n                \"gpsOkLat\": \"45.957\",\n                \"gpsOkLon\": \"-12.324\",\n                \"gs\": \"gs\",\n                \"gva\": 107,\n                \"hexString\": \"hex\",\n                \"ias\": 108,\n                \"lastPosition\": {\n                    \"lat\": \"10\",\n                    \"lon\": \"12.345\",\n                    \"nic\": 10,\n                    \"rc\": 1,\n                    \"seenPos\": \"789\"\n                },\n                \"lat\": \"45.324\",\n                \"lon\": \"-32.984\",\n                \"mach\": \"mach\",\n                \"magHeading\": \"mag_heading\",\n                \"messages\": \"2\",\n                \"mlat\": [\n                    \"mlat_0\",\n                    \"mlat_1\"\n                ],\n                \"nacP\": 110,\n                \"nacV\": 111,\n                \"navHeading\": \"nav_heading\",\n                \"navModes\": [\n                    \"nav_mode_0\",\n                    \"nav_mode_1\"\n                ],\n                \"navQnh\": \"nav_qnh\",\n                \"nic\": 115,\n                \"nicBaro\": 116,\n                \"oat\": 116,\n                \"r\": \"r\",\n                \"rc\": 117,\n                \"roll\": \"roll\",\n                \"rrLat\": \"45\",\n                \"rrLon\": \"0\",\n                \"rssi\": \"rssi\",\n                \"sda\": 118,\n                \"seen\": \"seen\",\n                \"seenPos\": \"seen_pos\",\n                \"sil\": 119,\n                \"silType\": \"sil_type\",\n                \"spi\": 120,\n                \"squawk\": \"squawk\",\n                \"t\": \"t\",\n                \"tas\": 121,\n                \"tat\": 122,\n                \"tisb\": [\n                    \"tisb_0\",\n                    \"tisb_1\"\n                ],\n                \"track\": \"track\",\n                \"trackRate\": \"track_rate\",\n                \"trueHeading\": \"true_heading\",\n                \"typeTag\": \"type\",\n                \"version\": 123,\n                \"wd\": 124,\n                \"ws\": 125\n            }\n        }\n    },\n    \"proofs\": [\n        {\n            \"id\": \"7b3d2646a726b7b5b2fd09fecec9885ba1aebf77f48ab40b5ff290dd6130ef9a05b8b0f629c5dfa061cacb4eb1f51017c7a0191a5ee76a60bce5ec0ff48d6a93\",\n            \"signature\": \"304402203aaf049e9f2a75f57ce55accc4f3f20d4e0aaddcf839227afed1ce94ba2a75320220426091f66148e2f8c96c70d70afc56b364bfcbef169b26bc3fa595ddced4159a\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{data-l1-port}}/data",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{data-l1-port}}",
+									"path": [
+										"data"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Apr 2024 18:57:55 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "102"
+								},
+								{
+									"key": "X-Id",
+									"value": "b1cf4d017eedb3e187b4d17cef9bdbcfdb2e57b26e346e9186da3a7a2b9110d73481fedbc6de23db51fb932371c54b02fff3388712dcb1e902870da7fa472f66"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 3,\n    \"message\": \"Invalid request body\",\n    \"retriable\": false,\n    \"details\": {\n        \"reason\": \"Invalid signature\"\n    }\n}"
+						},
+						{
+							"name": "Failure - modify before create",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"value\": {\n        \"ModifyEvent\": {\n            \"data\": {\n                \"alert\": 100,\n                \"altBaro\": 101,\n                \"altGeom\": 102,\n                \"baroRate\": 103,\n                \"calcTrack\": 104,\n                \"category\": \"category\",\n                \"dbFlags\": 105,\n                \"emergency\": \"emergency\",\n                \"flight\": \"JAA098\",\n                \"geomRate\": 106,\n                \"gpsOkBefore\": \"gpsOkBefore\",\n                \"gpsOkLat\": \"45.957\",\n                \"gpsOkLon\": \"-12.324\",\n                \"gs\": \"gs\",\n                \"gva\": 107,\n                \"hexString\": \"hex\",\n                \"ias\": 108,\n                \"lastPosition\": {\n                    \"lat\": \"10\",\n                    \"lon\": \"12.345\",\n                    \"nic\": 10,\n                    \"rc\": 1,\n                    \"seenPos\": \"789\"\n                },\n                \"lat\": \"45.324\",\n                \"lon\": \"-32.984\",\n                \"mach\": \"mach\",\n                \"magHeading\": \"mag_heading\",\n                \"messages\": \"1\",\n                \"mlat\": [\n                    \"mlat_0\",\n                    \"mlat_1\"\n                ],\n                \"nacP\": 110,\n                \"nacV\": 111,\n                \"navHeading\": \"nav_heading\",\n                \"navModes\": [\n                    \"nav_mode_0\",\n                    \"nav_mode_1\"\n                ],\n                \"navQnh\": \"nav_qnh\",\n                \"nic\": 115,\n                \"nicBaro\": 116,\n                \"oat\": 116,\n                \"r\": \"r\",\n                \"rc\": 117,\n                \"roll\": \"roll\",\n                \"rrLat\": \"45\",\n                \"rrLon\": \"0\",\n                \"rssi\": \"rssi\",\n                \"sda\": 118,\n                \"seen\": \"seen\",\n                \"seenPos\": \"seen_pos\",\n                \"sil\": 119,\n                \"silType\": \"sil_type\",\n                \"spi\": 120,\n                \"squawk\": \"squawk\",\n                \"t\": \"t\",\n                \"tas\": 121,\n                \"tat\": 122,\n                \"tisb\": [\n                    \"tisb_0\",\n                    \"tisb_1\"\n                ],\n                \"track\": \"track\",\n                \"trackRate\": \"track_rate\",\n                \"trueHeading\": \"true_heading\",\n                \"typeTag\": \"type\",\n                \"version\": 123,\n                \"wd\": 124,\n                \"ws\": 125\n            }\n        }\n    },\n    \"proofs\": [\n        {\n            \"id\": \"7b3d2646a726b7b5b2fd09fecec9885ba1aebf77f48ab40b5ff290dd6130ef9a05b8b0f629c5dfa061cacb4eb1f51017c7a0191a5ee76a60bce5ec0ff48d6a93\",\n            \"signature\": \"30440220068a6d6bffb718648b8286fef87cd587f9fe05c38fea301b443035123ef00db902207f849e028f955992c976055fbffcd1cc901a2b4b36c121277d0b2898e1ff7565\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{data-l1-port}}/data",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{data-l1-port}}",
+									"path": [
+										"data"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Apr 2024 18:50:41 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "98"
+								},
+								{
+									"key": "X-Id",
+									"value": "b1cf4d017eedb3e187b4d17cef9bdbcfdb2e57b26e346e9186da3a7a2b9110d73481fedbc6de23db51fb932371c54b02fff3388712dcb1e902870da7fa472f66"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 1,\n    \"message\": \"Unknown error\",\n    \"retriable\": true,\n    \"details\": {\n        \"reason\": \"key not found: JAA098\"\n    }\n}"
+						},
+						{
+							"name": "Failure - schema decoding",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"value\": {\n        \"ModifyEvent\": {\n            \"data\": {\n                \"alert\": 100,\n                \"altBaro\": 101,\n                \"altGeom\": 102,\n                \"baroRate\": 103,\n                \"calcTrack\": 104,\n                \"category\": \"category\",\n                \"dbFlags\": 105,\n                \"emergency\": \"emergency\",\n                \"flight\": \"JAA098\",\n                \"geomRate\": \"this_should_be_a_number\",\n                \"gpsOkBefore\": \"gpsOkBefore\",\n                \"gpsOkLat\": \"45.957\",\n                \"gpsOkLon\": \"-12.324\",\n                \"gs\": \"gs\",\n                \"gva\": 107,\n                \"hexString\": \"hex\",\n                \"ias\": 108,\n                \"lastPosition\": {\n                    \"lat\": \"10\",\n                    \"lon\": \"12.345\",\n                    \"nic\": 10,\n                    \"rc\": 1,\n                    \"seenPos\": \"789\"\n                },\n                \"lat\": \"45.324\",\n                \"lon\": \"-32.984\",\n                \"mach\": \"mach\",\n                \"magHeading\": \"mag_heading\",\n                \"messages\": \"1\",\n                \"mlat\": [\n                    \"mlat_0\",\n                    \"mlat_1\"\n                ],\n                \"nacP\": 110,\n                \"nacV\": 111,\n                \"navHeading\": \"nav_heading\",\n                \"navModes\": [\n                    \"nav_mode_0\",\n                    \"nav_mode_1\"\n                ],\n                \"navQnh\": \"nav_qnh\",\n                \"nic\": 115,\n                \"nicBaro\": 116,\n                \"oat\": 116,\n                \"r\": \"r\",\n                \"rc\": 117,\n                \"roll\": \"roll\",\n                \"rrLat\": \"45\",\n                \"rrLon\": \"0\",\n                \"rssi\": \"rssi\",\n                \"sda\": 118,\n                \"seen\": \"seen\",\n                \"seenPos\": \"seen_pos\",\n                \"sil\": 119,\n                \"silType\": \"sil_type\",\n                \"spi\": 120,\n                \"squawk\": \"squawk\",\n                \"t\": \"t\",\n                \"tas\": 121,\n                \"tat\": 122,\n                \"tisb\": [\n                    \"tisb_0\",\n                    \"tisb_1\"\n                ],\n                \"track\": \"track\",\n                \"trackRate\": \"track_rate\",\n                \"trueHeading\": \"true_heading\",\n                \"typeTag\": \"type\",\n                \"version\": 123,\n                \"wd\": 124,\n                \"ws\": 125\n            }\n        }\n    },\n    \"proofs\": [\n        {\n            \"id\": \"7b3d2646a726b7b5b2fd09fecec9885ba1aebf77f48ab40b5ff290dd6130ef9a05b8b0f629c5dfa061cacb4eb1f51017c7a0191a5ee76a60bce5ec0ff48d6a93\",\n            \"signature\": \"3045022100ee291d15a637b5c9d372ad1af0b8fa992ba3ed45fd2dd4d5d5c4156ab061f644022032adc03c1d1a507f2f41cc57ae9ed6b8a021479f505c6e37542365f504c4cdee\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{data-l1-port}}/data",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{data-l1-port}}",
+									"path": [
+										"data"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Apr 2024 18:53:00 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "149"
+								},
+								{
+									"key": "X-Id",
+									"value": "b1cf4d017eedb3e187b4d17cef9bdbcfdb2e57b26e346e9186da3a7a2b9110d73481fedbc6de23db51fb932371c54b02fff3388712dcb1e902870da7fa472f66"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 3,\n    \"message\": \"Invalid request body\",\n    \"retriable\": false,\n    \"details\": {\n        \"reason\": \"DecodingFailure at : Not an int32 value: this_should_be_a_number\"\n    }\n}"
+						},
+						{
+							"name": "Failure - does not increment counter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"value\": {\n        \"ModifyEvent\": {\n            \"data\": {\n                \"alert\": 100,\n                \"altBaro\": 101,\n                \"altGeom\": 102,\n                \"baroRate\": 103,\n                \"calcTrack\": 104,\n                \"category\": \"category\",\n                \"dbFlags\": 105,\n                \"emergency\": \"emergency\",\n                \"flight\": \"JAA123\",\n                \"geomRate\": 100,\n                \"gpsOkBefore\": \"gpsOkBefore\",\n                \"gpsOkLat\": \"45.957\",\n                \"gpsOkLon\": \"-12.324\",\n                \"gs\": \"gs\",\n                \"gva\": 107,\n                \"hexString\": \"hex\",\n                \"ias\": 108,\n                \"lastPosition\": {\n                    \"lat\": \"10\",\n                    \"lon\": \"12.345\",\n                    \"nic\": 10,\n                    \"rc\": 1,\n                    \"seenPos\": \"789\"\n                },\n                \"lat\": \"45.324\",\n                \"lon\": \"-32.984\",\n                \"mach\": \"mach\",\n                \"magHeading\": \"mag_heading\",\n                \"messages\": \"1\",\n                \"mlat\": [\n                    \"mlat_0\",\n                    \"mlat_1\"\n                ],\n                \"nacP\": 110,\n                \"nacV\": 111,\n                \"navHeading\": \"nav_heading\",\n                \"navModes\": [\n                    \"nav_mode_0\",\n                    \"nav_mode_1\"\n                ],\n                \"navQnh\": \"nav_qnh\",\n                \"nic\": 115,\n                \"nicBaro\": 116,\n                \"oat\": 116,\n                \"r\": \"r\",\n                \"rc\": 117,\n                \"roll\": \"roll\",\n                \"rrLat\": \"45\",\n                \"rrLon\": \"0\",\n                \"rssi\": \"rssi\",\n                \"sda\": 118,\n                \"seen\": \"seen\",\n                \"seenPos\": \"seen_pos\",\n                \"sil\": 119,\n                \"silType\": \"sil_type\",\n                \"spi\": 120,\n                \"squawk\": \"squawk\",\n                \"t\": \"t\",\n                \"tas\": 121,\n                \"tat\": 122,\n                \"tisb\": [\n                    \"tisb_0\",\n                    \"tisb_1\"\n                ],\n                \"track\": \"track\",\n                \"trackRate\": \"track_rate\",\n                \"trueHeading\": \"true_heading\",\n                \"typeTag\": \"type\",\n                \"version\": 123,\n                \"wd\": 124,\n                \"ws\": 125\n            }\n        }\n    },\n    \"proofs\": [\n        {\n            \"id\": \"7b3d2646a726b7b5b2fd09fecec9885ba1aebf77f48ab40b5ff290dd6130ef9a05b8b0f629c5dfa061cacb4eb1f51017c7a0191a5ee76a60bce5ec0ff48d6a93\",\n            \"signature\": \"3045022100e9f92c4b9a66aa403100e1f0765d6e6732010c73b5a8100fcf22795e5142dfc5022048bf8c8589db5973aab15e01450a3f098bdba62358496b8cd9a22314a7900dc1\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{data-l1-port}}/data",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{data-l1-port}}",
+									"path": [
+										"data"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Apr 2024 18:57:01 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "155"
+								},
+								{
+									"key": "X-Id",
+									"value": "b1cf4d017eedb3e187b4d17cef9bdbcfdb2e57b26e346e9186da3a7a2b9110d73481fedbc6de23db51fb932371c54b02fff3388712dcb1e902870da7fa472f66"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 3,\n    \"message\": \"Invalid request body\",\n    \"retriable\": false,\n    \"details\": {\n        \"reason\": \"Invalid data update, reason: Chain(UpdateFailsToAdvanceMessageCounter)\"\n    }\n}"
+						},
+						{
+							"name": "Failure - invalid signature",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"value\": {\n        \"ModifyEvent\": {\n            \"data\": {\n                \"alert\": 100,\n                \"altBaro\": 101,\n                \"altGeom\": 102,\n                \"baroRate\": 103,\n                \"calcTrack\": 104,\n                \"category\": \"category\",\n                \"dbFlags\": 105,\n                \"emergency\": \"emergency\",\n                \"flight\": \"JAA123\",\n                \"geomRate\": 100,\n                \"gpsOkBefore\": \"gpsOkBefore\",\n                \"gpsOkLat\": \"45.957\",\n                \"gpsOkLon\": \"-12.324\",\n                \"gs\": \"gs\",\n                \"gva\": 107,\n                \"hexString\": \"hex\",\n                \"ias\": 108,\n                \"lastPosition\": {\n                    \"lat\": \"10\",\n                    \"lon\": \"12.345\",\n                    \"nic\": 10,\n                    \"rc\": 1,\n                    \"seenPos\": \"789\"\n                },\n                \"lat\": \"45.324\",\n                \"lon\": \"-32.984\",\n                \"mach\": \"mach\",\n                \"magHeading\": \"mag_heading\",\n                \"messages\": \"2\",\n                \"mlat\": [\n                    \"mlat_0\",\n                    \"mlat_1\"\n                ],\n                \"nacP\": 110,\n                \"nacV\": 111,\n                \"navHeading\": \"nav_heading\",\n                \"navModes\": [\n                    \"nav_mode_0\",\n                    \"nav_mode_1\"\n                ],\n                \"navQnh\": \"nav_qnh\",\n                \"nic\": 115,\n                \"nicBaro\": 116,\n                \"oat\": 116,\n                \"r\": \"r\",\n                \"rc\": 117,\n                \"roll\": \"roll\",\n                \"rrLat\": \"45\",\n                \"rrLon\": \"0\",\n                \"rssi\": \"rssi\",\n                \"sda\": 118,\n                \"seen\": \"seen\",\n                \"seenPos\": \"seen_pos\",\n                \"sil\": 119,\n                \"silType\": \"sil_type\",\n                \"spi\": 120,\n                \"squawk\": \"squawk\",\n                \"t\": \"t\",\n                \"tas\": 121,\n                \"tat\": 122,\n                \"tisb\": [\n                    \"tisb_0\",\n                    \"tisb_1\"\n                ],\n                \"track\": \"track\",\n                \"trackRate\": \"track_rate\",\n                \"trueHeading\": \"true_heading\",\n                \"typeTag\": \"type\",\n                \"version\": 123,\n                \"wd\": 124,\n                \"ws\": 125\n            }\n        }\n    },\n    \"proofs\": [\n        {\n            \"id\": \"7b3d2646a726b7b5b2fd09fecec9885ba1aebf77f48ab40b5ff290dd6130ef9a05b8b0f629c5dfa061cacb4eb1f51017c7a0191a5ee76a60bce5ec0ff48d6a93\",\n            \"signature\": \"3045022100e9f92c4b9a66aa403100e1f0765d6e6732010c73b5a8100fcf22795e5142dfc5022048bf8c8589db5973aab15e01450a3f098bdba62358496b8cd9a22314a7900dc1\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{data-l1-port}}/data",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{data-l1-port}}",
+									"path": [
+										"data"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Apr 2024 18:57:55 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "102"
+								},
+								{
+									"key": "X-Id",
+									"value": "b1cf4d017eedb3e187b4d17cef9bdbcfdb2e57b26e346e9186da3a7a2b9110d73481fedbc6de23db51fb932371c54b02fff3388712dcb1e902870da7fa472f66"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 3,\n    \"message\": \"Invalid request body\",\n    \"retriable\": false,\n    \"details\": {\n        \"reason\": \"Invalid signature\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "All Active Tasks",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{data-l1-port}}/data-application/active-tasks/all",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{data-l1-port}}",
+							"path": [
+								"data-application",
+								"active-tasks",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current Time",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{data-l1-port}}/data-application/current-time",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{data-l1-port}}",
+							"path": [
+								"data-application",
+								"current-time"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Latest Metagraph Snapshot",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{data-l1-port}}/data-application/snapshot/currency/latest",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{data-l1-port}}",
+							"path": [
+								"data-application",
+								"snapshot",
+								"currency",
+								"latest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Latest Global Snapshot",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{data-l1-port}}/data-application/snapshot/global/latest",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{data-l1-port}}",
+							"path": [
+								"data-application",
+								"snapshot",
+								"global",
+								"latest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Node Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{data-l1-port}}/node/info",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{data-l1-port}}",
+							"path": [
+								"node",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cluster Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{data-l1-port}}/cluster/info",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{data-l1-port}}",
+							"path": [
+								"cluster",
+								"info"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Metagraph-L0",
+			"item": [
+				{
+					"name": "All Active Tasks",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{ml0-port}}/data-application/active-tasks/all",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{ml0-port}}",
+							"path": [
+								"data-application",
+								"active-tasks",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Archive Tasks",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{ml0-port}}/data-application/archive-tasks/all",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{ml0-port}}",
+							"path": [
+								"data-application",
+								"archive-tasks",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Latest Metagraph Snapshot Metadata",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{ml0-port}}/snapshots/latest/metadata",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{ml0-port}}",
+							"path": [
+								"snapshots",
+								"latest",
+								"metadata"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Latest Metagraph Snapshot",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{ml0-port}}/snapshots/latest",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{ml0-port}}",
+							"path": [
+								"snapshots",
+								"latest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Metagraph Snapshot by Ordinal",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{ml0-port}}/snapshots/13",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{ml0-port}}",
+							"path": [
+								"snapshots",
+								"13"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Node Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{ml0-port}}/node/info",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{ml0-port}}",
+							"path": [
+								"node",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cluster Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{ml0-port}}/cluster/info",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{ml0-port}}",
+							"path": [
+								"cluster",
+								"info"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Global-L0",
+			"item": [
+				{
+					"name": "Latest Global Snapshot Metadata",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"value\": {\n        \"CreateEvent\": {\n            \"data\": {\n                \"alert\": \"\",\n                \"altBaro\": 14637,\n                \"altGeom\": 28436,\n                \"baroRate\": 4002,\n                \"calcTrack\": 266,\n                \"category\": \"4dH\",\n                \"dbFlags\": 48,\n                \"emergency\": \"P92IJ\",\n                \"flight\": \"APR004\",\n                \"geomRate\": 1918,\n                \"gpsOkBefore\": \"TRUE\",\n                \"gpsOkLat\": 47.61,\n                \"gpsOkLon\": -122.33,\n                \"gs\": 0.3521788442,\n                \"gva\": 3,\n                \"hexString\": \"2ujEGX\",\n                \"ias\": 649,\n                \"lastPosition/lat\": 26.14,\n                \"lastPosition/lon\": 80.07,\n                \"lastPosition/rc\": 1035,\n                \"lastPosition/seenPos\": 74.07,\n                \"lat\": 47.61,\n                \"lon\": -122.33,\n                \"mach\": 0.939294887,\n                \"magHeading\": 0.3989627741,\n                \"messages\": 100,\n                \"mlat/0\": 0.1329714755,\n                \"mlat/1\": 0.9325362094,\n                \"mlat/2\": 0.1133183851,\n                \"nacP\": 9,\n                \"nacV\": 1,\n                \"navAltitudeFms\": 9051,\n                \"navAltitudeMcp\": 24319,\n                \"navHeading\": 0.112111298,\n                \"navModes/0\": \"jQAg\",\n                \"navModes/1\": \"IEep\",\n                \"navQnh\": 0.04466318632,\n                \"nic\": 6,\n                \"nicBaro\": \"\",\n                \"oat\": -21,\n                \"r\": 5,\n                \"rc\": 86,\n                \"roll\": 0.09109497885,\n                \"rrLat\": 47.61,\n                \"rrLon\": -122.33,\n                \"rssi\": 0.437224655,\n                \"sda\": 1,\n                \"seen\": 32,\n                \"seenPos\": 4,\n                \"sil\": \"\",\n                \"silType\": \"g2WGzcq8\",\n                \"spi\": 1,\n                \"squawk\": 7376,\n                \"t\": \"8TG\",\n                \"tas\": 373,\n                \"tat\": -12,\n                \"tisb/0\": \"EATSe\",\n                \"tisb/1\": \"SspgN\",\n                \"track\": 0.5418608812,\n                \"trackRate\": 0.6805056332,\n                \"trueHeading\": 0.437026095,\n                \"typeTag\": \"O2jU\",\n                \"version\": \"\",\n                \"wd\": 16,\n                \"ws\": 10\n            }\n        }\n    },\n    \"proofs\": [\n        {\n            \"id\": \"7b3d2646a726b7b5b2fd09fecec9885ba1aebf77f48ab40b5ff290dd6130ef9a05b8b0f629c5dfa061cacb4eb1f51017c7a0191a5ee76a60bce5ec0ff48d6a93\",\n            \"signature\": \"30440220445085352f527f00840f567cda002fb9591e9c290625f3dadc7e4de12127e5d2022074395cc308fa24f45479cd0b373eec433e3a483610990829e7028e32f50bcba6\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{gl0-port}}/global-snapshots/latest/metadata",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{gl0-port}}",
+							"path": [
+								"global-snapshots",
+								"latest",
+								"metadata"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Latest Global Snapshot",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{gl0-port}}/global-snapshots/latest",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{gl0-port}}",
+							"path": [
+								"global-snapshots",
+								"latest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Node Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{gl0-port}}/node/info",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{gl0-port}}",
+							"path": [
+								"node",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cluster Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{gl0-port}}/cluster/info",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{gl0-port}}",
+							"path": [
+								"cluster",
+								"info"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
