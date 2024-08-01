@@ -17,6 +17,7 @@ const CastVoteSchema = VoteSchema.extend({
 });
 
 type ICastVoteSchema = z.infer<typeof CastVoteSchema>;
+type IAPIResponse = { hash: string };
 
 export const castVote = async (values: ICastVoteSchema) => {
   const validatedFields = CastVoteSchema.safeParse(values);
@@ -47,7 +48,7 @@ export const castVote = async (values: ICastVoteSchema) => {
     };
   }
 
-  const responseData: [string, string] = await response.json();
+  const responseData: IAPIResponse = await response.json();
 
   console.log(responseData);
 
