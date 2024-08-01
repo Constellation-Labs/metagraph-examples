@@ -74,52 +74,129 @@ This example includes a script to generate, sign, and send data updates to the m
 Persisting User Calculated State to PostgreSQL
 ----------------------------------------------
 
-The metagraph will persist the user calculated state into an external PostgreSQL database. This PostgreSQL database requires a table called `calculated_states` with two columns: `ordinal` (number) and `state` (jsonb). The database credentials should be provided in `application.json`.
+The metagraph will store the user-calculated state in an external PostgreSQL database. This PostgreSQL database requires a table named calculated_states with two columns: ordinal (number) and state (jsonb). The database credentials should be specified in the application.json file.
 
-To set up PostgreSQL using Euclid, add the following tasks to the end of `nodes.ansible.yml` after the task `Starting Docker container`:
+To set up PostgreSQL using Euclid, you can customize your Dockerfile. Starting from version v0.13.0, Euclid supports running custom Dockerfiles.
 
-```yaml
-- name: Run PostgreSQL container
-  docker_container:
-    name: postgres-container
-    image: postgres
-    state: started
-  restart_policy: always
-  env:
-  POSTGRES_USER: social
-  POSTGRES_PASSWORD: social
-  POSTGRES_DB: social
-  networks:
-  - name: custom-network
-  published_ports:
-  - "5432:5432"
-  volumes:
-  - /var/lib/postgresql/data
+To do this, add the following content to a new file named `Dockerfile` in the directory: `infra/docker/custom/metagraph-base-image`.
+```dockerfile
+ARG TESSELLATION_VERSION_NAME
 
-- name: Wait for PostgreSQL to start
-  wait_for:
-  host: 127.0.0.1
-  port: 5432
-  delay: 10
-  timeout: 300
+FROM metagraph-ubuntu-${TESSELLATION_VERSION_NAME}
 
-- name: Create init.sql file with table creation script
-  copy:
-  dest: /tmp/init.sql
-  content: |
-    CREATE TABLE calculated_states (
-    ordinal BIGINT PRIMARY KEY,
-    state JSONB
-    );
-- name: Copy init.sql to container
-  command: docker cp /tmp/init.sql postgres-container:/docker-entrypoint-initdb.d/init.sql
+ARG SHOULD_BUILD_GLOBAL_L0
+ARG SHOULD_BUILD_DAG_L1
+ARG SHOULD_BUILD_METAGRAPH_L0
+ARG SHOULD_BUILD_CURRENCY_L1
+ARG SHOULD_BUILD_DATA_L1
+ARG TEMPLATE_NAME
 
-- name: Execute init.sql in container
-  command: docker exec -u postgres postgres-container psql social social -f /docker-entrypoint-initdb.d/init.sql
+ENV LC_ALL C.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
 
-- name: Clean up init.sql file
-  file:
-  path: /tmp/init.sql
-  state: absent
+COPY project/$TEMPLATE_NAME $TEMPLATE_NAME
+COPY global-l0/genesis/genesis.csv global-genesis.csv
+COPY metagraph-l0/genesis/genesis.csv metagraph-genesis.csv
+
+RUN mkdir shared_jars && mkdir shared_genesis
+
+RUN apt-get update && \
+    apt-get install -y \
+    postgresql postgresql-contrib curl && \
+    apt-get clean
+
+RUN set -e; \
+    if [ "$SHOULD_BUILD_GLOBAL_L0" = "true" ]; then \
+        mkdir global-l0 && \
+        cp global-l0.jar global-l0/global-l0.jar && \
+        cp cl-wallet.jar global-l0/cl-wallet.jar && \
+        cp cl-keytool.jar global-l0/cl-keytool.jar && \
+        mv global-genesis.csv global-l0/genesis.csv; \
+    fi
+
+RUN set -e; \
+    if [ "$SHOULD_BUILD_DAG_L1" = "true" ]; then \
+        mkdir dag-l1 && \
+        cp dag-l1.jar dag-l1/dag-l1.jar && \
+        cp cl-wallet.jar dag-l1/cl-wallet.jar && \
+        cp cl-keytool.jar dag-l1/cl-keytool.jar; \
+    fi
+
+RUN set -e; \
+    if [ "$SHOULD_BUILD_METAGRAPH_L0" = "true" ]; then \
+        mkdir metagraph-l0 && \
+        cp cl-wallet.jar metagraph-l0/cl-wallet.jar && \
+        cp cl-keytool.jar metagraph-l0/cl-keytool.jar && \
+        rm -r -f $TEMPLATE_NAME/modules/l0/target && \
+        cd $TEMPLATE_NAME && \
+        sbt currencyL0/assembly && \
+        cd .. && \
+        mv $TEMPLATE_NAME/modules/l0/target/scala-2.13/*.jar metagraph-l0/metagraph-l0.jar && \
+        mv metagraph-genesis.csv metagraph-l0/genesis.csv && \
+        cp metagraph-l0/metagraph-l0.jar shared_jars/metagraph-l0.jar && \
+        cp metagraph-l0/genesis.csv shared_genesis/genesis.csv; \
+    fi
+
+RUN set -e; \
+    if [ "$SHOULD_BUILD_CURRENCY_L1" = "true" ]; then \
+        mkdir currency-l1 && \
+        cp cl-wallet.jar currency-l1/cl-wallet.jar && \
+        cp cl-keytool.jar currency-l1/cl-keytool.jar && \
+        rm -r -f $TEMPLATE_NAME/modules/l1/target && \
+        cd $TEMPLATE_NAME && \
+        sbt currencyL1/assembly && \
+        cd .. && \
+        mv $TEMPLATE_NAME/modules/l1/target/scala-2.13/*.jar currency-l1/currency-l1.jar && \
+        cp currency-l1/currency-l1.jar shared_jars/currency-l1.jar; \
+    fi
+
+RUN set -e; \
+    if [ "$SHOULD_BUILD_DATA_L1" = "true" ]; then \
+        mkdir data-l1 && \
+        cp cl-wallet.jar data-l1/cl-wallet.jar && \
+        cp cl-keytool.jar data-l1/cl-keytool.jar && \
+        rm -r -f $TEMPLATE_NAME/modules/data_l1/target && \
+        cd $TEMPLATE_NAME && \
+        sbt dataL1/assembly && \
+        cd .. && \
+        mv $TEMPLATE_NAME/modules/data_l1/target/scala-2.13/*.jar data-l1/data-l1.jar && \
+        cp data-l1/data-l1.jar shared_jars/data-l1.jar; \
+    fi
+
+RUN rm -r -f cl-keytool.jar && \
+    rm -r -f cl-wallet.jar && \
+    rm -r -f global-l0.jar && \
+    rm -r -f dag-l1.jar && \
+    rm -r -f global-genesis.csv && \
+    rm -r -f metagraph-genesis.csv && \
+    rm -r -f tessellation && \
+    rm -r -f $TEMPLATE_NAME
+
+    # Environment variables for PostgreSQL
+ENV POSTGRES_USER=social \
+POSTGRES_PASSWORD=social \
+POSTGRES_DB=social
+
+# Expose PostgreSQL port
+EXPOSE 5432
+
+# Create the directory for init scripts and add the init.sql script
+RUN mkdir -p /docker-entrypoint-initdb.d && \
+    echo "CREATE TABLE calculated_states ( \
+             ordinal BIGINT PRIMARY KEY, \
+             state JSONB \
+         );" > /docker-entrypoint-initdb.d/init.sql && \
+    echo "GRANT ALL PRIVILEGES ON TABLE calculated_states TO $POSTGRES_USER;" >> /docker-entrypoint-initdb.d/init.sql
+
+# Start PostgreSQL and create the necessary table
+CMD service postgresql start && \
+    su - postgres -c "psql -c \"CREATE USER $POSTGRES_USER WITH PASSWORD '$POSTGRES_PASSWORD';\"" && \
+    su - postgres -c "psql -c \"CREATE DATABASE $POSTGRES_DB WITH OWNER $POSTGRES_USER;\"" && \
+    su - postgres -c "psql $POSTGRES_DB -f /docker-entrypoint-initdb.d/init.sql" && \
+    tail -f /dev/null
 ```
+
+This Dockerfile will install postgres individually in each container/node.
+
 This setup ensures that the user calculated state is persisted in the PostgreSQL database, providing a reliable and scalable way to store and retrieve state data.

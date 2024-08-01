@@ -32,7 +32,6 @@ metals.sbt
 .metals/
 site/
 .bsp/
-scripts/
 /logs/
 .envrc
 .direnv/
