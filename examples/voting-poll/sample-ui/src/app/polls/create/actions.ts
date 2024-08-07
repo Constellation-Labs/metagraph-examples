@@ -17,6 +17,7 @@ const CreatePollSchema = PollSchema.extend({
 });
 
 type ICreatePollSchema = z.infer<typeof CreatePollSchema>;
+type IAPIResponse = { hash: string };
 
 export const createPoll = async (values: ICreatePollSchema) => {
   const validatedFields = CreatePollSchema.safeParse(values);
@@ -51,7 +52,7 @@ export const createPoll = async (values: ICreatePollSchema) => {
     };
   }
 
-  const responseData: [string, string] = await response.json();
+  const responseData: IAPIResponse = await response.json();
 
   console.log(responseData);
 
