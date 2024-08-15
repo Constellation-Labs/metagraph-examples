@@ -92,7 +92,7 @@ The methods of the DataApplication are:
 -   `hashCalculatedState`
 -   `routes`
 
-For a more detailed understanding, please refer to the [complete documentation](https://docs.constellationnetwork.io/sdk/frameworks/currency/data-api) on the Data API.
+For a more detailed understanding, please refer to the [complete documentation](https://docs.constellationnetwork.io/sdk/metagraph-framework/data/overview) on the Data API.
 
 ### Lifecycle Functions
 
