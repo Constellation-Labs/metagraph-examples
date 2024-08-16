@@ -29,8 +29,8 @@ const EnvironmentContext = makeEnvironmentContext({
   nodeEnv: () => getEnvOrError<string>('NODE_ENV'),
   baseApiUrl: () =>
     getEnvOrError<string>(
-      'BASE_API_URL',
-      ...expandByCommonClientPrefixes('BASE_API_URL')
+      'METAGRAPH_L0_URL',
+      ...expandByCommonClientPrefixes('METAGRAPH_L0_URL')
     ),
   globalL0Url: () => getEnvOrError<string>('GLOBAL_L0_URL'),
   metagraphL1DataUrl: () => getEnvOrError<string>('METAGRAPH_L1_DATA_URL')
