@@ -1,30 +1,34 @@
 package com.my.nft.shared_data.validations
 
+import cats.effect.Sync
 import cats.syntax.all._
-import cats.syntax.option.catsSyntaxOptionId
-import com.my.nft.shared_data.errors.Errors.valid
-import com.my.nft.shared_data.types.Types._
-import com.my.nft.shared_data.validations.TypeValidators._
+
 import org.tessellation.currency.dataApplication.DataState
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.schema.address.Address
 
+import com.my.nft.shared_data.errors.Errors.valid
+import com.my.nft.shared_data.schema._
+import com.my.nft.shared_data.validations.TypeValidators._
+
 object Validations {
-  def mintCollectionValidations(
-    update    : MintCollection,
+
+  def mintCollectionValidations[F[_]: Sync](
+    update:     MintCollection,
     maybeState: Option[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]]
-  ): DataApplicationValidationErrorOr[Unit] =
+  ): F[DataApplicationValidationErrorOr[Unit]] =
     maybeState match {
       case Some(state) =>
-        validateIfCollectionIsUnique(update, state)
-          .productR(validateStringMaxSize(update.name, 64, "name"))
+        validateIfCollectionIsUnique(update, state).map {
+          _.productR(validateStringMaxSize(update.name, 64, "name"))
+        }
       case None =>
-        validateStringMaxSize(update.name, 64, "name")
+        validateStringMaxSize(update.name, 64, "name").pure[F]
 
     }
 
   def mintNFTValidations(
-    update    : MintNFT,
+    update:     MintNFT,
     maybeState: Option[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]]
   ): DataApplicationValidationErrorOr[Unit] =
     maybeState match {
@@ -43,7 +47,7 @@ object Validations {
     }
 
   def transferCollectionValidations(
-    update    : TransferCollection,
+    update:     TransferCollection,
     maybeState: Option[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]]
   ): DataApplicationValidationErrorOr[Unit] =
     maybeState match {
@@ -54,7 +58,7 @@ object Validations {
     }
 
   def transferNFTValidations(
-    update    : TransferNFT,
+    update:     TransferNFT,
     maybeState: Option[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]]
   ): DataApplicationValidationErrorOr[Unit] =
     maybeState match {
@@ -65,26 +69,24 @@ object Validations {
     }
 
   def mintNFTValidationsWithSignature(
-    update   : MintNFT,
-    state    : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+    update: MintNFT,
+    state:  DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] =
     mintNFTValidations(update, state.some)
 
   def transferCollectionValidationsWithSignature(
-    update   : TransferCollection,
+    update:    TransferCollection,
     addresses: List[Address],
-    state    : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+    state:     DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] =
     transferCollectionValidations(update, state.some)
       .productR(validateProvidedAddress(addresses, update.fromAddress))
 
   def transferNFTValidationsWithSignature(
-    update   : TransferNFT,
+    update:    TransferNFT,
     addresses: List[Address],
-    state    : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
-  ): DataApplicationValidationErrorOr[Unit] = {
+    state:     DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+  ): DataApplicationValidationErrorOr[Unit] =
     transferNFTValidations(update, state.some)
       .productR(validateProvidedAddress(addresses, update.fromAddress))
-  }
 }
-

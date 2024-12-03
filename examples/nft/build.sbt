@@ -2,8 +2,9 @@ import Dependencies.*
 import sbt.*
 
 ThisBuild / organization := "com.my.nft"
-ThisBuild / scalaVersion := "2.13.10"
+ThisBuild / scalaVersion := "2.13.15"
 ThisBuild / evictionErrorLevel := Level.Warn
+ThisBuild / scalafixDependencies += Libraries.organizeImports
 
 ThisBuild / assemblyMergeStrategy := {
   case "logback.xml" => MergeStrategy.first
@@ -13,6 +14,29 @@ ThisBuild / assemblyMergeStrategy := {
     val oldStrategy = (assembly / assemblyMergeStrategy).value
     oldStrategy(x)
 }
+
+lazy val commonSettings = Seq(
+  scalacOptions ++= List("-Ymacro-annotations", "-Yrangepos", "-Wconf:cat=unused:info", "-language:reflectiveCalls"),
+  resolvers += Resolver.mavenLocal,
+  resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
+  libraryDependencies ++= Seq(
+    CompilerPlugin.kindProjector,
+    CompilerPlugin.betterMonadicFor,
+    CompilerPlugin.semanticDB,
+    Libraries.tessellationSdk,
+    Libraries.metakit
+  )
+) ++ Defaults.itSettings
+
+lazy val buildInfoSettings = Seq(
+  buildInfoKeys := Seq[BuildInfoKey](
+    name,
+    version,
+    scalaVersion,
+    sbtVersion
+  ),
+  buildInfoPackage := "io.constellationnetwork.buildinfo"
+)
 
 lazy val root = (project in file(".")).
   settings(
@@ -24,38 +48,19 @@ lazy val sharedData = (project in file("modules/shared_data"))
   .enablePlugins(BuildInfoPlugin)
   .enablePlugins(JavaAppPackaging)
   .settings(
-    name := "nft-shared_data",
-    scalacOptions ++= List("-Ymacro-annotations", "-Yrangepos", "-Wconf:cat=unused:info", "-language:reflectiveCalls"),
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoPackage := "com.my.nft.shared_data",
-    resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
-    Defaults.itSettings,
-    libraryDependencies ++= Seq(
-      CompilerPlugin.kindProjector,
-      CompilerPlugin.betterMonadicFor,
-      CompilerPlugin.semanticDB,
-      Libraries.tessellationNodeShared
-    )
+    commonSettings,
+    name := "nft-shared_data"
   )
+
 lazy val currencyL1 = (project in file("modules/l1"))
   .enablePlugins(AshScriptPlugin)
   .enablePlugins(BuildInfoPlugin)
   .enablePlugins(JavaAppPackaging)
+  .dependsOn(sharedData)
   .settings(
+    commonSettings,
     name := "nft-currency-l1",
-    scalacOptions ++= List("-Ymacro-annotations", "-Yrangepos", "-Wconf:cat=unused:info", "-language:reflectiveCalls"),
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoPackage := "com.my.nft.l1",
-    resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
-    Defaults.itSettings,
-    libraryDependencies ++= Seq(
-      CompilerPlugin.kindProjector,
-      CompilerPlugin.betterMonadicFor,
-      CompilerPlugin.semanticDB,
-      Libraries.tessellationCurrencyL1
-    )
+    libraryDependencies ++= Seq(Libraries.tessellationCurrencyL1)
   )
 
 lazy val currencyL0 = (project in file("modules/l0"))
@@ -64,22 +69,9 @@ lazy val currencyL0 = (project in file("modules/l0"))
   .enablePlugins(JavaAppPackaging)
   .dependsOn(sharedData)
   .settings(
+    commonSettings,
     name := "nft-currency-l0",
-    scalacOptions ++= List("-Ymacro-annotations", "-Yrangepos", "-Wconf:cat=unused:info", "-language:reflectiveCalls"),
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoPackage := "com.my.nft.l0",
-    resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
-    Defaults.itSettings,
-    libraryDependencies ++= Seq(
-      CompilerPlugin.kindProjector,
-      CompilerPlugin.betterMonadicFor,
-      CompilerPlugin.semanticDB,
-      Libraries.declineRefined,
-      Libraries.declineCore,
-      Libraries.declineEffect,
-      Libraries.tessellationCurrencyL0
-    )
+    libraryDependencies ++= Seq(Libraries.tessellationCurrencyL0)
   )
 
 lazy val dataL1 = (project in file("modules/data_l1"))
@@ -88,17 +80,7 @@ lazy val dataL1 = (project in file("modules/data_l1"))
   .enablePlugins(JavaAppPackaging)
   .dependsOn(sharedData)
   .settings(
+    commonSettings,
     name := "nft-data_l1",
-    scalacOptions ++= List("-Ymacro-annotations", "-Yrangepos", "-Wconf:cat=unused:info", "-language:reflectiveCalls"),
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoPackage := "com.my.nft.data_l1",
-    resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
-    Defaults.itSettings,
-    libraryDependencies ++= Seq(
-      CompilerPlugin.kindProjector,
-      CompilerPlugin.betterMonadicFor,
-      CompilerPlugin.semanticDB,
-      Libraries.tessellationCurrencyL1
-    )
+    libraryDependencies ++= Seq(Libraries.tessellationCurrencyL1)
   )

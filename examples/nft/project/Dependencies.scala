@@ -3,42 +3,36 @@ import sbt.*
 object Dependencies {
 
   object V {
-    val tessellation = "2.8.1"
-    val decline = "2.4.1"
+    val tessellation = "2.12.0"
+    val metakit = "0.1.0"
+    val organizeImports = "0.5.0"
+    val betterMonadicFor = "0.3.1"
+    val kindProjector = "0.13.3"
+    val semanticDB = "4.11.2"
   }
 
   def tessellation(artifact: String): ModuleID = "org.constellation" %% s"tessellation-$artifact" % V.tessellation
 
-  def decline(artifact: String = ""): ModuleID =
-    "com.monovore" %% {
-      if (artifact.isEmpty) "decline" else s"decline-$artifact"
-    } % V.decline
-
   object Libraries {
-    val tessellationNodeShared = tessellation("node-shared")
+    val tessellationSdk = tessellation("sdk")
     val tessellationCurrencyL0 = tessellation("currency-l0")
     val tessellationCurrencyL1 = tessellation("currency-l1")
-    val declineCore = decline()
-    val declineEffect = decline("effect")
-    val declineRefined = decline("refined")
+    val metakit = "io.constellationnetwork" %% "metakit" % V.metakit
+    val organizeImports = "com.github.liancheng" %% "organize-imports" % V.organizeImports
   }
-
-
-  // Scalafix rules
-  val organizeImports = "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
   object CompilerPlugin {
 
     val betterMonadicFor = compilerPlugin(
-      "com.olegpy" %% "better-monadic-for" % "0.3.1"
+      "com.olegpy" %% "better-monadic-for" % V.betterMonadicFor
     )
 
     val kindProjector = compilerPlugin(
-      ("org.typelevel" % "kind-projector" % "0.13.2").cross(CrossVersion.full)
+      ("org.typelevel" % "kind-projector" % V.kindProjector).cross(CrossVersion.full)
     )
 
     val semanticDB = compilerPlugin(
-      ("org.scalameta" % "semanticdb-scalac" % "4.7.1").cross(CrossVersion.full)
+      ("org.scalameta" % "semanticdb-scalac" % V.semanticDB).cross(CrossVersion.full)
     )
   }
 }

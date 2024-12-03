@@ -1,30 +1,34 @@
 package com.my.nft.shared_data.validations
 
-import com.my.nft.shared_data.Utils.isValidURL
-import com.my.nft.shared_data.errors.Errors._
-import com.my.nft.shared_data.serializers.Serializers
-import com.my.nft.shared_data.types.Types._
+import cats.effect.Sync
+import cats.syntax.functor._
+
 import org.tessellation.currency.dataApplication.DataState
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 import org.tessellation.schema.address.Address
-import org.tessellation.security.hash.Hash
+
+import com.my.nft.shared_data.Utils.isValidURL
+import com.my.nft.shared_data.errors.Errors._
+import com.my.nft.shared_data.schema._
+
+import io.constellationnetwork.metagraph_sdk.std.JsonBinaryHasher.FromJsonBinaryCodec
 
 object TypeValidators {
+
   private def getCollectionById(
     collectionId: String,
-    state       : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
-  ): Option[Collection] = {
+    state:        DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+  ): Option[NFTCollection] =
     state.calculated.collections
       .get(collectionId)
-  }
 
-  def validateIfCollectionIsUnique(
+  def validateIfCollectionIsUnique[F[_]: Sync](
     update: MintCollection,
-    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
-  ): DataApplicationValidationErrorOr[Unit] = {
-    val collectionId = Hash.fromBytes(Serializers.serializeUpdate(update)).toString
-    DuplicatedCollection.whenA(state.calculated.collections.contains(collectionId))
-  }
+    state:  DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+  ): F[DataApplicationValidationErrorOr[Unit]] =
+    (update: NFTUpdate).hash.map { collectionId =>
+      DuplicatedCollection.whenA(state.calculated.collections.contains(collectionId.toString))
+    }
 
   def validateIfNFTUriIsValid(
     update: MintNFT
@@ -33,7 +37,7 @@ object TypeValidators {
 
   def validateIfNFTUriIsUnique(
     update: MintNFT,
-    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+    state:  DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] =
     getCollectionById(update.collectionId, state)
       .map { value =>
@@ -44,7 +48,7 @@ object TypeValidators {
 
   def validateIfNFTIdIsUnique(
     update: MintNFT,
-    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+    state:  DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] =
     getCollectionById(update.collectionId, state)
       .map { value =>
@@ -55,7 +59,7 @@ object TypeValidators {
 
   def validateIfProvidedNFTExists(
     update: TransferNFT,
-    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+    state:  DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] =
     getCollectionById(update.collectionId, state)
       .map { value =>
@@ -65,7 +69,7 @@ object TypeValidators {
 
   def validateIfFromAddressIsTheNFTOwner(
     update: TransferNFT,
-    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+    state:  DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] =
     getCollectionById(update.collectionId, state)
       .map { value =>
@@ -75,7 +79,7 @@ object TypeValidators {
 
   def validateIfFromAddressIsTheCollectionOwner(
     update: TransferCollection,
-    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+    state:  DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] =
     getCollectionById(update.collectionId, state)
       .map { value =>
@@ -85,28 +89,27 @@ object TypeValidators {
 
   def validateIfProvidedCollectionExists(
     update: TransferCollection,
-    state : DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
+    state:  DataState[NFTUpdatesState, NFTUpdatesCalculatedState]
   ): DataApplicationValidationErrorOr[Unit] =
     CollectionNotExists.unlessA(state.calculated.collections.contains(update.collectionId))
 
   def validateProvidedAddress(
     proofAddresses: List[Address],
-    address       : Address
+    address:        Address
   ): DataApplicationValidationErrorOr[Unit] =
     InvalidAddress.unlessA(proofAddresses.contains(address))
 
   def validateStringMaxSize(
-    value    : String,
-    maxSize  : Long,
+    value:     String,
+    maxSize:   Long,
     fieldName: String
   ): DataApplicationValidationErrorOr[Unit] =
     InvalidFieldSize(fieldName, maxSize).whenA(value.length > maxSize)
 
   def validateMapMaxSize(
-    value    : Map[String, String],
-    maxSize  : Long,
+    value:     Map[String, String],
+    maxSize:   Long,
     fieldName: String
   ): DataApplicationValidationErrorOr[Unit] =
     InvalidFieldSize(fieldName, maxSize).whenA(value.size > maxSize)
 }
-

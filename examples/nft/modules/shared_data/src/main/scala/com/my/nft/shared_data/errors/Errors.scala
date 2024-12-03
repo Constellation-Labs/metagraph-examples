@@ -1,6 +1,7 @@
 package com.my.nft.shared_data.errors
 
 import cats.syntax.validated.catsSyntaxValidatedIdBinCompat0
+
 import org.tessellation.currency.dataApplication.DataApplicationValidationError
 import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 
@@ -11,6 +12,7 @@ object Errors {
     ().validNec[DataApplicationValidationError]
 
   implicit class DataApplicationValidationTypeOps[E <: DataApplicationValidationError](err: E) {
+
     def invalid: DataApplicationValidationType =
       err.invalidNec[Unit]
 
@@ -42,7 +44,7 @@ object Errors {
   }
 
   case object CollectionNotExists extends DataApplicationValidationError {
-    val message = "Collection not exists"
+    val message = "NFTCollection not exists"
   }
 
   case object NFTNotExists extends DataApplicationValidationError {
@@ -50,7 +52,7 @@ object Errors {
   }
 
   case object CollectionDoesNotBelongsToProvidedAddress extends DataApplicationValidationError {
-    val message = "Collection does not belongs to provided address"
+    val message = "NFTCollection does not belongs to provided address"
   }
 
   case object NFTDoesNotBelongsToProvidedAddress extends DataApplicationValidationError {
@@ -73,4 +75,3 @@ object Errors {
     val message = s"Invalid field size: $fieldName, maxSize: $maxSize"
   }
 }
-
