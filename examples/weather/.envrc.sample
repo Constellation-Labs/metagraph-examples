@@ -1,0 +1,6 @@
+export METAGRAPH_WEATHER_WEATHERAPI_URL="https://api.weatherapi.com/v1"
+export METAGRAPH_WEATHER_WEATHERAPI_KEY="your-weatherapi-key"
+export METAGRAPH_WEATHER_DB_DRIVER="org.postgresql.Driver"
+export METAGRAPH_WEATHER_DB_URL="jdbc:postgresql://localhost:5432/weather"
+export METAGRAPH_WEATHER_DB_USR="weather"
+export METAGRAPH_WEATHER_DB_PWD="password"
