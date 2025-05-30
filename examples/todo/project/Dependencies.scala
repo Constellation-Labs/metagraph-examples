@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
 
   object V {
-    val tessellation = "2.8.1"
+    val metakit = "1.0.0-rc.3"
     val decline = "2.4.1"
     val cats = "2.9.0"
     val catsEffect = "3.4.2"
@@ -11,7 +11,6 @@ object Dependencies {
     val weaver = "0.8.1"
     val pureconfig = "0.17.4"
   }
-  def tessellation(artifact: String): ModuleID = "org.constellation" %% s"tessellation-$artifact" % V.tessellation
 
   def decline(artifact: String = ""): ModuleID =
     "com.monovore" %% {
@@ -19,9 +18,7 @@ object Dependencies {
     } % V.decline
 
   object Libraries {
-    val tessellationNodeShared = tessellation("node-shared")
-    val tessellationCurrencyL0 = tessellation("currency-l0")
-    val tessellationCurrencyL1 = tessellation("currency-l1")
+    val metakit = "io.constellationnetwork" %% "metakit" % V.metakit
     val declineCore = decline()
     val declineEffect = decline("effect")
     val declineRefined = decline("refined")
