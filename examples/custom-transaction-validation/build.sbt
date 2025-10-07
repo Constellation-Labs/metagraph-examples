@@ -29,7 +29,6 @@ lazy val currencyL1 = (project in file("modules/l1"))
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "com.my.custom_validator.l1",
     resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
     Defaults.itSettings,
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
@@ -49,7 +48,6 @@ lazy val currencyL0 = (project in file("modules/l0"))
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "com.my.custom_validator.l0",
     resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
     Defaults.itSettings,
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,

@@ -20,7 +20,6 @@ ThisBuild / assemblyMergeStrategy := {
 lazy val commonSettings = Seq(
   scalacOptions ++= List("-Ymacro-annotations", "-Yrangepos", "-Wconf:cat=unused:info", "-language:reflectiveCalls"),
   resolvers += Resolver.mavenLocal,
-  resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
 ) ++ Defaults.itSettings
 
 lazy val commonLibraryDependencies: Seq[ModuleID] = Seq(
