@@ -29,7 +29,6 @@ lazy val sharedData = (project in file("modules/shared_data"))
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "com.my.metagraph_social.shared_data",
     resolvers += Resolver.mavenLocal,
-
     Defaults.itSettings,
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
