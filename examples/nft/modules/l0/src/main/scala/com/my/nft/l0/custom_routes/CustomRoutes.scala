@@ -10,9 +10,9 @@ import org.http4s._
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.middleware.CORS
-import org.tessellation.ext.http4s.AddressVar
-import org.tessellation.routes.internal.{InternalUrlPrefix, PublicRoutes}
-import org.tessellation.schema.address.Address
+import io.constellationnetwork.ext.http4s.AddressVar
+import io.constellationnetwork.routes.internal.{InternalUrlPrefix, PublicRoutes}
+import io.constellationnetwork.schema.address.Address
 
 case class CustomRoutes[F[_] : Async](calculatedStateService: CalculatedStateService[F]) extends Http4sDsl[F] with PublicRoutes[F] {
 

@@ -14,16 +14,16 @@ import com.my.nft.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.{EntityDecoder, HttpRoutes}
-import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.dataApplication.dataApplication._
-import org.tessellation.currency.l0.CurrencyL0App
-import org.tessellation.ext.cats.effect.ResourceIO
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.BuildInfo
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.dataApplication.dataApplication._
+import io.constellationnetwork.currency.l0.CurrencyL0App
+import io.constellationnetwork.ext.cats.effect.ResourceIO
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.security.hash.Hash
+import io.constellationnetwork.security.signature.Signed
 
 import java.util.UUID
 
@@ -46,11 +46,6 @@ object Main
       updates: NonEmptyList[Signed[NFTUpdate]]
     )(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] =
       LifecycleSharedFunctions.validateData[IO](state, updates)
-
-    override def validateUpdate(
-      update: NFTUpdate
-    )(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] =
-      valid.pure[IO]
 
     override def combine(
       state  : DataState[NFTUpdatesState, NFTUpdatesCalculatedState],

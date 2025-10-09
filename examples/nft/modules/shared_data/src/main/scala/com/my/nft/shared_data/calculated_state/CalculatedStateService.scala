@@ -6,8 +6,8 @@ import cats.syntax.functor.toFunctorOps
 import com.my.nft.shared_data.types.Types._
 import io.circe.Json
 import io.circe.syntax.EncoderOps
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.security.hash.Hash
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.security.hash.Hash
 
 import java.nio.charset.StandardCharsets
 
