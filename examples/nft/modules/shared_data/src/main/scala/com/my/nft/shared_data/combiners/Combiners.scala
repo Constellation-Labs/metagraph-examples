@@ -3,9 +3,9 @@ package com.my.nft.shared_data.combiners
 import com.my.nft.shared_data.serializers.Serializers
 import com.my.nft.shared_data.types.Types._
 import monocle.Monocle.toAppliedFocusOps
-import org.tessellation.currency.dataApplication.DataState
-import org.tessellation.schema.address.Address
-import org.tessellation.security.hash.Hash
+import io.constellationnetwork.currency.dataApplication.DataState
+import io.constellationnetwork.schema.address.Address
+import io.constellationnetwork.security.hash.Hash
 
 object Combiners {
   def combineMintCollection(
