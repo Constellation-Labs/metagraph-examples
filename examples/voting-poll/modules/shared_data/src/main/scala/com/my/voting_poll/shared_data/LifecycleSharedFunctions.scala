@@ -13,10 +13,10 @@ import com.my.voting_poll.shared_data.errors.Errors.{CouldNotGetLatestCurrencySn
 import com.my.voting_poll.shared_data.types.Types._
 import com.my.voting_poll.shared_data.validations.Validations.{createPollValidations, createPollValidationsWithSignature, voteInPollValidations, voteInPollValidationsWithSignature}
 import org.slf4j.LoggerFactory
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.currency.dataApplication.{DataState, L0NodeContext, L1NodeContext}
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.currency.dataApplication.{DataState, L0NodeContext, L1NodeContext}
+import io.constellationnetwork.security.SecurityProvider
+import io.constellationnetwork.security.signature.Signed
 
 object LifecycleSharedFunctions {
 

@@ -7,14 +7,14 @@ import com.my.voting_poll.shared_data.errors.Errors.valid
 import com.my.voting_poll.shared_data.serializers.Serializers
 import com.my.voting_poll.shared_data.types.Types.{CreatePoll, VoteCalculatedState, VoteInPoll, VoteStateOnChain}
 import com.my.voting_poll.shared_data.validations.TypeValidators._
-import org.tessellation.currency.dataApplication.DataState
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.currency.schema.currency.CurrencySnapshotInfo
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.address.Address
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.signature.SignatureProof
+import io.constellationnetwork.currency.dataApplication.DataState
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.currency.schema.currency.CurrencySnapshotInfo
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.address.Address
+import io.constellationnetwork.security.SecurityProvider
+import io.constellationnetwork.security.hash.Hash
+import io.constellationnetwork.security.signature.signature.SignatureProof
 
 object Validations {
   def createPollValidations[F[_] : Async](update: CreatePoll, maybeState: Option[DataState[VoteStateOnChain, VoteCalculatedState]], lastSnapshotOrdinal: Option[SnapshotOrdinal]): F[DataApplicationValidationErrorOr[Unit]] = Async[F].delay {

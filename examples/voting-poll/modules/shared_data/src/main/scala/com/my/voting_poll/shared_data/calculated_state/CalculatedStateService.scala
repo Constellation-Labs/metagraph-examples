@@ -6,8 +6,8 @@ import cats.syntax.applicative._
 import cats.syntax.functor._
 import com.my.voting_poll.shared_data.types.Types.VoteCalculatedState
 import io.circe.syntax.EncoderOps
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.security.hash.Hash
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.security.hash.Hash
 
 import java.nio.charset.StandardCharsets
 
