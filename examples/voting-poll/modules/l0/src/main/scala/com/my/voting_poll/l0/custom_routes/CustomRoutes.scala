@@ -13,8 +13,8 @@ import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.middleware.CORS
 import org.http4s.{HttpRoutes, Response}
-import org.tessellation.routes.internal.{InternalUrlPrefix, PublicRoutes}
-import org.tessellation.schema.address.Address
+import io.constellationnetwork.routes.internal.{InternalUrlPrefix, PublicRoutes}
+import io.constellationnetwork.schema.address.Address
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 

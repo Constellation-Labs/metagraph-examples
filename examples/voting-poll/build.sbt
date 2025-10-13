@@ -29,13 +29,12 @@ lazy val sharedData = (project in file("modules/shared_data"))
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "com.my.voting_poll.shared_data",
     resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
     Defaults.itSettings,
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
       CompilerPlugin.betterMonadicFor,
       CompilerPlugin.semanticDB,
-      Libraries.tessellationNodeShared
+      Libraries.tessellationSdk
     )
   )
 lazy val currencyL1 = (project in file("modules/l1"))
@@ -48,13 +47,12 @@ lazy val currencyL1 = (project in file("modules/l1"))
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "com.my.voting_poll.l1",
     resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
     Defaults.itSettings,
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
       CompilerPlugin.betterMonadicFor,
       CompilerPlugin.semanticDB,
-      Libraries.tessellationCurrencyL1
+      Libraries.tessellationSdk
     )
   )
 
@@ -69,7 +67,6 @@ lazy val currencyL0 = (project in file("modules/l0"))
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "com.my.voting_poll.l0",
     resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
     Defaults.itSettings,
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
@@ -78,8 +75,7 @@ lazy val currencyL0 = (project in file("modules/l0"))
       Libraries.declineRefined,
       Libraries.declineCore,
       Libraries.declineEffect,
-      Libraries.tessellationNodeShared,
-      Libraries.tessellationCurrencyL0,
+      Libraries.tessellationSdk,
       Libraries.http4sCore,
       Libraries.http4sDsl,
       Libraries.http4sServer,
@@ -99,12 +95,11 @@ lazy val dataL1 = (project in file("modules/data_l1"))
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "com.my.voting_poll.data_l1",
     resolvers += Resolver.mavenLocal,
-    resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
     Defaults.itSettings,
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
       CompilerPlugin.betterMonadicFor,
       CompilerPlugin.semanticDB,
-      Libraries.tessellationCurrencyL1
+      Libraries.tessellationSdk
     )
   )
