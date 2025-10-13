@@ -7,11 +7,11 @@ import com.my.water_and_energy_usage.shared_data.Utils.getAllAddressesFromProofs
 import com.my.water_and_energy_usage.shared_data.combiners.Combiners.combineUpdateUsage
 import com.my.water_and_energy_usage.shared_data.types.Types.{UsageUpdate, UsageUpdateCalculatedState, UsageUpdateState}
 import com.my.water_and_energy_usage.shared_data.validations.Validations.{validateUsageUpdate, validateUsageUpdateSigned}
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.currency.dataApplication.{DataState, L0NodeContext}
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.currency.dataApplication.{DataState, L0NodeContext}
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.security.SecurityProvider
+import io.constellationnetwork.security.signature.Signed
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 

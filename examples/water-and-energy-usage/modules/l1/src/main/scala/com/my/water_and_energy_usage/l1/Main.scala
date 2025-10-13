@@ -1,9 +1,9 @@
 package com.my.water_and_energy_usage.l1
 
-import org.tessellation.BuildInfo
-import org.tessellation.currency.l1.CurrencyL1App
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.BuildInfo
+import io.constellationnetwork.currency.l1.CurrencyL1App
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
 
 import java.util.UUID
 

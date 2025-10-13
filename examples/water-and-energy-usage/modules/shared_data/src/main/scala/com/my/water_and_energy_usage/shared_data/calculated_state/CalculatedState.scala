@@ -1,7 +1,7 @@
 package com.my.water_and_energy_usage.shared_data.calculated_state
 
 import com.my.water_and_energy_usage.shared_data.types.Types.UsageUpdateCalculatedState
-import org.tessellation.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.SnapshotOrdinal
 
 case class CalculatedState(ordinal: SnapshotOrdinal, state: UsageUpdateCalculatedState)
 
