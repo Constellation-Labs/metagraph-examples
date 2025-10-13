@@ -6,16 +6,15 @@ import cats.effect.std.Supervisor
 import cats.effect.{IO, Resource}
 import cats.implicits._
 
-import scala.concurrent.duration.DurationInt
 
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.l0.CurrencyL0App
-import org.tessellation.ext.cats.effect.ResourceIO
-import org.tessellation.json.JsonSerializer
-import org.tessellation.node.shared.domain.Daemon
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
-import org.tessellation.security.{Hasher, SecurityProvider}
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.l0.CurrencyL0App
+import io.constellationnetwork.ext.cats.effect.ResourceIO
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.node.shared.domain.Daemon
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.security.{Hasher, SecurityProvider}
 
 import com.my.buildinfo.BuildInfo
 import com.my.shared_data.app.{ApplicationConfig, ApplicationConfigOps}
@@ -29,7 +28,7 @@ object Main
       name = "metagraph-l0",
       header = "Metagraph L0 node",
       clusterId = ClusterId(UUID.fromString("517c3a05-9219-471b-a54c-21b7d72f4ae5")),
-      tessellationVersion = TessellationVersion.unsafeFrom(org.tessellation.BuildInfo.version),
+      tessellationVersion = TessellationVersion.unsafeFrom(io.constellationnetwork.BuildInfo.version),
       metagraphVersion = MetagraphVersion.unsafeFrom(BuildInfo.version)
     ) {
 

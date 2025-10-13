@@ -1,6 +1,6 @@
 package com.my.shared_data.lib
 
-import org.tessellation.currency.dataApplication.DataUpdate
+import io.constellationnetwork.currency.dataApplication.DataUpdate
 
 import com.my.shared_data.schema.Updates.TodoUpdate
 

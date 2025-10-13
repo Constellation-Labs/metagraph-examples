@@ -3,11 +3,11 @@ package com.my.shared_data.lifecycle
 import cats.effect.Async
 import cats.implicits.{toFlatMapOps, toFunctorOps}
 
-import org.tessellation.currency.dataApplication.{DataState, L0NodeContext}
-import org.tessellation.ext.cats.syntax.next.catsSyntaxNext
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.security.signature.Signed
-import org.tessellation.security.{Hasher, SecurityProvider}
+import io.constellationnetwork.currency.dataApplication.{DataState, L0NodeContext}
+import io.constellationnetwork.ext.cats.syntax.next.catsSyntaxNext
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.security.signature.Signed
+import io.constellationnetwork.security.{Hasher, SecurityProvider}
 
 import com.my.shared_data.schema.TaskRecord.generateId
 import com.my.shared_data.schema.Updates.TodoUpdate

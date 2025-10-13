@@ -7,13 +7,13 @@ import cats.syntax.all._
 
 import scala.collection.immutable.SortedSet
 
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.currency.dataApplication.{DataApplicationValidationError, DataState, L0NodeContext}
-import org.tessellation.currency.schema.currency.CurrencyIncrementalSnapshot
-import org.tessellation.json.JsonSerializer
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.security.signature.Signed
-import org.tessellation.security.{Hashed, SecurityProvider}
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.currency.dataApplication.{DataApplicationValidationError, DataState, L0NodeContext}
+import io.constellationnetwork.currency.schema.currency.CurrencyIncrementalSnapshot
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.security.signature.Signed
+import io.constellationnetwork.security.{Hashed, SecurityProvider}
 
 import com.my.shared_data.lib.syntax.CurrencyIncrementalSnapshotOps
 import com.my.shared_data.lib.{JsonBinaryCodec, LatestUpdateValidator, SignedUpdateReducer}

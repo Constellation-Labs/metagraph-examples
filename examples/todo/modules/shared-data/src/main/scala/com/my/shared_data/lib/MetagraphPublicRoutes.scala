@@ -2,8 +2,8 @@ package com.my.shared_data.lib
 
 import cats.effect.Async
 
-import org.tessellation.currency.dataApplication.DataApplicationValidationError
-import org.tessellation.routes.internal.{InternalUrlPrefix, PublicRoutes}
+import io.constellationnetwork.currency.dataApplication.DataApplicationValidationError
+import io.constellationnetwork.routes.internal.{InternalUrlPrefix, PublicRoutes}
 
 import eu.timepit.refined.auto._
 import io.circe.Encoder

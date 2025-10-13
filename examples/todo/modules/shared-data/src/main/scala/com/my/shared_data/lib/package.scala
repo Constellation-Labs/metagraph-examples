@@ -6,12 +6,11 @@ import cats.implicits.{toFlatMapOps, toFunctorOps, toTraverseOps}
 import scala.collection.immutable.SortedSet
 import scala.reflect.ClassTag
 
-import org.tessellation.currency.dataApplication.DataUpdate
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationBlock
-import org.tessellation.currency.schema.currency.{CurrencyIncrementalSnapshot, DataApplicationPart}
-import org.tessellation.json.JsonSerializer
-import org.tessellation.security.hex.Hex
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.currency.dataApplication.DataUpdate
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationBlock
+import io.constellationnetwork.currency.schema.currency.{CurrencyIncrementalSnapshot, DataApplicationPart}
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.security.signature.Signed
 
 import com.my.shared_data.lib.CirceOps.implicits._
 import com.my.shared_data.lib.OrderedOps.implicits._
@@ -27,14 +26,14 @@ package object lib {
 
     implicit class CurrencyIncrementalSnapshotOps[F[_]: Sync: JsonSerializer](cis: CurrencyIncrementalSnapshot) {
 
-      def countUpdates: F[Long] = getBlocks.map(_.map(_.updates.size.toLong).sum)
+      def countUpdates: F[Long] = getBlocks.map(_.map(_.value.dataTransactions.toList.flatMap(_.toList).size.toLong).sum)
 
       def getUpdates[U <: DataUpdate: ClassTag]: F[List[Signed[U]]] =
         getBlocks
           .map {
             _.flatMap { block =>
-              block.updates.toList.collect { case s: U =>
-                Signed(s.value.asInstanceOf[U], s.proofs)
+              block.value.dataTransactions.toList.flatMap(_.toList).collect {
+                case s @ Signed(_: U, _) => s.asInstanceOf[Signed[U]]
               }
             }.distinct
           }

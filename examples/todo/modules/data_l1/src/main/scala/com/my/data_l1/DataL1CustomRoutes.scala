@@ -4,8 +4,8 @@ import cats.effect.{Async, Clock}
 import cats.implicits.{toFlatMapOps, toFunctorOps}
 import cats.syntax.either._
 
-import org.tessellation.currency.dataApplication.{DataApplicationValidationError, L1NodeContext}
-import org.tessellation.json.JsonSerializer
+import io.constellationnetwork.currency.dataApplication.{DataApplicationValidationError, L1NodeContext}
+import io.constellationnetwork.json.JsonSerializer
 
 import com.my.data_l1.DataL1NodeContext.syntax._
 import com.my.shared_data.lib.MetagraphPublicRoutes

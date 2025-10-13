@@ -5,8 +5,8 @@ import cats.implicits.toFoldableOps
 
 import scala.collection.immutable.SortedSet
 
-import org.tessellation.currency.dataApplication.L0NodeContext
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.currency.dataApplication.L0NodeContext
+import io.constellationnetwork.security.signature.Signed
 
 import com.my.shared_data.lifecycle.StateUpdateCombiner
 

@@ -20,14 +20,13 @@ ThisBuild / assemblyMergeStrategy := {
 lazy val commonSettings = Seq(
   scalacOptions ++= List("-Ymacro-annotations", "-Yrangepos", "-Wconf:cat=unused:info", "-language:reflectiveCalls"),
   resolvers += Resolver.mavenLocal,
-  resolvers += Resolver.githubPackages("abankowski", "http-request-signer"),
 ) ++ Defaults.itSettings
 
 lazy val commonLibraryDependencies: Seq[ModuleID] = Seq(
   CompilerPlugin.kindProjector,
   CompilerPlugin.betterMonadicFor,
   CompilerPlugin.semanticDB,
-  Libraries.tessellationNodeShared,
+  Libraries.tessellationSdk,
   Libraries.cats,
   Libraries.catsEffect,
   Libraries.pureconfigCore,
@@ -77,7 +76,7 @@ lazy val currencyL0 = (project in file("modules/l0"))
     commonSettings,
     commonTestSettings,
     name := "todo-currency-l0",
-    libraryDependencies ++= (commonLibraryDependencies ++ Seq(Libraries.tessellationCurrencyL0))
+    libraryDependencies ++= (commonLibraryDependencies ++ Seq(Libraries.tessellationSdk))
   )
 
 lazy val currencyL1 = (project in file("modules/l1"))
@@ -88,7 +87,7 @@ lazy val currencyL1 = (project in file("modules/l1"))
     commonSettings,
     commonTestSettings,
     name := "todo-currency-l1",
-    libraryDependencies ++= (commonLibraryDependencies ++ Seq(Libraries.tessellationCurrencyL1))
+    libraryDependencies ++= (commonLibraryDependencies ++ Seq(Libraries.tessellationSdk))
   )
 
 lazy val dataL1 = (project in file("modules/data_l1"))
@@ -99,5 +98,5 @@ lazy val dataL1 = (project in file("modules/data_l1"))
     commonSettings,
     commonTestSettings,
     name := "todo-data-l1",
-    libraryDependencies ++= (commonLibraryDependencies ++ Seq(Libraries.tessellationCurrencyL1))
+    libraryDependencies ++= (commonLibraryDependencies ++ Seq(Libraries.tessellationSdk))
   )
