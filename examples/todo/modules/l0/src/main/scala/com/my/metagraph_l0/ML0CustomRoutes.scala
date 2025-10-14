@@ -3,9 +3,9 @@ package com.my.metagraph_l0
 import cats.effect.Async
 import cats.syntax.all._
 
-import org.tessellation.currency.dataApplication.{DataApplicationValidationError, L0NodeContext}
-import org.tessellation.json.JsonSerializer
-import org.tessellation.node.shared.ext.http4s.SnapshotOrdinalVar
+import io.constellationnetwork.currency.dataApplication.{DataApplicationValidationError, L0NodeContext}
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.node.shared.ext.http4s.SnapshotOrdinalVar
 
 import com.my.metagraph_l0.ML0NodeContext.syntax._
 import com.my.shared_data.lib.{CheckpointService, MetagraphPublicRoutes}

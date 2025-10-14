@@ -1,6 +1,6 @@
 package com.my.shared_data.lib
 
-import org.tessellation.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.SnapshotOrdinal
 
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive

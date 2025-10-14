@@ -3,9 +3,9 @@ package com.my.shared_data.schema
 import cats.effect.Async
 import cats.implicits.toFunctorOps
 
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.address.Address
-import org.tessellation.security.Hasher
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.address.Address
+import io.constellationnetwork.security.Hasher
 
 import com.my.shared_data.schema.Updates.CreateTask
 
