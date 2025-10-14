@@ -4,10 +4,10 @@ import com.my.water_and_energy_usage.shared_data.Utils.removeKeyFromJSON
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 import io.circe.syntax.EncoderOps
-import org.tessellation.currency.dataApplication.{DataCalculatedState, DataOnChainState, DataUpdate}
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.address.Address
-import org.tessellation.security.hash.Hash
+import io.constellationnetwork.currency.dataApplication.{DataCalculatedState, DataOnChainState, DataUpdate}
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.address.Address
+import io.constellationnetwork.security.hash.Hash
 
 import java.nio.charset.StandardCharsets
 

@@ -5,9 +5,9 @@ import cats.syntax.option.{catsSyntaxOptionId, none}
 import com.my.water_and_energy_usage.shared_data.errors.Errors.EmptyUpdate
 import com.my.water_and_energy_usage.shared_data.types.Types._
 import com.my.water_and_energy_usage.shared_data.validations.TypeValidators._
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.schema.address.Address
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.schema.address.Address
+import io.constellationnetwork.security.signature.Signed
 
 
 object Validations {
