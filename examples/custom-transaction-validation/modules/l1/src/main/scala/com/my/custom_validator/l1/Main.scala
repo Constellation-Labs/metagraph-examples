@@ -1,17 +1,16 @@
 package com.my.custom_validator.l1
 
 import java.util.UUID
-import org.tessellation.BuildInfo
-import org.tessellation.currency.l1.CurrencyL1App
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.transaction.Transaction
-import org.tessellation.schema.semver.MetagraphVersion
-import org.tessellation.schema.semver.TessellationVersion
-import org.tessellation.security.Hashed
-import org.tessellation.dag.l1.domain.transaction.CustomContextualTransactionValidator
-import org.tessellation.dag.l1.domain.transaction.ContextualTransactionValidator.CustomValidationError
-import org.tessellation.dag.l1.domain.transaction.TransactionValidatorContext
+
 import eu.timepit.refined.auto._
+import io.constellationnetwork.BuildInfo
+import io.constellationnetwork.currency.l1.CurrencyL1App
+import io.constellationnetwork.dag.l1.domain.transaction.ContextualTransactionValidator.CustomValidationError
+import io.constellationnetwork.dag.l1.domain.transaction.{CustomContextualTransactionValidator, TransactionValidatorContext}
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.schema.transaction.Transaction
+import io.constellationnetwork.security.Hashed
 
 object Main
   extends CurrencyL1App(
