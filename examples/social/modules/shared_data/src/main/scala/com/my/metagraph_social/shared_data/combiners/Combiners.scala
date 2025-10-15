@@ -5,13 +5,13 @@ import cats.syntax.all._
 import com.my.metagraph_social.shared_data.Utils.getFirstAddressFromProofs
 import com.my.metagraph_social.shared_data.types.States._
 import com.my.metagraph_social.shared_data.types.Updates._
+import io.constellationnetwork.currency.dataApplication.DataState
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.security.SecurityProvider
+import io.constellationnetwork.security.hash.Hash
+import io.constellationnetwork.security.signature.Signed
 import monocle.Monocle.toAppliedFocusOps
-import org.tessellation.currency.dataApplication.DataState
-import org.tessellation.json.JsonSerializer
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.Signed
 
 import java.time.LocalDateTime
 

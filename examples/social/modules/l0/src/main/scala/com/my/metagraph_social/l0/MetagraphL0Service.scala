@@ -11,15 +11,15 @@ import com.my.metagraph_social.shared_data.types.Updates._
 import com.my.metagraph_social.shared_data.types.codecs.DataUpdateCodec._
 import io.circe.generic.auto._
 import io.circe.{Decoder, Encoder}
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.security.SecurityProvider
+import io.constellationnetwork.security.hash.Hash
+import io.constellationnetwork.security.signature.Signed
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.{EntityDecoder, HttpRoutes}
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
-import org.tessellation.json.JsonSerializer
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.Signed
 
 object MetagraphL0Service {
 
@@ -42,11 +42,6 @@ object MetagraphL0Service {
             SocialCalculatedState(Map.empty)
           )
         }
-
-        override def validateUpdate(
-          update: SocialUpdate
-        )(implicit context: L0NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] =
-          Async[F].pure(LifecycleSharedFunctions.validateUpdate(update))
 
         override def validateData(
           state  : DataState[SocialOnChainState, SocialCalculatedState],

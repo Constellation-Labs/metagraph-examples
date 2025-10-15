@@ -4,7 +4,7 @@ import cats.syntax.all._
 import com.my.metagraph_social.shared_data.errors.Errors._
 import com.my.metagraph_social.shared_data.types.States.SocialCalculatedState
 import com.my.metagraph_social.shared_data.types.Updates.Subscribe
-import org.tessellation.schema.address.Address
+import io.constellationnetwork.schema.address.Address
 
 object TypeValidators {
   def validateIfPostContentIsGreaterThan200Chars(
