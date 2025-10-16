@@ -2,8 +2,8 @@ package com.my.metagraph_social.shared_data.types
 
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
-import org.tessellation.currency.dataApplication.DataUpdate
-import org.tessellation.schema.address.Address
+import io.constellationnetwork.currency.dataApplication.DataUpdate
+import io.constellationnetwork.schema.address.Address
 
 object Updates {
   @derive(decoder, encoder)

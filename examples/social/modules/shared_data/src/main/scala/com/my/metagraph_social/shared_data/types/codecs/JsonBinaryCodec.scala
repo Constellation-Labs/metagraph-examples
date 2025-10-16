@@ -4,7 +4,7 @@ import cats.effect.Sync
 import io.circe.jawn.JawnParser
 import io.circe.syntax.EncoderOps
 import io.circe.{Decoder, Encoder, Printer}
-import org.tessellation.json.JsonSerializer
+import io.constellationnetwork.json.JsonSerializer
 
 object JsonBinaryCodec {
 

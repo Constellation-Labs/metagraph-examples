@@ -5,8 +5,8 @@ import cats.syntax.all._
 import com.my.metagraph_social.shared_data.types.States.SocialCalculatedState
 import io.circe.Json
 import io.circe.syntax.EncoderOps
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.security.hash.Hash
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.security.hash.Hash
 
 import java.nio.charset.StandardCharsets
 

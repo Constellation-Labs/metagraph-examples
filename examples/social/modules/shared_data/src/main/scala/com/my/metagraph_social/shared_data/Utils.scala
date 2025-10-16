@@ -4,11 +4,11 @@ import cats.Functor
 import cats.data.NonEmptySet
 import cats.effect.Async
 import cats.syntax.functor._
-import org.tessellation.currency.dataApplication.{L0NodeContext, L1NodeContext}
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.address.Address
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.signature.signature.SignatureProof
+import io.constellationnetwork.currency.dataApplication.{L0NodeContext, L1NodeContext}
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.address.Address
+import io.constellationnetwork.security.SecurityProvider
+import io.constellationnetwork.security.signature.signature.SignatureProof
 
 
 object Utils {

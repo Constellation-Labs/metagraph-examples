@@ -6,13 +6,13 @@ import com.my.metagraph_social.shared_data.app.ApplicationConfigOps
 import com.my.metagraph_social.shared_data.calculated_state.CalculatedStateService
 import com.my.metagraph_social.shared_data.calculated_state.postgres.PostgresService
 import com.my.metagraph_social.shared_data.types.codecs.JsonBinaryCodec
-import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.l0.CurrencyL0App
-import org.tessellation.ext.cats.effect.ResourceIO
-import org.tessellation.json.JsonSerializer
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.BuildInfo
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.l0.CurrencyL0App
+import io.constellationnetwork.ext.cats.effect.ResourceIO
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
 
 import java.util.UUID
 
