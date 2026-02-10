@@ -1,0 +1,43 @@
+import sbt.*
+
+object Dependencies {
+
+  object V {
+    val tessellation = "99.99.99" //TODO: Update with the official version with FeeTransactions
+    val decline = "2.4.1"
+  }
+
+  def tessellation(artifact: String): ModuleID = "io.constellationnetwork" %% s"tessellation-$artifact" % V.tessellation
+
+  def decline(artifact: String = ""): ModuleID =
+    "com.monovore" %% {
+      if (artifact.isEmpty) "decline" else s"decline-$artifact"
+    } % V.decline
+
+  object Libraries {
+    // Use SDK as a single dependency that includes all modules
+    val tessellationSdk = tessellation("sdk")
+    val declineCore = decline()
+    val declineEffect = decline("effect")
+    val declineRefined = decline("refined")
+  }
+
+
+  // Scalafix rules
+  val organizeImports = "com.github.liancheng" %% "organize-imports" % "0.5.0"
+
+  object CompilerPlugin {
+
+    val betterMonadicFor = compilerPlugin(
+      "com.olegpy" %% "better-monadic-for" % "0.3.1"
+    )
+
+    val kindProjector = compilerPlugin(
+      ("org.typelevel" % "kind-projector" % "0.13.4").cross(CrossVersion.full)
+    )
+
+    val semanticDB = compilerPlugin(
+      ("org.scalameta" % "semanticdb-scalac" % "4.14.2").cross(CrossVersion.full)
+    )
+  }
+}
