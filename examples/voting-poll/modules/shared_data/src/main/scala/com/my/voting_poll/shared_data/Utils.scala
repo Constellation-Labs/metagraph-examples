@@ -2,9 +2,9 @@ package com.my.voting_poll.shared_data
 
 import cats.Functor
 import cats.syntax.functor._
-import org.tessellation.currency.dataApplication.{L0NodeContext, L1NodeContext}
-import org.tessellation.currency.schema.currency.CurrencySnapshotInfo
-import org.tessellation.schema.SnapshotOrdinal
+import io.constellationnetwork.currency.dataApplication.{L0NodeContext, L1NodeContext}
+import io.constellationnetwork.currency.schema.currency.CurrencySnapshotInfo
+import io.constellationnetwork.schema.SnapshotOrdinal
 
 
 object Utils {

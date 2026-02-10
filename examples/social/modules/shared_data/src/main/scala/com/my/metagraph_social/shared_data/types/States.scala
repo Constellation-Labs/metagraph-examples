@@ -3,9 +3,9 @@ package com.my.metagraph_social.shared_data.types
 import com.my.metagraph_social.shared_data.types.Updates.SocialUpdate
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
-import org.tessellation.currency.dataApplication.{DataCalculatedState, DataOnChainState}
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.address.Address
+import io.constellationnetwork.currency.dataApplication.{DataCalculatedState, DataOnChainState}
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.address.Address
 
 import java.time.LocalDateTime
 

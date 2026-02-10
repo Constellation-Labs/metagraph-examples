@@ -3,7 +3,7 @@ package com.my.shared_data.lib
 import cats.effect.Sync
 import cats.implicits.toFunctorOps
 
-import org.tessellation.json.JsonSerializer
+import io.constellationnetwork.json.JsonSerializer
 
 import io.circe.jawn.JawnParser
 import io.circe.syntax.EncoderOps

@@ -7,8 +7,8 @@ import cats.syntax.validated._
 
 import scala.concurrent.duration.DurationInt
 
-import org.tessellation.currency.dataApplication.DataApplicationValidationError
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.currency.dataApplication.DataApplicationValidationError
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 
 import com.my.shared_data.schema.Updates.ModifyTask
 import com.my.shared_data.schema.{OnChain, TaskStatus}

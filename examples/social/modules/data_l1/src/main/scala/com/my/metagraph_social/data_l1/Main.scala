@@ -2,17 +2,14 @@ package com.my.metagraph_social.data_l1
 
 import cats.effect.{IO, Resource}
 import cats.syntax.all._
-import com.my.metagraph_social.shared_data.app.ApplicationConfigOps
-import com.my.metagraph_social.shared_data.calculated_state.CalculatedStateService
-import com.my.metagraph_social.shared_data.calculated_state.postgres.PostgresService
 import com.my.metagraph_social.shared_data.types.codecs.JsonBinaryCodec
-import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.l1.CurrencyL1App
-import org.tessellation.ext.cats.effect.ResourceIO
-import org.tessellation.json.JsonSerializer
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.BuildInfo
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.l1.CurrencyL1App
+import io.constellationnetwork.ext.cats.effect.ResourceIO
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
 
 import java.util.UUID
 
@@ -26,10 +23,6 @@ object Main
   ) {
   override def dataApplication: Option[Resource[IO, BaseDataApplicationL1Service[IO]]] = (for {
     implicit0(json2bin: JsonSerializer[IO]) <- JsonBinaryCodec.forSync[IO].asResource
-    config <- ApplicationConfigOps.readDefault[IO].asResource
-    dbCredentials = config.postgresDatabase
-    postgresService <- PostgresService.make[IO](dbCredentials.url, dbCredentials.user, dbCredentials.password)
-    calculatedStateService <- CalculatedStateService.make[IO](postgresService).asResource
-    l1Service <- DataL1Service.make[IO](calculatedStateService).asResource
+    l1Service <- DataL1Service.make[IO].asResource
   } yield l1Service).some
 }

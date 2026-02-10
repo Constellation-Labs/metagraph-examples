@@ -1,6 +1,6 @@
 package com.my.shared_data.schema
 
-import org.tessellation.currency.dataApplication.DataOnChainState
+import io.constellationnetwork.currency.dataApplication.DataOnChainState
 
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive

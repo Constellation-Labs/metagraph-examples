@@ -7,11 +7,11 @@ import com.my.metagraph_social.shared_data.errors.Errors.valid
 import com.my.metagraph_social.shared_data.types.States.SocialCalculatedState
 import com.my.metagraph_social.shared_data.types.Updates._
 import com.my.metagraph_social.shared_data.validations.TypeValidators._
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.json.JsonSerializer
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.security.SecurityProvider
+import io.constellationnetwork.security.hash.Hash
+import io.constellationnetwork.security.signature.Signed
 
 object Validations {
   def createPostValidationL1(
@@ -51,7 +51,7 @@ object Validations {
   ): F[DataApplicationValidationErrorOr[Unit]] = for {
     userId <- getFirstAddressFromProofs(signedUpdate.proofs)
     l1Validations = editPostValidationL1(signedUpdate.value)
-    postNotExists = validateIfPostExists(signedUpdate.postId, userId, calculatedState)
+    postNotExists = validateIfPostExists(signedUpdate.value.postId, userId, calculatedState)
   } yield l1Validations.productR(postNotExists)
 
   def deletePostValidationL0[F[_] : Async : SecurityProvider](
@@ -60,7 +60,7 @@ object Validations {
   ): F[DataApplicationValidationErrorOr[Unit]] = for {
     userId <- getFirstAddressFromProofs(signedUpdate.proofs)
     l1Validations = deletePostValidationL1(signedUpdate.value)
-    postNotExists = validateIfPostExists(signedUpdate.postId, userId, calculatedState)
+    postNotExists = validateIfPostExists(signedUpdate.value.postId, userId, calculatedState)
   } yield l1Validations.productR(postNotExists)
 
   def subscriptionValidationL0[F[_] : Async : SecurityProvider](

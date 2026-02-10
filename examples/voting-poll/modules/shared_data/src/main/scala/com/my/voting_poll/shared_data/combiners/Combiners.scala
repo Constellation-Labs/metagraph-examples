@@ -3,9 +3,9 @@ package com.my.voting_poll.shared_data.combiners
 import com.my.voting_poll.shared_data.serializers.Serializers
 import com.my.voting_poll.shared_data.types.Types._
 import monocle.Monocle.toAppliedFocusOps
-import org.tessellation.currency.dataApplication.DataState
-import org.tessellation.currency.schema.currency.CurrencySnapshotInfo
-import org.tessellation.security.hash.Hash
+import io.constellationnetwork.currency.dataApplication.DataState
+import io.constellationnetwork.currency.schema.currency.CurrencySnapshotInfo
+import io.constellationnetwork.security.hash.Hash
 
 object Combiners {
   def combineCreatePoll(createPoll: CreatePoll, state: DataState[VoteStateOnChain, VoteCalculatedState]): DataState[VoteStateOnChain, VoteCalculatedState] = {

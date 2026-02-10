@@ -5,17 +5,17 @@ import cats.data.NonEmptyList
 import cats.effect.Async
 import cats.syntax.all._
 
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.dataApplication.dataApplication.{
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.dataApplication.dataApplication.{
   DataApplicationBlock,
   DataApplicationValidationErrorOr
 }
-import org.tessellation.currency.schema.currency.CurrencyIncrementalSnapshot
-import org.tessellation.json.JsonSerializer
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.Signed
-import org.tessellation.security.{Hashed, Hasher, SecurityProvider}
+import io.constellationnetwork.currency.schema.currency.CurrencyIncrementalSnapshot
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.security.hash.Hash
+import io.constellationnetwork.security.signature.Signed
+import io.constellationnetwork.security.{Hashed, Hasher, SecurityProvider}
 
 import com.my.metagraph_l0.ML0NodeContext.syntax.dataStateOps
 import com.my.shared_data.lib.CirceOps.implicits._
@@ -114,10 +114,6 @@ object ML0Service {
           updates: NonEmptyList[Signed[TodoUpdate]]
         )(implicit context: L0NodeContext[F]): F[DataApplicationValidationErrorOr[Unit]] =
           state.verify(updates)(validator)
-
-        override def validateUpdate(update: TodoUpdate)(implicit
-          context: L0NodeContext[F]
-        ): F[DataApplicationValidationErrorOr[Unit]] = ().validNec.pure[F]
 
         override def combine(
           state:   DataState[OnChain, CalculatedState],

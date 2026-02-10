@@ -12,20 +12,20 @@ import com.my.water_and_energy_usage.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.{EntityDecoder, HttpRoutes}
-import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.l0.CurrencyL0App
-import org.tessellation.currency.schema.currency.{CurrencyIncrementalSnapshot, CurrencySnapshotStateProof}
-import org.tessellation.ext.cats.effect.ResourceIO
-import org.tessellation.node.shared.domain.rewards.Rewards
-import org.tessellation.node.shared.snapshot.currency.CurrencySnapshotEvent
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.BuildInfo
+import io.constellationnetwork.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.l0.CurrencyL0App
+import io.constellationnetwork.currency.schema.currency.{CurrencyIncrementalSnapshot, CurrencySnapshotStateProof}
+import io.constellationnetwork.ext.cats.effect.ResourceIO
+import io.constellationnetwork.node.shared.domain.rewards.Rewards
+import io.constellationnetwork.node.shared.snapshot.currency.CurrencySnapshotEvent
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.security.SecurityProvider
+import io.constellationnetwork.security.hash.Hash
+import io.constellationnetwork.security.signature.Signed
 
 import java.util.UUID
 
@@ -45,11 +45,6 @@ object Main
       new DataApplicationL0Service[IO, UsageUpdate, UsageUpdateState, UsageUpdateCalculatedState] {
         override def genesis: DataState[UsageUpdateState, UsageUpdateCalculatedState] =
           DataState(UsageUpdateState(List.empty), UsageUpdateCalculatedState(Map.empty))
-
-        override def validateUpdate(
-          update: UsageUpdate
-        )(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] =
-          ().validNec.pure[IO]
 
         override def validateData(
           state  : DataState[UsageUpdateState, UsageUpdateCalculatedState],

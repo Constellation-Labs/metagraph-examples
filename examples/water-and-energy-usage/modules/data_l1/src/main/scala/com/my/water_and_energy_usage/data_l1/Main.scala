@@ -1,26 +1,22 @@
 package com.my.water_and_energy_usage.data_l1
 
-import cats.data.NonEmptyList
 import cats.effect.{IO, Resource}
 import cats.syntax.all._
 import com.my.water_and_energy_usage.shared_data.LifecycleSharedFunctions
-import com.my.water_and_energy_usage.shared_data.calculated_state.CalculatedStateService
 import com.my.water_and_energy_usage.shared_data.deserializers.Deserializers
 import com.my.water_and_energy_usage.shared_data.serializers.Serializers
 import com.my.water_and_energy_usage.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
 import org.http4s.{EntityDecoder, _}
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
-import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
-import org.tessellation.currency.l1.CurrencyL1App
-import org.tessellation.ext.cats.effect.ResourceIO
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.BuildInfo
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
+import io.constellationnetwork.currency.l1.CurrencyL1App
+import io.constellationnetwork.ext.cats.effect.ResourceIO
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.security.signature.Signed
 
 import java.util.UUID
 
@@ -32,26 +28,12 @@ object Main extends CurrencyL1App(
   tessellationVersion = TessellationVersion.unsafeFrom(BuildInfo.version)
 ) {
 
-  private def makeBaseDataApplicationL1Service(
-    calculatedStateService: CalculatedStateService[IO]
-  ): BaseDataApplicationL1Service[IO] = BaseDataApplicationL1Service(
+  private def makeBaseDataApplicationL1Service: BaseDataApplicationL1Service[IO] = BaseDataApplicationL1Service(
     new DataApplicationL1Service[IO, UsageUpdate, UsageUpdateState, UsageUpdateCalculatedState] {
-      override def validateData(
-        state  : DataState[UsageUpdateState, UsageUpdateCalculatedState],
-        updates: NonEmptyList[Signed[UsageUpdate]]
-      )(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] =
-        ().validNec.pure[IO]
-
       override def validateUpdate(
         update: UsageUpdate
       )(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] =
         LifecycleSharedFunctions.validateUpdate[IO](update)
-
-      override def combine(
-        state  : DataState[UsageUpdateState, UsageUpdateCalculatedState],
-        updates: List[Signed[UsageUpdate]]
-      )(implicit context: L1NodeContext[IO]): IO[DataState[UsageUpdateState, UsageUpdateCalculatedState]] =
-        state.pure[IO]
 
       override def routes(implicit context: L1NodeContext[IO]): HttpRoutes[IO] =
         HttpRoutes.empty
@@ -101,20 +83,6 @@ object Main extends CurrencyL1App(
       ): IO[Either[Throwable, UsageUpdate]] =
         IO(Deserializers.deserializeUpdate(bytes))
 
-      override def getCalculatedState(implicit context: L1NodeContext[IO]): IO[(SnapshotOrdinal, UsageUpdateCalculatedState)] =
-        calculatedStateService.getCalculatedState.map(calculatedState => (calculatedState.ordinal, calculatedState.state))
-
-      override def setCalculatedState(
-        ordinal: SnapshotOrdinal,
-        state  : UsageUpdateCalculatedState
-      )(implicit context: L1NodeContext[IO]): IO[Boolean] =
-        calculatedStateService.setCalculatedState(ordinal, state)
-
-      override def hashCalculatedState(
-        state: UsageUpdateCalculatedState
-      )(implicit context: L1NodeContext[IO]): IO[Hash] =
-        calculatedStateService.hashCalculatedState(state)
-
       override def serializeCalculatedState(
         state: UsageUpdateCalculatedState
       ): IO[Array[Byte]] =
@@ -127,12 +95,8 @@ object Main extends CurrencyL1App(
     }
   )
 
-  private def makeL1Service: IO[BaseDataApplicationL1Service[IO]] = {
-    for {
-      calculatedStateService <- CalculatedStateService.make[IO]
-      dataApplicationL1Service = makeBaseDataApplicationL1Service(calculatedStateService)
-    } yield dataApplicationL1Service
-  }
+  private def makeL1Service: IO[BaseDataApplicationL1Service[IO]] =
+    makeBaseDataApplicationL1Service.pure[IO]
 
   override def dataApplication: Option[Resource[IO, BaseDataApplicationL1Service[IO]]] =
     makeL1Service.asResource.some

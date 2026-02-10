@@ -4,11 +4,11 @@ import cats.Monad
 import cats.data.EitherT
 import cats.implicits.{toBifunctorOps, toFunctorOps, toTraverseOps}
 
-import org.tessellation.currency.dataApplication.{DataApplicationValidationError, L1NodeContext}
-import org.tessellation.currency.schema.currency.CurrencyIncrementalSnapshot
-import org.tessellation.json.JsonSerializer
-import org.tessellation.schema.GlobalIncrementalSnapshot
-import org.tessellation.security.Hashed
+import io.constellationnetwork.currency.dataApplication.{DataApplicationValidationError, L1NodeContext}
+import io.constellationnetwork.currency.schema.currency.CurrencyIncrementalSnapshot
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.schema.GlobalIncrementalSnapshot
+import io.constellationnetwork.security.Hashed
 
 import com.my.shared_data.lib.JsonBinaryCodec
 import com.my.shared_data.schema.OnChain

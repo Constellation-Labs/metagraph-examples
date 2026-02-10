@@ -4,7 +4,7 @@ import cats.data.NonEmptyList
 import cats.effect.Async
 import cats.implicits.toFunctorOps
 
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 
 import com.my.shared_data.lib.UpdateValidator
 

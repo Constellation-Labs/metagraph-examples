@@ -1,8 +1,8 @@
 package com.my.water_and_energy_usage.shared_data.errors
 
 import cats.syntax.all._
-import org.tessellation.currency.dataApplication.DataApplicationValidationError
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.currency.dataApplication.DataApplicationValidationError
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
 
 object Errors {
   type DataApplicationValidationType = DataApplicationValidationErrorOr[Unit]

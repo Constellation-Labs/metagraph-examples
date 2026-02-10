@@ -4,10 +4,10 @@ import com.my.water_and_energy_usage.shared_data.Utils.getUsageUpdateHash
 import com.my.water_and_energy_usage.shared_data.types.Types._
 import eu.timepit.refined.types.numeric.NonNegLong
 import monocle.Monocle.toAppliedFocusOps
-import org.tessellation.currency.dataApplication.DataState
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.address.Address
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.currency.dataApplication.DataState
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.address.Address
+import io.constellationnetwork.security.signature.Signed
 
 object Combiners {
   private def getUsageUpdateType(

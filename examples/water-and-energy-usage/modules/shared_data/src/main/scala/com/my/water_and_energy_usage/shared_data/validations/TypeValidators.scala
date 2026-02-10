@@ -2,8 +2,8 @@ package com.my.water_and_energy_usage.shared_data.validations
 
 import com.my.water_and_energy_usage.shared_data.errors.Errors._
 import com.my.water_and_energy_usage.shared_data.types.Types._
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.schema.address.Address
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.schema.address.Address
 
 object TypeValidators {
   def validateEnergyUsageUpdate(energy: EnergyUsage): DataApplicationValidationErrorOr[Unit] =

@@ -9,11 +9,11 @@ import com.my.metagraph_social.shared_data.types.States.{SocialCalculatedState, 
 import com.my.metagraph_social.shared_data.types.Updates._
 import com.my.metagraph_social.shared_data.validations.Validations._
 import eu.timepit.refined.types.numeric.NonNegLong
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.currency.dataApplication.{DataState, L0NodeContext}
-import org.tessellation.json.JsonSerializer
-import org.tessellation.security.SecurityProvider
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.currency.dataApplication.{DataState, L0NodeContext}
+import io.constellationnetwork.json.JsonSerializer
+import io.constellationnetwork.security.SecurityProvider
+import io.constellationnetwork.security.signature.Signed
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 

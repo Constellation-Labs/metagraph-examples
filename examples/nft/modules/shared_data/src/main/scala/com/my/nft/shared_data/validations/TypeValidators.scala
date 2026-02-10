@@ -4,10 +4,10 @@ import com.my.nft.shared_data.Utils.isValidURL
 import com.my.nft.shared_data.errors.Errors._
 import com.my.nft.shared_data.serializers.Serializers
 import com.my.nft.shared_data.types.Types._
-import org.tessellation.currency.dataApplication.DataState
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.schema.address.Address
-import org.tessellation.security.hash.Hash
+import io.constellationnetwork.currency.dataApplication.DataState
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.schema.address.Address
+import io.constellationnetwork.security.hash.Hash
 
 object TypeValidators {
   private def getCollectionById(

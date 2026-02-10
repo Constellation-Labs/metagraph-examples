@@ -13,16 +13,16 @@ import com.my.nft.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
 import org.http4s._
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
-import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.dataApplication.dataApplication._
-import org.tessellation.currency.l1.CurrencyL1App
-import org.tessellation.ext.cats.effect.ResourceIO
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.BuildInfo
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.dataApplication.dataApplication._
+import io.constellationnetwork.currency.l1.CurrencyL1App
+import io.constellationnetwork.ext.cats.effect.ResourceIO
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.security.hash.Hash
+import io.constellationnetwork.security.signature.Signed
 
 import java.util.UUID
 
@@ -37,22 +37,11 @@ object Main
   private def makeBaseDataApplicationL1Service(
     calculatedStateService: CalculatedStateService[IO]
   ): BaseDataApplicationL1Service[IO] = BaseDataApplicationL1Service(new DataApplicationL1Service[IO, NFTUpdate, NFTUpdatesState, NFTUpdatesCalculatedState] {
-    override def validateData(
-      state  : DataState[NFTUpdatesState, NFTUpdatesCalculatedState],
-      updates: NonEmptyList[Signed[NFTUpdate]]
-    )(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] =
-      valid.pure[IO]
 
     override def validateUpdate(
       update: NFTUpdate
     )(implicit context: L1NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] =
       LifecycleSharedFunctions.validateUpdate[IO](update)
-
-    override def combine(
-      state  : DataState[NFTUpdatesState, NFTUpdatesCalculatedState],
-      updates: List[Signed[NFTUpdate]]
-    )(implicit context: L1NodeContext[IO]): IO[DataState[NFTUpdatesState, NFTUpdatesCalculatedState]] =
-      state.pure[IO]
 
     override def serializeState(
       state: NFTUpdatesState
@@ -101,20 +90,6 @@ object Main
 
     override def signedDataEntityDecoder: EntityDecoder[IO, Signed[NFTUpdate]] =
       circeEntityDecoder
-
-    override def getCalculatedState(implicit context: L1NodeContext[IO]): IO[(SnapshotOrdinal, NFTUpdatesCalculatedState)] =
-      calculatedStateService.getCalculatedState.map(calculatedState => (calculatedState.ordinal, calculatedState.state))
-
-    override def setCalculatedState(
-      ordinal: SnapshotOrdinal,
-      state  : NFTUpdatesCalculatedState
-    )(implicit context: L1NodeContext[IO]): IO[Boolean] =
-      calculatedStateService.setCalculatedState(ordinal, state)
-
-    override def hashCalculatedState(
-      state: NFTUpdatesCalculatedState
-    )(implicit context: L1NodeContext[IO]): IO[Hash] =
-      calculatedStateService.hashCalculatedState(state)
 
     override def serializeCalculatedState(
       state: NFTUpdatesCalculatedState

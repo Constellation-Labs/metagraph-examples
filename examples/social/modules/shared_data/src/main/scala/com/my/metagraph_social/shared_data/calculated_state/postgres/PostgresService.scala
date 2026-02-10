@@ -8,7 +8,7 @@ import doobie.hikari.HikariTransactor
 import doobie.implicits._
 import io.circe.parser._
 import io.circe.syntax._
-import org.tessellation.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.SnapshotOrdinal
 
 import scala.concurrent.ExecutionContext
 

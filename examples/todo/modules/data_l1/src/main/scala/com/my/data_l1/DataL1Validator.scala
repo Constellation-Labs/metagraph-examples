@@ -5,9 +5,9 @@ import cats.implicits.{toFlatMapOps, toFoldableOps, toFunctorOps}
 import cats.syntax.applicative._
 import cats.syntax.validated._
 
-import org.tessellation.currency.dataApplication.DataApplicationValidationError
-import org.tessellation.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
-import org.tessellation.security.Hasher
+import io.constellationnetwork.currency.dataApplication.DataApplicationValidationError
+import io.constellationnetwork.currency.dataApplication.dataApplication.DataApplicationValidationErrorOr
+import io.constellationnetwork.security.Hasher
 
 import com.my.shared_data.lib.UpdateValidator
 import com.my.shared_data.lifecycle.ValidatorRules

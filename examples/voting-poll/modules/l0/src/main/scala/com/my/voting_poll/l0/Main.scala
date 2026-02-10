@@ -2,9 +2,7 @@ package com.my.voting_poll.l0
 
 import cats.data.NonEmptyList
 import cats.effect.{IO, Resource}
-import cats.syntax.applicative._
 import cats.syntax.option.catsSyntaxOptionId
-import cats.syntax.validated._
 import com.my.voting_poll.l0.custom_routes.CustomRoutes
 import com.my.voting_poll.shared_data.LifecycleSharedFunctions
 import com.my.voting_poll.shared_data.calculated_state.CalculatedStateService
@@ -14,16 +12,16 @@ import com.my.voting_poll.shared_data.types.Types._
 import io.circe.{Decoder, Encoder}
 import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
 import org.http4s.{EntityDecoder, HttpRoutes}
-import org.tessellation.BuildInfo
-import org.tessellation.currency.dataApplication._
-import org.tessellation.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
-import org.tessellation.currency.l0.CurrencyL0App
-import org.tessellation.ext.cats.effect.ResourceIO
-import org.tessellation.schema.SnapshotOrdinal
-import org.tessellation.schema.cluster.ClusterId
-import org.tessellation.schema.semver.{MetagraphVersion, TessellationVersion}
-import org.tessellation.security.hash.Hash
-import org.tessellation.security.signature.Signed
+import io.constellationnetwork.BuildInfo
+import io.constellationnetwork.currency.dataApplication._
+import io.constellationnetwork.currency.dataApplication.dataApplication.{DataApplicationBlock, DataApplicationValidationErrorOr}
+import io.constellationnetwork.currency.l0.CurrencyL0App
+import io.constellationnetwork.ext.cats.effect.ResourceIO
+import io.constellationnetwork.schema.SnapshotOrdinal
+import io.constellationnetwork.schema.cluster.ClusterId
+import io.constellationnetwork.schema.semver.{MetagraphVersion, TessellationVersion}
+import io.constellationnetwork.security.hash.Hash
+import io.constellationnetwork.security.signature.Signed
 
 import java.util.UUID
 
@@ -40,8 +38,6 @@ object Main extends CurrencyL0App(
   ): BaseDataApplicationL0Service[IO] =
     BaseDataApplicationL0Service(new DataApplicationL0Service[IO, PollUpdate, VoteStateOnChain, VoteCalculatedState] {
       override def genesis: DataState[VoteStateOnChain, VoteCalculatedState] = DataState(VoteStateOnChain(List.empty), VoteCalculatedState(Map.empty))
-
-      override def validateUpdate(update: PollUpdate)(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = ().validNec.pure[IO]
 
       override def validateData(state: DataState[VoteStateOnChain, VoteCalculatedState], updates: NonEmptyList[Signed[PollUpdate]])(implicit context: L0NodeContext[IO]): IO[DataApplicationValidationErrorOr[Unit]] = LifecycleSharedFunctions.validateData[IO](state, updates)
 
