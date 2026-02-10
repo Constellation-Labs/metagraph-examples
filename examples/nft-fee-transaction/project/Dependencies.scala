@@ -15,9 +15,8 @@ object Dependencies {
     } % V.decline
 
   object Libraries {
-    val tessellationNodeShared = tessellation("node-shared")
-    val tessellationCurrencyL0 = tessellation("currency-l0")
-    val tessellationCurrencyL1 = tessellation("currency-l1")
+    // Use SDK as a single dependency that includes all modules
+    val tessellationSdk = tessellation("sdk")
     val declineCore = decline()
     val declineEffect = decline("effect")
     val declineRefined = decline("refined")
@@ -34,11 +33,11 @@ object Dependencies {
     )
 
     val kindProjector = compilerPlugin(
-      ("org.typelevel" % "kind-projector" % "0.13.2").cross(CrossVersion.full)
+      ("org.typelevel" % "kind-projector" % "0.13.4").cross(CrossVersion.full)
     )
 
     val semanticDB = compilerPlugin(
-      ("org.scalameta" % "semanticdb-scalac" % "4.7.1").cross(CrossVersion.full)
+      ("org.scalameta" % "semanticdb-scalac" % "4.14.2").cross(CrossVersion.full)
     )
   }
 }
