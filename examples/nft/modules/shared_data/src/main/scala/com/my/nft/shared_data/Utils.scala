@@ -8,12 +8,12 @@ import io.constellationnetwork.schema.address.Address
 import io.constellationnetwork.security.SecurityProvider
 import io.constellationnetwork.security.signature.signature.SignatureProof
 
-import java.net.URL
+import java.net.URI
 import scala.util.Try
 
 object Utils {
   def isValidURL(url: String): Boolean =
-    Try(new URL(url).toURI).isSuccess
+    Try(URI.create(url).toURL).isSuccess
 
   def getAllAddressesFromProofs[F[_] : Async : SecurityProvider](
     proofs: NonEmptySet[SignatureProof]
