@@ -3,7 +3,7 @@ import sbt.*
 object Dependencies {
 
   object V {
-    val tessellation = "3.5.0-rc.0"
+    val tessellation = "4.0.0-rc.10"
     val decline = "2.4.1"
   }
 
@@ -32,11 +32,11 @@ object Dependencies {
     )
 
     val kindProjector = compilerPlugin(
-      ("org.typelevel" % "kind-projector" % "0.13.2").cross(CrossVersion.full)
+      ("org.typelevel" % "kind-projector" % "0.13.4").cross(CrossVersion.full)
     )
 
     val semanticDB = compilerPlugin(
-      ("org.scalameta" % "semanticdb-scalac" % "4.7.1").cross(CrossVersion.full)
+      ("org.scalameta" % "semanticdb-scalac" % "4.14.2").cross(CrossVersion.full)
     )
   }
 }
